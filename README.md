@@ -1,3 +1,3 @@
 # appbee
 
-REST, GraphQL and Socket.io API agnostic Backend Engine
+**`appbee`** is a REST, GraphQL and Socket.io API agnostic Backend Engine
