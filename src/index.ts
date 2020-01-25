@@ -112,7 +112,6 @@ const startCluster = async (base: string) => {
 
 		const shutdown = () => {
 				console.log("Shutting down...");
-				// const ids: string[] = Object.keys(cluster.workers);
 				const goDown = (wk?: cluster.Worker) => {
 					wk?.disconnect();
 					if (workers.length) {
@@ -129,7 +128,6 @@ const startCluster = async (base: string) => {
 			},
 			restart = () => {
 				console.log("Reloading...");
-				//   console.log(`Total workers in cluster before reload: ${workers.length}`);
 
 				for (let i = 0; i < workers.length; ++i) {
 					const next = workers[i];
