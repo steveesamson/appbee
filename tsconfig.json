@@ -1,12 +1,13 @@
 {
-  "compilerOptions": {
-    "declaration": true,
-    "module": "commonjs",
-    "noImplicitAny": true,
-    "target": "es5",
-    "strict": true,
-    "outDir": "dist"
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"declaration": true,
+		"declarationDir": "./dist",
+		"module": "esnext",
+		"noImplicitAny": true,
+		"outDir": "./dist",
+		"target": "es5",
+		"esModuleInterop": true
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }

@@ -1,2 +1,195 @@
-const greet = (name?: string): string => `Hello ${name || "world"}`;
-export default greet;
+import os from "os";
+import cluster, { Cluster } from "cluster";
+import net from "net";
+import sioRedis from "socket.io-redis";
+import * as utils from "./common/utils/index";
+import createServer from "./server/index";
+import { Models } from "./common/utils/storeModels";
+const farmhash: any = require("farmhash");
+
+const numCPUs = os.cpus().length;
+
+import { Response, NextFunction } from "express";
+import { Route } from "./rest/route";
+import {
+	Request,
+	Record,
+	Params,
+	Model,
+	DBConfig,
+	StoreConfig,
+	AppConfig,
+	ViewConfig,
+	LdapConfig,
+	CronConfig,
+	PolicyConfig,
+	MiddlewareConfig,
+} from "./common/types";
+
+const startCluster = async (base: string) => {
+	if (cluster.isMaster) {
+		console.log(`Master ${process.pid} is running`);
+
+		let watchesStarted = false;
+		const workers: cluster.Worker[] = [],
+			startWatches = () => {
+				watchesStarted = true;
+				const { cronMaster, mailMaster, mailer, cdc, configuration, modules } = utils;
+				const { store, smtp } = configuration;
+				const { crons } = modules;
+
+				Object.keys(store).forEach(k => {
+					const db = store[k];
+					if (db.cdc) {
+						const ChangeDataCapture = cdc(k);
+						ChangeDataCapture.start();
+					}
+
+					if (db.maillog) {
+						const Mler = mailer(smtp),
+							MailSender = mailMaster(k, Mler);
+						MailSender.start();
+					}
+				});
+
+				cronMaster.init(crons);
+			};
+
+		cluster
+			.on("fork", (worker: cluster.Worker) => {
+				workers.push(worker);
+				console.log(`worker ${worker.process.pid} created successfully!`);
+			})
+			.on("listening", (worker: cluster.Worker, address: cluster.Address) => {
+				//Start watch here
+				if (!watchesStarted) {
+					startWatches();
+				}
+			})
+			.on("exit", (worker: cluster.Worker, code: number, signal: string) => {
+				console.log(`worker ${worker.process.pid} died from code:${code}, signal:${signal}`);
+				if (worker.exitedAfterDisconnect === false) {
+					console.log("Respawning suicided worker");
+					cluster.fork();
+				}
+			});
+
+		// Fork workers.
+		for (let i = 0; i < numCPUs; i++) {
+			cluster.fork();
+		}
+
+		// Helper function for getting a worker index based on IP address.
+		// This is a hot path so it should be really fast. The way it works
+		// is by converting the IP address to a number by removing non numeric
+		// characters, then compressing it to the number of slots we have.
+		//
+		// Compared against "real" hashing (from the sticky-session code) and
+		// "real" IP number conversion, this function is on par in terms of
+		// worker index distribution only much faster.
+		const workerIndex = function(ip: any, len: number) {
+			return farmhash.fingerprint32(ip) % len; // Farmhash is the fastest and works with IPv6, too
+		};
+
+		// Create the outside facing server listening on our port.
+		const server = net
+			.createServer(
+				{
+					pauseOnConnect: true,
+				},
+				connection => {
+					// We received a connection and need to pass it to the appropriate
+					// worker. Get the worker for this connection's source IP and pass
+					// it the connection.
+					const worker = workers[workerIndex(connection.remoteAddress, numCPUs)];
+
+					worker.send("sticky-session:connection", connection);
+				},
+			)
+			.listen(utils.configuration.application.port, () => {
+				console.log(`Server started on localhost:${utils.configuration.application.port}...`);
+			});
+
+		const shutdown = () => {
+				console.log("Shutting down...");
+				// const ids: string[] = Object.keys(cluster.workers);
+				const goDown = (wk?: cluster.Worker) => {
+					wk?.disconnect();
+					if (workers.length) {
+						setTimeout(() => goDown(workers.shift()), 3000);
+					} else {
+						console.log("Closing db and pipes...");
+						setTimeout(() => {
+							server.close();
+							process.exit(0);
+						}, 3000);
+					}
+				};
+				goDown(workers.shift());
+			},
+			restart = () => {
+				console.log("Reloading...");
+				//   console.log(`Total workers in cluster before reload: ${workers.length}`);
+
+				for (let i = 0; i < workers.length; ++i) {
+					const next = workers[i];
+					next.on("disconnect", () => {
+						console.log(`worker ${next.process.pid} shut down is complete.`);
+						workers.splice(i, 1);
+						cluster.fork();
+					});
+					next.disconnect();
+				}
+			};
+
+		//SIGINT/SIGTERM/SIGKILL
+		//SIGUSR2/SIGHUP
+		process.on("SIGHUP", restart);
+		process.on("SIGUSR2", restart);
+		process.on("SIGINT", shutdown);
+		process.on("SIGTERM", shutdown);
+	} else {
+		const app = await createServer(base);
+
+		// Tell Socket.IO to use the redis adapter. By default, the redis
+		// server is assumed to be on localhost:6379. You don't have to
+		// specify them explicitly unless you want to change them.
+		//(app as any).io.adapter(sioRedis({ host: "localhost", port: 6379 }));
+
+		// Here you might use Socket.IO middleware for authorization etc.
+
+		// Listen to messages sent from the master. Ignore everything else.
+		process.on("message", function(message, connection) {
+			if (typeof message === "string") {
+				if (message === "sticky-session:connection") {
+					// Emulate a connection event on the server by emitting the
+					// event with the connection the master sent us.
+					(app as any).server.emit("connection", connection);
+					connection.resume();
+				}
+			}
+		});
+	}
+};
+
+export {
+	createServer as startDevServer,
+	startCluster,
+	Models,
+	utils,
+	Route,
+	Request,
+	Record,
+	Params,
+	Model,
+	DBConfig,
+	StoreConfig,
+	AppConfig,
+	ViewConfig,
+	LdapConfig,
+	CronConfig,
+	PolicyConfig,
+	MiddlewareConfig,
+	Response,
+	NextFunction,
+};

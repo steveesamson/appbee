@@ -1,81 +1,106 @@
 {
-  "name": "appbee",
-  "version": "1.0.0",
-  "description": "appbee is a REST, GraphQL and Socket.io API agnostic Backend Engine",
-  "files": [
-    "dist"
-  ],
-  "main": "dist/index.js",
-  "types": "dist",
-  "scripts": {
-    "prestart": "yarn build",
-    "dev": "tsc -w",
-    "prebuild": "rimraf dist",
-    "build": "tsc",
-    "test": "jest --passWithNoTests",
-    "test:coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
-    "lint": "prettier-eslint '**/*.ts' --write",
-    "prepublishOnly": "yarn build",
-    "preversion": "yarn test && yarn lint",
-    "version": "git add -A .",
-    "postversion": "git push && git push --tags"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "npm run lint",
-      "git add"
-    ]
-  },
-  "keywords": [
-    "graphql",
-    "rest",
-    "express",
-    "apollo",
-    "nodejs",
-    "javascript",
-    "typescript"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/steveesamson/appbee.git"
-  },
-  "author": {
-    "name": "Steve S. Samson",
-    "email": "stevee.samson@gmail.com"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/steveesamson/appbee/blob/master/MIT-License.txt"
-    }
-  ],
-  "readmeFilename": "README.md",
-  "bugs": {
-    "url": "https://github.com/steveesamson/appbee/issues"
-  },
-  "devDependencies": {
-    "@types/jest": "^24.0.22",
-    "@types/node": "^12.12.14",
-    "@typescript-eslint/eslint-plugin": "^2.6.1",
-    "@typescript-eslint/parser": "^2.6.1",
-    "coveralls": "^3.0.7",
-    "dotenv": "^8.2.0",
-    "eslint": "^5.1.0",
-    "eslint-config-prettier": "^6.5.0",
-    "eslint-plugin-import": "^2.18.2",
-    "husky": "^3.0.9",
-    "jest": "^24.9.0",
-    "lint-staged": "^9.4.2",
-    "prettier": "^1.19.1",
-    "prettier-eslint-cli": "^5.0.0",
-    "rimraf": "^3.0.0",
-    "ts-jest": "^24.1.0",
-    "typescript": "^3.7.2"
-  },
-  "dependencies": {}
+	"name": "appbee",
+	"version": "1.0.0",
+	"description": "appbee(Application Back-End Engine) is a REST, GraphQL and Socket.io API Backend Engine",
+	"files": [
+		"dist"
+	],
+	"main": "dist/cjs/index.js",
+	"module": "dist/esm/index.js",
+	"scripts": {
+		"test": "NODE_ENV=development TS_NODE_FILES=true jest --passWithNoTests",
+		"test:coverage": "NODE_ENV=development TS_NODE_FILES=true jest --coverage",
+		"prebuild": "rimraf dist",
+		"predev": "rimraf dist",
+		"lint": "prettier-eslint 'src/**/*.ts' --write",
+		"build": "NODE_ENV=production rollup -c",
+		"prepublishOnly": "npm run build",
+		"preversion": "npm test && npm run lint",
+		"version": "git add -A .",
+		"postversion": "git push && git push --tags",
+		"dev": "rollup -c --watch"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{ts,tsx}": [
+			"npm run lint",
+			"git add"
+		]
+	},
+	"dependencies": {
+		"apollo-server-express": "^2.9.14",
+		"bcryptjs": "^2.4.3",
+		"busboy": "^0.3.1",
+		"compression": "^1.7.4",
+		"cookie-parser": "^1.4.4",
+		"cors": "^2.8.5",
+		"errorhandler": "^1.5.1",
+		"express": "^4.17.1",
+		"farmhash": "^3.0.0",
+		"gm": "^1.23.1",
+		"graphql": "^14.5.8",
+		"graphql-tag": "^2.10.1",
+		"helmet": "^3.21.2",
+		"jsonwebtoken": "^8.5.1",
+		"knex": "^0.20.4",
+		"lodash": "^4.17.15",
+		"method-override": "^3.0.0",
+		"node-cron": "^2.0.3",
+		"nodemailer": "^6.4.2",
+		"nodemailer-smtp-pool": "^2.8.3",
+		"path-to-regexp": "^6.1.0",
+		"shortid": "^2.2.15",
+		"socket.io": "^2.3.0",
+		"socket.io-cookie": "^0.0.1",
+		"socket.io-redis": "^5.2.0",
+		"stud": "^1.1.2",
+		"svg-captcha": "^1.4.0"
+	},
+	"devDependencies": {
+		"@types/bcryptjs": "^2.4.2",
+		"@types/busboy": "^0.2.3",
+		"@types/compression": "^1.0.1",
+		"@types/cookie-parser": "^1.4.2",
+		"@types/errorhandler": "^0.0.32",
+		"@types/express": "^4.17.2",
+		"@types/gm": "^1.18.6",
+		"@types/helmet": "^0.0.45",
+		"@types/jsonwebtoken": "^8.3.5",
+		"@types/lodash": "^4.14.149",
+		"@types/method-override": "^0.0.31",
+		"@types/node": "^12.12.14",
+		"@types/node-cron": "^2.0.2",
+		"@types/nodemailer": "^6.4.0",
+		"@types/nodemailer-smtp-pool": "^1.0.31",
+		"@types/path-to-regexp": "^1.7.0",
+		"@types/shortid": "^0.0.29",
+		"@types/socket.io": "^2.1.4",
+		"@types/socket.io-client": "^1.4.32",
+		"@types/socket.io-redis": "^1.0.25",
+		"@rollup/plugin-commonjs": "^11.0.1",
+		"@rollup/plugin-json": "^4.0.1",
+		"@rollup/plugin-node-resolve": "^7.0.0",
+		"@types/jest": "^24.0.22",
+		"@typescript-eslint/eslint-plugin": "^2.6.1",
+		"@typescript-eslint/parser": "^2.6.1",
+		"coveralls": "^3.0.7",
+		"eslint": "^5.1.0",
+		"eslint-config-prettier": "^6.5.0",
+		"eslint-plugin-import": "^2.18.2",
+		"husky": "^3.0.9",
+		"jest": "^24.9.0",
+		"lint-staged": "^9.4.2",
+		"prettier": "^1.19.1",
+		"prettier-eslint-cli": "^5.0.0",
+		"rimraf": "^3.0.0",
+		"rollup": "^1.26.5",
+		"rollup-plugin-terser": "^5.1.2",
+		"rollup-plugin-typescript2": "^0.25.2",
+		"ts-jest": "^24.1.0",
+		"typescript": "^3.7.2"
+	}
 }

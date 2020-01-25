@@ -6,9 +6,14 @@ coverage
 .travis.yml
 .gitignore
 .npmignore
+.prettierignore
+.prettierrc
 jest.config.js
-preInstall.js
+jest.setup.ts
 .tsconfig.json
+
+yarn-error.log
+yarn.lock
 
 #linters
 .eslintrc*
@@ -17,3 +22,5 @@ preInstall.js
 .editor.config
 .vscode
 .env
+
+src
