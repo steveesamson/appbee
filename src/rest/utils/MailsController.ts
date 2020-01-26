@@ -1,2 +1,2 @@
 import { Route } from "../route";
-Route("Mails", "/mails");
+export default () => Route("Mails", "/mails");

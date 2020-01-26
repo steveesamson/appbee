@@ -1,2 +1,2 @@
 import { Route } from "../route";
-Route("Redo", "/redo");
+export default () => Route("Redo", "/redo");

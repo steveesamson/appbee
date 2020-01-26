@@ -6,6 +6,8 @@ import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Conf
 import { routes } from "../../rest/route";
 import baseREST from "../../rest/restful";
 import { NextFunction, Response } from "express";
+import mailController from "../../rest/utils/MailsController";
+import redoController from "../../rest/utils/RedoController";
 
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 
@@ -85,8 +87,8 @@ const loadControllers = async (base: string, config: Configuration): Promise<Rou
 	for (let i = 0; i < list.length; ++i) {
 		await import(path.resolve(base, list[i]));
 	}
-	await import("../../rest/utils/MailsController");
-	await import("../../rest/utils/RedoController");
+	mailController();
+	redoController();
 
 	for (const key in routes) {
 		const route = routes[key],
