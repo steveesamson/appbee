@@ -1,5 +1,5 @@
-import { Response } from "express";
-import { RouteConfig, Request } from "../common/types";
+import { Response, Request } from "express";
+import { RouteConfig } from "../common/types";
 import raa from "../common/utils/handleAsyncAwait";
 import { Models } from "../common/utils/storeModels";
 

@@ -1,5 +1,4 @@
-import { Request } from "../common/types";
-import { NextFunction, Response } from "express";
+import { NextFunction, Response, Request } from "express";
 import { DataSources } from "../common/utils/configurer";
 
 const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {

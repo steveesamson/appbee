@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, Token } from "../../../src";
+import { Request, Response, NextFunction } from "../../../src";
 export = function (req:any, res:Response, next:NextFunction) {
 
     if(!req.parameters.username){

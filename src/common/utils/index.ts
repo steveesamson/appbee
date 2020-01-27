@@ -1,6 +1,6 @@
 // import _ from "lodash";
 
-import { configuration, modules, Token, Encrypt } from "./configurer";
+// import { configure, configuration, modules, Token, Encrypt } from "./configurer";
 import raa from "./handleAsyncAwait";
 import request from "./request";
 import cdc from "./changeDataCapture";
@@ -13,10 +13,11 @@ import { writeFileTo, writeStreamTo } from "./writers";
 export {
 	writeFileTo,
 	writeStreamTo,
-	Token,
-	Encrypt,
-	modules,
-	configuration,
+	// Token,
+	// Encrypt,
+	// modules,
+	// configure,
+	// configuration,
 	request,
 	cdc,
 	mailer,

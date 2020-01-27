@@ -1,5 +1,6 @@
 import _ from "lodash";
-import { Request, Record, Model, Params } from "./types";
+import { Request } from "express";
+import { Record, Model, Params } from "./types";
 import { SqlError } from "./utils/Error";
 
 // if (typeof String.prototype.startsWith == "undefined") {

@@ -6,9 +6,8 @@ import Busboy from "busboy";
 import path from "path";
 import os from "os";
 import fs from "fs";
-import { Request } from "../common/types";
 import _ from "lodash";
-import { Response, NextFunction } from "express";
+import { Response, NextFunction, Request } from "express";
 
 const multipart = () => {
 	const { PUBLIC_DIR } = global;

@@ -4,9 +4,9 @@
 import { Request, Response, NextFunction,  Models } from "../../../src";
 
 
-export = async (req:any, res:Response, next:NextFunction) =>{
+export = async (req:Request, res:Response, next:NextFunction) =>{
 
-    req = <Request>req;
+    // req = <Request>req;
     
     if(!req.parameters.otp){
         console.log("Access denied to %s", req.url);

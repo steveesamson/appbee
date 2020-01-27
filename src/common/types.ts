@@ -1,21 +1,16 @@
-import express, { Response, NextFunction, Application } from "express";
+import express, { Response, NextFunction, Request } from "express";
 import { Server } from "http";
 import { Socket } from "socket.io";
-declare namespace NodeJS {
-	export interface Global {
-		[key: string]: any;
+
+declare module "express" {
+	interface Request {
+		files?: any;
+		parameters: any;
+		db?: any;
+		io?: any;
 	}
 }
 
-export interface Request extends express.Request {
-	files: any;
-	body: any;
-	parameters: any;
-	db: any;
-	io: any;
-}
-
-// [key in string | number | symbol]: any;
 export type Record = {
 	[key: string]: any;
 };
@@ -46,9 +41,15 @@ export interface Model {
 	orderDirection?: "ASC" | "DESC";
 	[key: string]: any;
 }
+export interface ControllerRequest {
+	(req: Request, res: Response): void;
+}
 
-export type ControllerRequest = (req: Request, res: Response) => void;
-export type MiddlewareRoutine = (req: Request, res: Response, next: NextFunction) => void;
+export interface MiddlewareRoutine {
+	(req: Request, res: Response, next: NextFunction): void;
+}
+// export type ControllerRequest = (req: Request, res: Response) => void;
+// export type MiddlewareRoutine = (req: Request, res: Response, next: NextFunction) => void;
 
 //method path is the key, ControllerRequest, the handler is the value
 export interface RouteConfig {
@@ -164,9 +165,4 @@ export interface ioRequest {
 	method: string;
 	socket: Socket;
 	ioRoutes: any;
-}
-
-export interface Core {
-	app: Application;
-	server: Server;
 }

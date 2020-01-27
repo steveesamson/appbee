@@ -6,9 +6,10 @@ const otp = function () {
     return Math.floor(Math.random() * 89999 + 10000);
 };
 
-export = (req:any, res:Response, next:NextFunction) =>{
+export = (req:Request, res:Response, next:NextFunction) =>{
 
-    req = <Request>req;
+    // req = <Request>req;
+
     const {userId} = req.parameters;
     const Otp = Models.getOtps(req);
     Otp.destroy({where:{userId:userId}})

@@ -3,7 +3,7 @@ import qs from "querystring";
 import { match as m } from "path-to-regexp";
 import { ioRequest } from "../common/types";
 
-const ioRouter = ({ req, method, cb, socket, ioRoutes }: ioRequest) => {
+const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	const res = {
 		json(data: any) {
 			cb({ status: res.status, body: data });
@@ -13,6 +13,9 @@ const ioRouter = ({ req, method, cb, socket, ioRoutes }: ioRequest) => {
 			return res;
 		},
 	};
+
+	req = req || {};
+	// console.dir("REQ:", req);
 
 	req.io = socket;
 	req.url = req.path;

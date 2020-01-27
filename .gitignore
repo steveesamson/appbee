@@ -4,4 +4,4 @@ dist
 
 coverage
 
-backup
+.DS_Store

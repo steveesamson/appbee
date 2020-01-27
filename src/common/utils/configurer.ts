@@ -1,16 +1,15 @@
 import { Socket } from "socket.io";
 import _ from "lodash";
-import { Router, Response } from "express";
+import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
 import { loadModels } from "./storeModels";
 import dataSource from "./dataSource";
 import securityUtil from "./security";
-import restRouter from "../../rest/ioRouter";
+import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
 
 import {
-	Request,
 	RouteConfig,
 	Record,
 	ControllerRequest,

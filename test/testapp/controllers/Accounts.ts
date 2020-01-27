@@ -1,9 +1,9 @@
-import { Route, Request, Response} from "../../../src";
+import { Route,Request, Response} from "../../../src";
 
 const {get, post, put, del, patch} = Route("Accounts","/accounts");
 
-
   get(`/`, (req: Request, res: Response) => {
+    
     // console.log('Parameters: ', req.parameters, req.db)
     res.status(200).json({
       data: [
@@ -21,7 +21,6 @@ const {get, post, put, del, patch} = Route("Accounts","/accounts");
   });
 
   put(`/:id`, (req: Request, res: Response) => {
-    
     res.status(200).json({
       data: {
       ...req.body
@@ -35,6 +34,7 @@ const {get, post, put, del, patch} = Route("Accounts","/accounts");
 
 
   patch(`/:id`, (req: Request, res: Response) => {
+    
     res.status(200).json({
       data: {
       ...req.body,

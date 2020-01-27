@@ -1,42 +1,107 @@
 import os from "os";
 import cluster, { Cluster } from "cluster";
 import net from "net";
+import { existsSync as x } from "fs";
+import { join } from "path";
 import sioRedis from "socket.io-redis";
-import * as utils from "./common/utils/index";
-import createServer from "./server/index";
+
+import { Application, Request, Response, NextFunction } from "express";
+import { Route } from "./rest/route";
+import {
+	writeFileTo,
+	mailer,
+	mailMaster,
+	cronMaster,
+	BeeError,
+	SqlError,
+	cdc,
+	request,
+	raa,
+	writeStreamTo,
+} from "./common/utils/index";
+import {
+	AppConfig,
+	StoreConfig,
+	LdapConfig,
+	PolicyConfig,
+	MiddlewareConfig,
+	Params,
+	Record,
+	ViewConfig,
+	Model,
+} from "./common/types";
+
+import { configure, configuration, modules, Token, Encrypt } from "../src/common/utils/configurer";
+
+import createServer from "./common/server";
 import { Models } from "./common/utils/storeModels";
 const farmhash: any = require("farmhash");
 
 const numCPUs = os.cpus().length;
 
-import { Response, NextFunction } from "express";
-import { Route } from "./rest/route";
-import {
-	Request,
-	Record,
-	Params,
-	Model,
-	DBConfig,
-	StoreConfig,
-	AppConfig,
-	ViewConfig,
-	LdapConfig,
-	CronConfig,
-	PolicyConfig,
-	MiddlewareConfig,
-} from "./common/types";
+const startDevServer = async (base: string): Promise<Application> => {
+	base = base || process.cwd();
+	const ok = (p: string): boolean => x(join(base, p));
 
-const startCluster = async (base: string) => {
+	if (!ok("controllers") || !ok("models") || !ok("config")) {
+		console.error("Sorry, am bailing; I cannot find 'controllers', 'models' or 'config' folders in your application.");
+		return null;
+	}
+	await configure(base);
+	const { view, application } = configuration;
+	// const { policies, middlewares } = modules;
+	const staticDir = view.staticDir || "";
+	const viewDir = view.viewDir || "";
+
+	global.isMultitenant = application.useMultiTenant === true;
+	// global.appResources = appResources;
+	global.SERVER_TYPE = "STAND_ALONE";
+	global.APP_PORT = application.port;
+	global.MOUNT_PATH = application.mountRestOn || "";
+
+	global.BASE_DIR = base;
+	global.PUBLIC_DIR = join(base, staticDir);
+	global.VIEW_DIR = join(base, viewDir);
+
+	return await createServer(modules);
+};
+
+const startCluster = async (base: string): Promise<net.Server> => {
 	if (cluster.isMaster) {
+		base = base || process.cwd();
+		const ok = (p: string): boolean => x(join(base, p));
+
+		if (!ok("controllers") || !ok("models") || !ok("config")) {
+			console.error(
+				"Sorry, am bailing; I cannot find 'controllers', 'models' or 'config' folders in your application.",
+			);
+			return null;
+		}
+		await configure(base);
+		const { view, application } = configuration;
+		// const { policies, middlewares } = modules;
+		const staticDir = view.staticDir || "";
+		const viewDir = view.viewDir || "";
+
+		global.isMultitenant = application.useMultiTenant === true;
+		// global.appResources = appResources;
+		(global.SERVER_TYPE = "CLUSTER"), (global.APP_PORT = application.port);
+		global.MOUNT_PATH = application.mountRestOn || "";
+
+		global.BASE_DIR = base;
+		global.PUBLIC_DIR = join(base, staticDir);
+		global.VIEW_DIR = join(base, viewDir);
+		process.env.NODE_ENV = "production";
 		console.log(`Master ${process.pid} is running`);
 
 		let watchesStarted = false;
 		const workers: cluster.Worker[] = [],
 			startWatches = () => {
 				watchesStarted = true;
-				const { cronMaster, mailMaster, mailer, cdc, configuration, modules } = utils;
 				const { store, smtp } = configuration;
 				const { crons } = modules;
+
+				console.log(cronMaster, mailMaster, mailer, cdc, configuration, modules);
 
 				Object.keys(store).forEach(k => {
 					const db = store[k];
@@ -91,6 +156,7 @@ const startCluster = async (base: string) => {
 			return farmhash.fingerprint32(ip) % len; // Farmhash is the fastest and works with IPv6, too
 		};
 
+		console.log("APPPORT:", global.APP_PORT);
 		// Create the outside facing server listening on our port.
 		const server = net
 			.createServer(
@@ -106,8 +172,8 @@ const startCluster = async (base: string) => {
 					worker.send("sticky-session:connection", connection);
 				},
 			)
-			.listen(utils.configuration.application.port, () => {
-				console.log(`Server started on localhost:${utils.configuration.application.port}...`);
+			.listen(configuration.application.port, () => {
+				console.log(`Server started on localhost:${configuration.application.port}...`);
 			});
 
 		const shutdown = () => {
@@ -146,8 +212,9 @@ const startCluster = async (base: string) => {
 		process.on("SIGUSR2", restart);
 		process.on("SIGINT", shutdown);
 		process.on("SIGTERM", shutdown);
+		return server;
 	} else {
-		const app = await createServer(base);
+		const app = await createServer(modules);
 
 		// Tell Socket.IO to use the redis adapter. By default, the redis
 		// server is assumed to be on localhost:6379. You don't have to
@@ -170,24 +237,36 @@ const startCluster = async (base: string) => {
 	}
 };
 
+const utils: any = {
+	writeFileTo,
+	mailer,
+	mailMaster,
+	cronMaster,
+	BeeError,
+	SqlError,
+	cdc,
+	request,
+	raa,
+	writeStreamTo,
+	Encrypt,
+	Token,
+};
 export {
-	createServer as startDevServer,
-	startCluster,
 	Models,
-	utils,
 	Route,
-	Request,
-	Record,
-	Params,
-	Model,
-	DBConfig,
-	StoreConfig,
+	utils,
 	AppConfig,
-	ViewConfig,
+	StoreConfig,
 	LdapConfig,
-	CronConfig,
 	PolicyConfig,
 	MiddlewareConfig,
+	Params,
+	Record,
+	ViewConfig,
+	Model,
+	Request,
 	Response,
 	NextFunction,
 };
+
+export default process.env.NODE_ENV === "development" ? startDevServer : startCluster;

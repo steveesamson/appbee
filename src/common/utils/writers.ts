@@ -1,19 +1,20 @@
 import fs from "fs";
 import path from "path";
-import { Request, Record } from "../types";
+import { Request } from "express";
+import { Params } from "../types";
 
-const writeStreamTo = (req: Request, options: Record, cb: any) => {
+const writeStreamTo = (req: Request, options: Params, cb: any) => {
 	const { PUBLIC_DIR } = global;
 	const dest = options.saveAs as string,
 		ws = fs.createWriteStream(dest);
 
 	req
-		.on("data", function(chunk) {
+		.on("data", (chunk: any) => {
 			ws.write(chunk);
 		})
-		.on("end", function() {
+		.on("end", () => {
 			ws.destroy();
-			ws.on("close", function() {
+			ws.on("close", () => {
 				const ndest = dest.replace(PUBLIC_DIR, "");
 				cb &&
 					cb({
@@ -23,7 +24,7 @@ const writeStreamTo = (req: Request, options: Record, cb: any) => {
 			});
 		});
 };
-const writeFileTo = (req: Request, options: Record, cb: any) => {
+const writeFileTo = (req: Request, options: Params, cb: any) => {
 	//console.log(req.files);
 	const { PUBLIC_DIR } = global;
 	const file = req.files[options.loadName],

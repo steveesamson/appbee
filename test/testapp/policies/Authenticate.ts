@@ -2,7 +2,7 @@
  * Created by steve Samson <stevee.samson@gmail.com> on 2/5/14.
  */
 //var jwt = require('jsonwebtoken');
-import { Request, Response, NextFunction, Token } from "../../../src";
+import { Request, Response, NextFunction, utils } from "../../../src";
 const Authenticate = (req:any, res:Response, next:NextFunction) =>
 {
 
@@ -28,7 +28,7 @@ const Authenticate = (req:any, res:Response, next:NextFunction) =>
 
     const iosocket = `${i}.${w}.${t}`;
 
-    Token.verify(iosocket, (err:any, decoded:any) => {
+    utils.Token.verify(iosocket, (err:any, decoded:any) => {
         if (err || typeof decoded === 'undefined') {
             console.log("Access denied to %s", req.url);
             res.status(401).json({});

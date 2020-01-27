@@ -8,6 +8,7 @@
 		"target": "es5",
 		"esModuleInterop": true
 	},
+	"files": ["src/global.d.ts"],
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }
