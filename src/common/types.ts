@@ -166,3 +166,14 @@ export interface ioRequest {
 	socket: Socket;
 	ioRoutes: any;
 }
+export interface AppState {
+	isMultitenant?: boolean;
+	SERVER_TYPE?: string;
+	APP_PORT?: number;
+	MOUNT_PATH?: string;
+	BASE_DIR?: string;
+	PUBLIC_DIR?: string;
+	VIEW_DIR?: string;
+	SECRET?: string;
+	IO?: any;
+}

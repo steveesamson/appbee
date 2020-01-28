@@ -3,8 +3,8 @@ import _ from "lodash";
 import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
 import { loadModels } from "./storeModels";
-import dataSource from "./dataSource";
-import securityUtil from "./security";
+import { configure as configureDataSources } from "./dataSource";
+// import securityUtil from "./security";
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
@@ -26,9 +26,9 @@ import {
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
-const Token: IToken = {} as any;
-const Encrypt: IEncrypt = {} as any;
-const DataSources: any = {};
+// const Token: IToken = {} as any;
+// const Encrypt: IEncrypt = {} as any;
+// const DataSources: any = {};
 const ioRoutes: any = {
 	get: {},
 	post: {},
@@ -37,15 +37,15 @@ const ioRoutes: any = {
 	patch: {},
 	head: {},
 };
-const configureDataSources = (store: StoreConfig) => {
-	Object.keys(store).forEach((key: string) => {
-		try {
-			DataSources[key] = dataSource(store[key]);
-		} catch (e) {
-			console.error(e);
-		}
-	});
-};
+// const configureDataSources = (store: StoreConfig) => {
+// 	Object.keys(store).forEach((key: string) => {
+// 		try {
+// 			DataSources[key] = dataSource(store[key]);
+// 		} catch (e) {
+// 			console.error(e);
+// 		}
+// 	});
+// };
 const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
 	const policiesMap: Record = {};
 
@@ -161,13 +161,10 @@ const configure = async (base: string) => {
 	modules.middlewares = _middlewares;
 
 	//Load controllers
-	const _controllers = await loadControllers(base, configuration);
+	const _controllers = await loadControllers(base, configuration.store);
 	modules.controllers = _controllers;
 
 	configureDataSources(configuration.store);
-	const secureActions = securityUtil(configuration.security);
-	Object.assign(Token, secureActions.Token);
-	Object.assign(Encrypt, secureActions.Encrypt);
 
 	modules.policies = await configurePolicies(base, configuration.policy);
 	await loadModels(base, configuration);
@@ -179,10 +176,7 @@ export {
 	configureDataSources,
 	configureRestRoutes,
 	configure,
-	DataSources,
 	ioRoutes,
 	configuration,
-	Token,
-	Encrypt,
 	modules,
 };

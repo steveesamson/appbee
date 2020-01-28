@@ -7,10 +7,12 @@ import path from "path";
 import os from "os";
 import fs from "fs";
 import _ from "lodash";
+import { appState } from "../common/appState";
+
 import { Response, NextFunction, Request } from "express";
 
 const multipart = () => {
-	const { PUBLIC_DIR } = global;
+	const { PUBLIC_DIR } = appState();
 	return (req: any, res: Response, next: NextFunction) => {
 		req = req as Request;
 		const options = req.parameters;

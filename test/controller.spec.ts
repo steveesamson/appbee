@@ -1,6 +1,6 @@
 import path from "path"
 import io from "socket.io-client";
-import createServer, {utils} from "../src";
+import { serve as createServer,utils} from "../src";
 
 const { http } = utils.request();
 http.set("host","localhost").set("port",8000);

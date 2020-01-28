@@ -1,13 +1,14 @@
 import request from "./request";
-import { DataSources } from "./configurer";
+import { DataSources } from "./dataSource";
 import { Models } from "./storeModels";
 import { Record } from "../types";
+import { appState } from "../appState";
 
 const { http } = request();
 
 http
 	.set("host", "localhost")
-	.set("port", (global as any).APP_PORT)
+	.set("port", appState().APP_PORT)
 	.setHeader("Content-Type", "application/json");
 
 const sendRedo = (options: Record) => http.post("/redo", options);

@@ -18,6 +18,8 @@ import {
 	request,
 	raa,
 	writeStreamTo,
+	Encrypt,
+	Token,
 } from "./common/utils/index";
 import {
 	AppConfig,
@@ -29,11 +31,13 @@ import {
 	Record,
 	ViewConfig,
 	Model,
+	AppState,
 } from "./common/types";
 
-import { configure, configuration, modules, Token, Encrypt } from "../src/common/utils/configurer";
+import { configure, configuration, modules } from "../src/common/utils/configurer";
 
 import createServer from "./common/server";
+import { appState } from "./common/appState";
 import { Models } from "./common/utils/storeModels";
 const farmhash: any = require("farmhash");
 
@@ -48,21 +52,21 @@ const startDevServer = async (base: string): Promise<Application> => {
 		return null;
 	}
 	await configure(base);
-	const { view, application } = configuration;
-	// const { policies, middlewares } = modules;
+	const { view, application, security } = configuration;
 	const staticDir = view.staticDir || "";
 	const viewDir = view.viewDir || "";
 
-	global.isMultitenant = application.useMultiTenant === true;
-	// global.appResources = appResources;
-	global.SERVER_TYPE = "STAND_ALONE";
-	global.APP_PORT = application.port;
-	global.MOUNT_PATH = application.mountRestOn || "";
-
-	global.BASE_DIR = base;
-	global.PUBLIC_DIR = join(base, staticDir);
-	global.VIEW_DIR = join(base, viewDir);
-
+	appState({
+		isMultitenant: application.useMultiTenant === true,
+		SERVER_TYPE: "STAND_ALONE",
+		APP_PORT: application.port,
+		MOUNT_PATH: application.mountRestOn || "",
+		BASE_DIR: base,
+		PUBLIC_DIR: join(base, staticDir),
+		VIEW_DIR: join(base, viewDir),
+		SECRET: security.secret,
+	});
+	process.env.NODE_ENV = "development";
 	return await createServer(modules);
 };
 
@@ -78,19 +82,21 @@ const startCluster = async (base: string): Promise<net.Server> => {
 			return null;
 		}
 		await configure(base);
-		const { view, application } = configuration;
-		// const { policies, middlewares } = modules;
+		const { view, application, security } = configuration;
 		const staticDir = view.staticDir || "";
 		const viewDir = view.viewDir || "";
 
-		global.isMultitenant = application.useMultiTenant === true;
-		// global.appResources = appResources;
-		(global.SERVER_TYPE = "CLUSTER"), (global.APP_PORT = application.port);
-		global.MOUNT_PATH = application.mountRestOn || "";
+		appState({
+			isMultitenant: application.useMultiTenant === true,
+			SERVER_TYPE: "STAND_ALONE",
+			APP_PORT: application.port,
+			MOUNT_PATH: application.mountRestOn || "",
+			BASE_DIR: base,
+			PUBLIC_DIR: join(base, staticDir),
+			VIEW_DIR: join(base, viewDir),
+			SECRET: security.secret,
+		});
 
-		global.BASE_DIR = base;
-		global.PUBLIC_DIR = join(base, staticDir);
-		global.VIEW_DIR = join(base, viewDir);
 		process.env.NODE_ENV = "production";
 		console.log(`Master ${process.pid} is running`);
 
@@ -101,7 +107,7 @@ const startCluster = async (base: string): Promise<net.Server> => {
 				const { store, smtp } = configuration;
 				const { crons } = modules;
 
-				console.log(cronMaster, mailMaster, mailer, cdc, configuration, modules);
+				// console.log(cronMaster, mailMaster, mailer, cdc, configuration, modules);
 
 				Object.keys(store).forEach(k => {
 					const db = store[k];
@@ -156,7 +162,6 @@ const startCluster = async (base: string): Promise<net.Server> => {
 			return farmhash.fingerprint32(ip) % len; // Farmhash is the fastest and works with IPv6, too
 		};
 
-		console.log("APPPORT:", global.APP_PORT);
 		// Create the outside facing server listening on our port.
 		const server = net
 			.createServer(
@@ -251,10 +256,12 @@ const utils: any = {
 	Encrypt,
 	Token,
 };
+const serve = process.env.NODE_ENV === "development" ? startDevServer : startCluster;
 export {
 	Models,
 	Route,
 	utils,
+	serve,
 	AppConfig,
 	StoreConfig,
 	LdapConfig,
@@ -268,5 +275,3 @@ export {
 	Response,
 	NextFunction,
 };
-
-export default process.env.NODE_ENV === "development" ? startDevServer : startCluster;

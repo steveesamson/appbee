@@ -1,17 +1,7 @@
 import knex from "knex";
-import { DBConfig } from "../types";
+import { DBConfig, StoreConfig } from "../types";
 
-// const dataSource = (options: DBConfig) =>
-//   knex({
-//     client: "mysql",
-//     connection: {
-//       host: "127.0.0.1",
-//       user: "coopeepsapp",
-//       password: "k00p33p5@pp",
-//       database: "coopeeps"
-//     }
-//   });
-
+const DataSources: any = {};
 const dataSource = ({ type, host, user, password, database, debug }: DBConfig) =>
 	knex({
 		debug,
@@ -24,4 +14,14 @@ const dataSource = ({ type, host, user, password, database, debug }: DBConfig) =
 		},
 	});
 
-export default dataSource;
+const configure = (store: StoreConfig) => {
+	Object.keys(store).forEach((key: string) => {
+		try {
+			DataSources[key] = dataSource(store[key]);
+		} catch (e) {
+			console.error(e);
+		}
+	});
+};
+
+export { configure, DataSources };

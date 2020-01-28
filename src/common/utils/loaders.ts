@@ -8,6 +8,7 @@ import baseREST from "../../rest/restful";
 import { NextFunction, Response } from "express";
 import mailController from "../../rest/utils/MailsController";
 import redoController from "../../rest/utils/RedoController";
+import { StoreConfig } from "../../index";
 
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 
@@ -79,7 +80,7 @@ const loadModules = async (base: string, type: string): Promise<Record | CronCon
 	return modules;
 };
 
-const loadControllers = async (base: string, config: Configuration): Promise<RouteMap> => {
+const loadControllers = async (base: string, store: StoreConfig): Promise<RouteMap> => {
 	base = path.resolve(base, "controllers");
 
 	const list = fetchTypeFiles(base);
@@ -93,7 +94,7 @@ const loadControllers = async (base: string, config: Configuration): Promise<Rou
 	for (const key in routes) {
 		const route = routes[key],
 			baseRest = baseREST(route.mountPoint as string, key);
-		routes[key] = _.extend({}, config.application.useStore ? baseRest : {}, route);
+		routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
 	}
 
 	return routes;

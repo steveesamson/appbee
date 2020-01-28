@@ -8,7 +8,6 @@ describe("models", () => {
 
     await configure(path.resolve(__dirname,"testapp"));
 
-    // const models = (global as any).Models ;
     expect(Object.keys(models).length).toBe(4);
     expect(Object.keys(models)).toContain("getUsers");
     expect(Object.keys(models)).toContain("getAccounts");

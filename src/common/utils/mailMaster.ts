@@ -1,4 +1,4 @@
-import { DataSources } from "./configurer";
+import { DataSources } from "./dataSource";
 import { Models } from "./storeModels";
 
 const Mailer = (_db: string, messanger: any) => {

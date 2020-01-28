@@ -2,9 +2,10 @@ import fs from "fs";
 import path from "path";
 import { Request } from "express";
 import { Params } from "../types";
+import { appState } from "../appState";
 
 const writeStreamTo = (req: Request, options: Params, cb: any) => {
-	const { PUBLIC_DIR } = global;
+	const { PUBLIC_DIR } = appState();
 	const dest = options.saveAs as string,
 		ws = fs.createWriteStream(dest);
 
@@ -26,7 +27,7 @@ const writeStreamTo = (req: Request, options: Params, cb: any) => {
 };
 const writeFileTo = (req: Request, options: Params, cb: any) => {
 	//console.log(req.files);
-	const { PUBLIC_DIR } = global;
+	const { PUBLIC_DIR } = appState();
 	const file = req.files[options.loadName],
 		dest = options.saveAs + path.extname(file.name);
 	file.renameTo(dest, (e: any) => {

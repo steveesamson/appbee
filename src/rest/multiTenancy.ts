@@ -1,11 +1,12 @@
 import { NextFunction, Response, Request } from "express";
-import { DataSources } from "../common/utils/configurer";
+import { DataSources } from "../common/utils/dataSource";
+import { appState } from "../common/appState";
 
 const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {
 	// console.log('Tenancy: ', isMultitenant);
 	req = req as Request;
 	const { parameters } = req;
-	const { isMultitenant } = global;
+	const { isMultitenant } = appState();
 	if (isMultitenant) {
 		if (parameters.tenant) {
 			const tenant = parameters.tenant;

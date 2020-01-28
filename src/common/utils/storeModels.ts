@@ -9,10 +9,6 @@ import Redo from "../../rest/utils/Redo";
 const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 const fetchTypeFiles = filesWithExtension(ext);
-// const fetchTypeFiles = (dir: string) => {
-// 	const onlyTypeScriptFile = (file: string): boolean => path.extname(file).toLowerCase() === ext;
-// 	return fs.readdirSync(dir).filter(onlyTypeScriptFile);
-// };
 
 const makeModel = (name: string, defaultModel: Model, config: Configuration): void => {
 	const parentModel = baseModel(name),
@@ -49,25 +45,6 @@ const loadModels = async (base: string, config: Configuration) => {
 			defaultModel = modelObject.default;
 
 		makeModel(name, defaultModel, config);
-
-		// 	parentModel = baseModel(name),
-		// 	baseKeys = parentModel["uniqueKeys"],
-		// 	defaultKeys = defaultModel["uniqueKeys"] || [];
-
-		// const emblished = Object.assign({}, config.application.useStore ? parentModel : {}, defaultModel);
-		// emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
-
-		// Models["get" + name] = ((mdl: any) => {
-		// 	return (req: any): Model => {
-		// 		const copy = _.clone(mdl);
-		// 		if (!req || !req.db) {
-		// 			console.error("Null db object, check all your database connections. Looks like no db was configured...");
-		// 		}
-		// 		copy["db"] = req.db;
-
-		// 		return copy;
-		// 	};
-		// })(emblished);
 	}
 	makeModel("Mails", Mails as any, config);
 	makeModel("Redo", Redo as any, config);

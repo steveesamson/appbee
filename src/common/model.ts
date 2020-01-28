@@ -2,7 +2,7 @@ import _ from "lodash";
 import { Request } from "express";
 import { Record, Model, Params } from "./types";
 import { SqlError } from "./utils/Error";
-
+import { appState } from "./appState";
 // if (typeof String.prototype.startsWith == "undefined") {
 //   String.prototype.startsWith = function(prefix): boolean {
 //     return this.indexOf(prefix) === 0;
@@ -12,7 +12,7 @@ import { SqlError } from "./utils/Error";
 const baseModel = function(model: string): Model {
 	const modelName = model.toLowerCase(),
 		broadcast = (load: Record): void => {
-			// global.IO.sockets.emit("comets", load);
+			appState().IO.emit("comets", load);
 		};
 	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any) => {
 		if (searchStrings.length) {

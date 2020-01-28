@@ -7,9 +7,11 @@ import cdc from "./changeDataCapture";
 import mailer from "./mailer";
 import cronMaster from "./cronMaster";
 import mailMaster from "./mailMaster";
+
 import { BeeError, SqlError } from "./Error";
 import { writeFileTo, writeStreamTo } from "./writers";
 
+export { Encrypt, Token } from "./security";
 export {
 	writeFileTo,
 	writeStreamTo,
