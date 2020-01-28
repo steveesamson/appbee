@@ -31,17 +31,16 @@ import {
 	Record,
 	ViewConfig,
 	Model,
-	AppState,
+	CronConfig,
 } from "./common/types";
 
-import { configure, configuration, modules } from "../src/common/utils/configurer";
+import { loadConfig, loadModules } from "./common/utils/loaders";
 
 import createServer from "./common/server";
-import { appState } from "./common/appState";
 import { Models } from "./common/utils/storeModels";
 const farmhash: any = require("farmhash");
 
-const numCPUs = os.cpus().length;
+const numCPUs = 1; //os.cpus().length;
 
 const startDevServer = async (base: string): Promise<Application> => {
 	base = base || process.cwd();
@@ -51,23 +50,9 @@ const startDevServer = async (base: string): Promise<Application> => {
 		console.error("Sorry, am bailing; I cannot find 'controllers', 'models' or 'config' folders in your application.");
 		return null;
 	}
-	await configure(base);
-	const { view, application, security } = configuration;
-	const staticDir = view.staticDir || "";
-	const viewDir = view.viewDir || "";
 
-	appState({
-		isMultitenant: application.useMultiTenant === true,
-		SERVER_TYPE: "STAND_ALONE",
-		APP_PORT: application.port,
-		MOUNT_PATH: application.mountRestOn || "",
-		BASE_DIR: base,
-		PUBLIC_DIR: join(base, staticDir),
-		VIEW_DIR: join(base, viewDir),
-		SECRET: security.secret,
-	});
-	process.env.NODE_ENV = "development";
-	return await createServer(modules);
+	process.env.SERVER_TYPE = "STAND_ALONE";
+	return await createServer(base);
 };
 
 const startCluster = async (base: string): Promise<net.Server> => {
@@ -81,31 +66,19 @@ const startCluster = async (base: string): Promise<net.Server> => {
 			);
 			return null;
 		}
-		await configure(base);
-		const { view, application, security } = configuration;
-		const staticDir = view.staticDir || "";
-		const viewDir = view.viewDir || "";
-
-		appState({
-			isMultitenant: application.useMultiTenant === true,
-			SERVER_TYPE: "STAND_ALONE",
-			APP_PORT: application.port,
-			MOUNT_PATH: application.mountRestOn || "",
-			BASE_DIR: base,
-			PUBLIC_DIR: join(base, staticDir),
-			VIEW_DIR: join(base, viewDir),
-			SECRET: security.secret,
-		});
+		const { application, store, smtp } = await loadConfig(base);
+		const crons = (await loadModules(base, "crons")) as CronConfig[];
 
 		process.env.NODE_ENV = "production";
+		process.env.SERVER_TYPE = "CLUSTER";
 		console.log(`Master ${process.pid} is running`);
 
 		let watchesStarted = false;
 		const workers: cluster.Worker[] = [],
 			startWatches = () => {
 				watchesStarted = true;
-				const { store, smtp } = configuration;
-				const { crons } = modules;
+				// const { store, smtp } = configuration;
+				// const { crons } = modules;
 
 				// console.log(cronMaster, mailMaster, mailer, cdc, configuration, modules);
 
@@ -177,8 +150,8 @@ const startCluster = async (base: string): Promise<net.Server> => {
 					worker.send("sticky-session:connection", connection);
 				},
 			)
-			.listen(configuration.application.port, () => {
-				console.log(`Server started on localhost:${configuration.application.port}...`);
+			.listen(application.port, () => {
+				console.log(`Server started on localhost:${application.port}...`);
 			});
 
 		const shutdown = () => {
@@ -219,7 +192,8 @@ const startCluster = async (base: string): Promise<net.Server> => {
 		process.on("SIGTERM", shutdown);
 		return server;
 	} else {
-		const app = await createServer(modules);
+		// console.log(modules);
+		const app = await createServer(base);
 
 		// Tell Socket.IO to use the redis adapter. By default, the redis
 		// server is assumed to be on localhost:6379. You don't have to

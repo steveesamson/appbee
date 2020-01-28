@@ -4,7 +4,6 @@ import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
 import { loadModels } from "./storeModels";
 import { configure as configureDataSources } from "./dataSource";
-// import securityUtil from "./security";
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
@@ -26,9 +25,6 @@ import {
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
-// const Token: IToken = {} as any;
-// const Encrypt: IEncrypt = {} as any;
-// const DataSources: any = {};
 const ioRoutes: any = {
 	get: {},
 	post: {},
@@ -37,15 +33,6 @@ const ioRoutes: any = {
 	patch: {},
 	head: {},
 };
-// const configureDataSources = (store: StoreConfig) => {
-// 	Object.keys(store).forEach((key: string) => {
-// 		try {
-// 			DataSources[key] = dataSource(store[key]);
-// 		} catch (e) {
-// 			console.error(e);
-// 		}
-// 	});
-// };
 const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
 	const policiesMap: Record = {};
 
@@ -151,10 +138,6 @@ const configure = async (base: string) => {
 	const cfg = await loadConfig(base);
 
 	Object.assign(configuration, cfg);
-
-	//Load crons
-	const _crons = (await loadModules(base, "crons")) as CronConfig[];
-	modules.crons = _crons;
 
 	//Load middlewares
 	const _middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];

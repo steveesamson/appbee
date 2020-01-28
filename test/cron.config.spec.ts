@@ -1,11 +1,13 @@
 import path from "path";
 
-import { configure, modules } from "../src/common/utils/configurer";
+import { loadModules } from "../src/common/utils/loaders";
+import { CronConfig } from "../src/common/types";
 
 describe("cron configs", () => {
   it("expects loadModules to return valid cron config", async () => {
-    await configure(path.resolve(__dirname,"testapp"));
-    const { crons } = modules;
+    // const crons:CronConfig[] = await loadConfig(path.resolve(__dirname,"testapp")) as CronConfig[];
+    // const { crons } = modules;
+    const crons = (await loadModules(path.resolve(__dirname, "testapp"), "crons")) as CronConfig[];
     expect(crons).toBeInstanceOf(Array);
     const first = crons[0];
     expect(first).toBeDefined();

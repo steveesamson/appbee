@@ -11,6 +11,7 @@ import redoController from "../../rest/utils/RedoController";
 import { StoreConfig } from "../../index";
 
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
+const fetchTypeFiles = filesWithExtension(ext);
 
 const denyAll = (req: any, res: Response, next: NextFunction) => {
 	console.error("Unauthorized Access to " + req.url);
@@ -21,7 +22,6 @@ const allowAll = (req: any, res: Response, next: NextFunction) => {
 };
 
 const fileExists = (filePath: string): boolean => fs.existsSync(filePath);
-const fetchTypeFiles = filesWithExtension(ext);
 
 const loadConfig = async (base: string): Promise<Configuration> => {
 	const configPath = path.resolve(base, "config"),
@@ -96,7 +96,6 @@ const loadControllers = async (base: string, store: StoreConfig): Promise<RouteM
 			baseRest = baseREST(route.mountPoint as string, key);
 		routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
 	}
-
 	return routes;
 };
 
