@@ -4,7 +4,6 @@ import net from "net";
 import { existsSync as x } from "fs";
 import { join } from "path";
 import sioRedis from "socket.io-redis";
-
 import { Application, Request, Response, NextFunction } from "express";
 import { Route } from "./rest/route";
 import {
@@ -40,7 +39,7 @@ import createServer from "./common/server";
 import { Models } from "./common/utils/storeModels";
 const farmhash: any = require("farmhash");
 
-const numCPUs = 1; //os.cpus().length;
+const numCPUs = os.cpus().length;
 
 const startDevServer = async (base: string): Promise<Application> => {
 	base = base || process.cwd();
