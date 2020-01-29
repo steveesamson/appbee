@@ -22,7 +22,7 @@ const multipart = () => {
 			contentType = req.headers["content-type"],
 			isUpload = contentType && contentType.indexOf("multipart/form-data") !== -1,
 			isJson = contentType && contentType.indexOf("application/json") !== -1,
-			isUrlEncoded = contentType.indexOf("application/x-www-form-urlencoded") !== -1,
+			isUrlEncoded = contentType && contentType.indexOf("application/x-www-form-urlencoded") !== -1,
 			decodeChunks = () => {
 				let chunk: any = "";
 				req
