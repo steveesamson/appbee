@@ -6,6 +6,7 @@ import Busboy from "busboy";
 import path from "path";
 import os from "os";
 import fs from "fs";
+import qs from "querystring";
 import _ from "lodash";
 import { appState } from "../common/appState";
 
@@ -20,10 +21,8 @@ const multipart = () => {
 			body: any = {},
 			contentType = req.headers["content-type"],
 			isUpload = contentType && contentType.indexOf("multipart/form-data") !== -1,
-			isJson =
-				contentType &&
-				(contentType.indexOf("application/json") !== -1 ||
-					contentType.indexOf("application/x-www-form-urlencoded") !== -1),
+			isJson = contentType && contentType.indexOf("application/json") !== -1,
+			isUrlEncoded = contentType.indexOf("application/x-www-form-urlencoded") !== -1,
 			decodeChunks = () => {
 				let chunk: any = "";
 				req
@@ -33,6 +32,11 @@ const multipart = () => {
 					.on("end", () => {
 						if (isJson) {
 							body = JSON.parse(chunk);
+							req.body = _.extend(req.body || {}, body);
+							return next();
+						}
+						if (isUrlEncoded) {
+							body = qs.decode(chunk);
 							req.body = _.extend(req.body || {}, body);
 							return next();
 						}
