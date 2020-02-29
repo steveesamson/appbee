@@ -2,8 +2,8 @@ import path from "path"
 import io from "socket.io-client";
 import { serve as createServer,utils} from "../src";
 
-const { http } = utils.request();
-http.set("host","localhost").set("port",8000);
+const { http } = utils.request({hostname:'localhost', port:8000});
+// http.set("host","localhost").set("port",8000);
 let inserteID:any =null;
 let socket:any = null,
 Transport:any = {};
