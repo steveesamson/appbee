@@ -9,7 +9,7 @@
 	"module": "dist/esm/index.js",
 	"scripts": {
 		"test": "NODE_ENV=development TS_NODE_FILES=true jest --passWithNoTests",
-		"test:coverage": "NODE_ENV=development TS_NODE_FILES=true jest --coverage",
+		"test:coverage": "NODE_ENV=development TS_NODE_FILES=true jest --coverage --detectOpenHandles",
 		"prebuild": "rimraf dist",
 		"predev": "rimraf dist",
 		"lint": "prettier-eslint 'src/**/*.ts' --write",
