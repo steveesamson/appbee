@@ -19,7 +19,10 @@ import {
 	writeStreamTo,
 	Encrypt,
 	Token,
+	compileTypeScript,
+	watchServerFiles,
 } from "./common/utils/index";
+
 import {
 	AppConfig,
 	StoreConfig,
@@ -31,6 +34,7 @@ import {
 	ViewConfig,
 	Model,
 	CronConfig,
+	UtilsType,
 } from "./common/types";
 
 import { loadConfig, loadModules } from "./common/utils/loaders";
@@ -214,20 +218,21 @@ const startCluster = async (base: string): Promise<net.Server> => {
 		});
 	}
 };
-
-const utils: any = {
+const utils: UtilsType = {
 	writeFileTo,
 	mailer,
 	mailMaster,
 	cronMaster,
-	BeeError,
-	SqlError,
 	cdc,
 	request,
 	raa,
 	writeStreamTo,
 	Encrypt,
 	Token,
+	rollup: {
+		watchServerFiles,
+		compileTypeScript,
+	},
 };
 const serve = process.env.NODE_ENV === "development" ? startDevServer : startCluster;
 export {
@@ -235,6 +240,8 @@ export {
 	Route,
 	utils,
 	serve,
+	BeeError,
+	SqlError,
 	AppConfig,
 	StoreConfig,
 	LdapConfig,

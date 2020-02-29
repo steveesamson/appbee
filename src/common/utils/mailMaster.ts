@@ -1,7 +1,8 @@
 import { DataSources } from "./dataSource";
 import { Models } from "./storeModels";
+import { MailMasterType } from "../types";
 
-const Mailer = (_db: string, messanger: any) => {
+const MailMaster: MailMasterType = (_db: string, messanger: any) => {
 	if (!DataSources[_db]) return { start: () => false };
 
 	const _req: any = { db: DataSources[_db] },
@@ -38,4 +39,4 @@ const Mailer = (_db: string, messanger: any) => {
 	};
 };
 
-export default Mailer;
+export default MailMaster;

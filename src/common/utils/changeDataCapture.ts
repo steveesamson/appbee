@@ -1,7 +1,7 @@
 import request from "./request";
 import { DataSources } from "./dataSource";
 import { Models } from "./storeModels";
-import { Record } from "../types";
+import { Record, ChangeDataCaptureType } from "../types";
 import { appState } from "../appState";
 
 const { http } = request();
@@ -13,7 +13,7 @@ http
 
 const sendRedo = (options: Record) => http.post("/redo", options);
 
-const ChangeDataCapture = (_db: string) => {
+const ChangeDataCapture: ChangeDataCaptureType = (_db: string) => {
 	if (!DataSources[_db]) return { start: () => false };
 
 	const _req: any = { db: DataSources[_db] },

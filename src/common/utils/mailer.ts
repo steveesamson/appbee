@@ -1,7 +1,7 @@
 import fs from "fs";
 import nodemailer from "nodemailer";
 import smtpPool from "nodemailer-smtp-pool";
-import { Record } from "../types";
+import { Record, MailerType } from "../types";
 
 let mailConfig = {};
 const stud: any = require("stud"),
@@ -27,7 +27,7 @@ const stud: any = require("stud"),
 		});
 	};
 
-const mailer = (smtpConfig: any) => {
+const mailer: MailerType = (smtpConfig: any) => {
 	const { sender, templateFile } = smtpConfig;
 	delete smtpConfig.sender;
 	delete smtpConfig.templateFile;

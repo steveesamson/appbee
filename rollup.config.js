@@ -32,6 +32,9 @@ export default (async () => ({
 		"cluster",
 		"net",
 		"os",
+		"typescript",
+		"glob",
+		"chokidar",
 	],
 	plugins: [
 		resolve({

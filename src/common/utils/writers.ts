@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { Request } from "express";
-import { Params } from "../types";
+import { Params, WriteFileType, WriteStreamType } from "../types";
 import { appState } from "../appState";
 
-const writeStreamTo = (req: Request, options: Params, cb: any) => {
+const writeStreamTo: WriteStreamType = (req: Request, options: Params, cb: any) => {
 	const { PUBLIC_DIR } = appState();
 	const dest = options.saveAs as string,
 		ws = fs.createWriteStream(dest);
@@ -25,7 +25,7 @@ const writeStreamTo = (req: Request, options: Params, cb: any) => {
 			});
 		});
 };
-const writeFileTo = (req: Request, options: Params, cb: any) => {
+const writeFileTo: WriteFileType = (req: Request, options: Params, cb: any) => {
 	//console.log(req.files);
 	const { PUBLIC_DIR } = appState();
 	const file = req.files[options.loadName],

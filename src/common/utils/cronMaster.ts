@@ -1,8 +1,8 @@
 import cronRunner from "node-cron";
-import { Record, CronConfig } from "../types";
+import { Record, CronConfig, CronMasterType } from "../types";
 
 const cronStack: Record = {};
-const cronMaster = {
+const cronMaster: CronMasterType = {
 	start(cronName: string) {
 		console.log(`Starting cron:${cronName}...`);
 		const task = cronStack[cronName];

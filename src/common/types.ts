@@ -1,6 +1,7 @@
 import express, { Response, NextFunction, Request } from "express";
-import { Server } from "http";
+import * as ts from "typescript";
 import { Socket } from "socket.io";
+import { BeeError, SqlError } from "./utils/Error";
 
 declare module "express" {
 	interface Request {
@@ -176,4 +177,101 @@ export interface AppState {
 	VIEW_DIR?: string;
 	SECRET?: string;
 	IO?: any;
+}
+
+export interface CallBackFunction {
+	(e: Error, res?: any): void;
+}
+
+export interface CronMasterType {
+	init(crons: CronConfig[]): void;
+	start(cronName: string): void;
+	stop(cronName: string): void;
+	startAll(): void;
+	stopAll(): void;
+}
+
+export interface MailMasterType {
+	(_db: string, messanger: any): { start: () => void };
+}
+
+export interface ChangeDataCaptureType {
+	(_db: string): { start: () => void };
+}
+
+export interface WriteFileType {
+	(req: Request, options: Params, cb: CallBackFunction): void;
+}
+export interface WriteStreamType {
+	(req: Request, options: Params, cb: CallBackFunction): void;
+}
+
+export interface MailerType {
+	(smtpConfig: any): any;
+}
+
+export interface HandleAsyncAwait {
+	(promise: Promise<any>): any;
+}
+
+export interface CompileTypeScriptType {
+	(tsCompilerOptions: ts.CompilerOptions): any;
+}
+
+export interface WatchServerFilesType {
+	(serverFiles: string): { buildStart(): void };
+}
+
+interface IWithDataRequest {
+	(url: string, data: Record): Promise<Record>;
+}
+interface IWithNoDataRequest {
+	(url: string): Promise<Record>;
+}
+interface IKeyValueRequest {
+	(key: string, value: any): any;
+}
+interface IWithOptionalDataRequest {
+	(url: string, data?: Record): Promise<Record>;
+}
+
+export interface HttpRequestType {
+	(props: Record): {
+		http: {
+			post: IWithDataRequest;
+			put: IWithDataRequest;
+			patch: IWithDataRequest;
+			delete: IWithOptionalDataRequest;
+			get: IWithNoDataRequest;
+			head: IWithNoDataRequest;
+			set: IKeyValueRequest;
+			setHeader: IKeyValueRequest;
+		};
+		https: {
+			post: IWithDataRequest;
+			put: IWithDataRequest;
+			patch: IWithDataRequest;
+			delete: IWithOptionalDataRequest;
+			get: IWithNoDataRequest;
+			head: IWithNoDataRequest;
+			set: IKeyValueRequest;
+			setHeader: IKeyValueRequest;
+		};
+	};
+}
+export interface UtilsType {
+	writeFileTo: WriteFileType;
+	writeStreamTo: WriteStreamType;
+	mailer: MailerType;
+	mailMaster: MailMasterType;
+	cronMaster: CronMasterType;
+	cdc: ChangeDataCaptureType;
+	request: HttpRequestType;
+	raa: HandleAsyncAwait;
+	Encrypt: IEncrypt;
+	Token: IToken;
+	rollup: {
+		watchServerFiles: WatchServerFilesType;
+		compileTypeScript: CompileTypeScriptType;
+	};
 }

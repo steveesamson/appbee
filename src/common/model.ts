@@ -135,13 +135,6 @@ const baseModel = function(model: string): Model {
 			if (options.ROW_COUNT) {
 				return await this.rowCount(db);
 			}
-			// if (options["SUM"]) {
-			//    return this.qb
-			//      .sum({ totalId: "st.id", totalUpline: "sumt.upline" })
-			//      .from(this.db.as("st"))
-			//      .first();
-			// }
-
 			return this.hasKey(options) ? db.first() : db;
 		},
 		async create(options: Params) {
