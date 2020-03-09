@@ -21,6 +21,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const { view, application, security } = configuration;
 	const staticDir = view.staticDir || "";
 	const viewDir = view.viewDir || "";
+	const templateDir = view.templateDir || "";
 	appState({
 		isMultitenant: application.useMultiTenant === true,
 		APP_PORT: application.port,
@@ -28,6 +29,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		BASE_DIR: base,
 		PUBLIC_DIR: join(base, staticDir),
 		VIEW_DIR: join(base, viewDir),
+		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: security.secret,
 	});
 	const { policies, middlewares } = modules;

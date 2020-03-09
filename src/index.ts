@@ -41,6 +41,8 @@ import { loadConfig, loadModules } from "./common/utils/loaders";
 
 import createServer from "./common/server";
 import { Models } from "./common/utils/storeModels";
+import { appState } from "./common/appState";
+
 const farmhash: any = require("farmhash");
 
 const numCPUs = os.cpus().length;
@@ -240,6 +242,7 @@ export {
 	Route,
 	utils,
 	serve,
+	appState,
 	BeeError,
 	SqlError,
 	AppConfig,

@@ -8,20 +8,7 @@ import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
 
-import {
-	RouteConfig,
-	Record,
-	ControllerRequest,
-	StoreConfig,
-	MiddlewareConfig,
-	ioRequest,
-	CronConfig,
-	Configuration,
-	Modules,
-	IToken,
-	IEncrypt,
-	GetModels,
-} from "../types";
+import { RouteConfig, Record, ControllerRequest, MiddlewareConfig, ioRequest, Configuration, Modules } from "../types";
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
@@ -150,6 +137,7 @@ const configure = async (base: string) => {
 	configureDataSources(configuration.store);
 
 	modules.policies = await configurePolicies(base, configuration.policy);
+
 	await loadModels(base, configuration);
 };
 

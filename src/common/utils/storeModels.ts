@@ -1,4 +1,5 @@
 import path from "path";
+import { Request } from "express";
 import _ from "lodash";
 import filesWithExtension from "./fetchFileTypes";
 import baseModel from "../model";
@@ -15,11 +16,11 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 		baseKeys = parentModel["uniqueKeys"],
 		defaultKeys = defaultModel["uniqueKeys"] || [];
 
-	const emblished = Object.assign({}, config.application.useStore ? parentModel : {}, defaultModel);
+	const emblished = Object.assign({}, Object.keys(config.store).length ? parentModel : {}, defaultModel);
 	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
 
 	Models["get" + name] = ((mdl: any) => {
-		return (req: any): Model => {
+		return (req: Request): Model => {
 			const copy = _.clone(mdl);
 			if (!req || !req.db) {
 				console.error("Null db object, check all your database connections. Looks like no db was configured...");

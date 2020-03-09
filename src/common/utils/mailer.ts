@@ -1,9 +1,12 @@
 import fs from "fs";
+import { join } from "path";
 import nodemailer from "nodemailer";
 import smtpPool from "nodemailer-smtp-pool";
+import { appState } from "../appState";
 import { Record, MailerType } from "../types";
 
 let mailConfig = {};
+const { TEMPLATE_DIR } = appState();
 const stud: any = require("stud"),
 	mail = (mailLoad: Record, cb: Function) => {
 		const transporter = nodemailer.createTransport(smtpPool(mailConfig)),
@@ -30,11 +33,12 @@ const stud: any = require("stud"),
 const mailer: MailerType = (smtpConfig: any) => {
 	const { sender, templateFile } = smtpConfig;
 	delete smtpConfig.sender;
+	delete smtpConfig.template;
 	delete smtpConfig.templateFile;
 
 	mailConfig = smtpConfig;
 
-	const tpl = fs.readFileSync(templateFile, "utf8");
+	const tpl = fs.readFileSync(join(TEMPLATE_DIR, templateFile), "utf8");
 	// console.log(smtpConfig, tpl)
 	return {
 		sendMail(options: any, cb: Function) {

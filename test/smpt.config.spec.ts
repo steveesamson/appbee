@@ -3,7 +3,7 @@ import path from "path";
 import { configure, configuration } from "../src/common/utils/configurer";
 const expected = {
     sender: 'Domain Supports <support@domain.net>',
-    templateFile:'templates/mail.html',
+    templateFile:'mail.html',
     host: 'smtp.domain.com',
     port: 465,
     secure:true,

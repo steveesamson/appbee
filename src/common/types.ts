@@ -49,8 +49,6 @@ export interface ControllerRequest {
 export interface MiddlewareRoutine {
 	(req: Request, res: Response, next: NextFunction): void;
 }
-// export type ControllerRequest = (req: Request, res: Response) => void;
-// export type MiddlewareRoutine = (req: Request, res: Response, next: NextFunction) => void;
 
 //method path is the key, ControllerRequest, the handler is the value
 export interface RouteConfig {
@@ -61,9 +59,6 @@ export interface RouteConfig {
 export interface RouteMap {
 	[key: string]: RouteConfig;
 }
-// export interface Models {
-//   [key: string]: Model;
-// }
 
 //models name is the key, its Model is the value
 export interface ModelMap {
@@ -91,16 +86,16 @@ export interface StoreConfig {
 export interface AppConfig {
 	port: number;
 	spa: boolType;
-	useStore: boolType;
 	useMultiTenant: boolType;
 	mountRestOn: string;
 }
 
 export interface ViewConfig {
-	engine: string;
-	staticDir: string;
-	viewDir: string;
-	indexFile: string;
+	engine?: string;
+	staticDir?: string;
+	viewDir?: string;
+	indexFile?: string;
+	templateDir?: string;
 }
 export interface LdapConfig {
 	host: string;
@@ -153,10 +148,7 @@ export interface GetModels {
 }
 export interface Modules {
 	controllers: RouteMap;
-	// models: GetModels;
-	// dataSources: any;
 	policies: MiddlewareConfig;
-	// configuration: Configuration;
 	crons: CronConfig[];
 	middlewares: MiddlewareConfig[];
 }
@@ -169,6 +161,7 @@ export interface ioRequest {
 }
 export interface AppState {
 	isMultitenant?: boolean;
+	TEMPLATE_DIR?: string;
 	SERVER_TYPE?: string;
 	APP_PORT?: number;
 	MOUNT_PATH?: string;

@@ -5,7 +5,6 @@ import { configure, configuration} from "../src/common/utils/configurer";
 const expected:AppConfig = {
  port : 8000,
  spa:true,
- useStore:false,
  useMultiTenant:false,
  mountRestOn:""
 };
