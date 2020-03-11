@@ -35,10 +35,11 @@ export default (async () => ({
 		"typescript",
 		"glob",
 		"chokidar",
+		"querystring",
 	],
 	plugins: [
 		resolve({
-			preferBuiltins: true,
+			preferBuiltins: false,
 			extensions: [".ts", ".tsx"],
 		}),
 		commonjs(),

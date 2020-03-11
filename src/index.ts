@@ -1,6 +1,6 @@
 import os from "os";
 import cluster, { Cluster } from "cluster";
-import net from "net";
+import { Server, createServer } from "net";
 import { existsSync as x } from "fs";
 import { join } from "path";
 import sioRedis from "socket.io-redis";
@@ -39,7 +39,7 @@ import {
 
 import { loadConfig, loadModules } from "./common/utils/loaders";
 
-import createServer from "./common/server";
+import createNextServer from "./common/server";
 import { Models } from "./common/utils/storeModels";
 import { appState } from "./common/appState";
 
@@ -57,10 +57,10 @@ const startDevServer = async (base: string): Promise<Application> => {
 	}
 
 	process.env.SERVER_TYPE = "STAND_ALONE";
-	return await createServer(base);
+	return await createNextServer(base);
 };
 
-const startCluster = async (base: string): Promise<net.Server> => {
+const startCluster = async (base: string): Promise<Server> => {
 	if (cluster.isMaster) {
 		base = base || process.cwd();
 		const ok = (p: string): boolean => x(join(base, p));
@@ -141,23 +141,21 @@ const startCluster = async (base: string): Promise<net.Server> => {
 		};
 
 		// Create the outside facing server listening on our port.
-		const server = net
-			.createServer(
-				{
-					pauseOnConnect: true,
-				},
-				connection => {
-					// We received a connection and need to pass it to the appropriate
-					// worker. Get the worker for this connection's source IP and pass
-					// it the connection.
-					const worker = workers[workerIndex(connection.remoteAddress, numCPUs)];
+		const server = createServer(
+			{
+				pauseOnConnect: true,
+			},
+			connection => {
+				// We received a connection and need to pass it to the appropriate
+				// worker. Get the worker for this connection's source IP and pass
+				// it the connection.
+				const worker = workers[workerIndex(connection.remoteAddress, numCPUs)];
 
-					worker.send("sticky-session:connection", connection);
-				},
-			)
-			.listen(application.port, () => {
-				console.log(`Server started on localhost:${application.port}...`);
-			});
+				worker.send("sticky-session:connection", connection);
+			},
+		).listen(application.port, () => {
+			console.log(`Server started on localhost:${application.port}...`);
+		});
 
 		const shutdown = () => {
 				console.log("Shutting down...");
@@ -198,7 +196,7 @@ const startCluster = async (base: string): Promise<net.Server> => {
 		return server;
 	} else {
 		// console.log(modules);
-		const app = await createServer(base);
+		const app = await createNextServer(base);
 
 		// Tell Socket.IO to use the redis adapter. By default, the redis
 		// server is assumed to be on localhost:6379. You don't have to
