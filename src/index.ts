@@ -47,7 +47,7 @@ const farmhash: any = require("farmhash");
 
 const numCPUs = os.cpus().length;
 
-const startDevServer = async (base: string): Promise<Application> => {
+const startDevServer = async (base: string, sapper?: any): Promise<Application> => {
 	base = base || process.cwd();
 	const ok = (p: string): boolean => x(join(base, p));
 
@@ -57,10 +57,10 @@ const startDevServer = async (base: string): Promise<Application> => {
 	}
 
 	process.env.SERVER_TYPE = "STAND_ALONE";
-	return await createNextServer(base);
+	return await createNextServer(base, sapper);
 };
 
-const startCluster = async (base: string): Promise<Server> => {
+const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 	if (cluster.isMaster) {
 		base = base || process.cwd();
 		const ok = (p: string): boolean => x(join(base, p));
@@ -196,7 +196,7 @@ const startCluster = async (base: string): Promise<Server> => {
 		return server;
 	} else {
 		// console.log(modules);
-		const app = await createNextServer(base);
+		const app = await createNextServer(base, sapper);
 
 		// Tell Socket.IO to use the redis adapter. By default, the redis
 		// server is assumed to be on localhost:6379. You don't have to

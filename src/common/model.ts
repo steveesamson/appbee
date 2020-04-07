@@ -45,6 +45,7 @@ const baseModel = function(model: string): Model {
 		verbatims: [], //['attachments'] excludes from mclean.
 		searchPath: [], //['attachments'] excludes from mclean.
 		orderBy: "",
+		insertKey: "id",
 		publishCreate(req: Request, load: Record) {
 			if (req.io) {
 				const pload = {
@@ -139,8 +140,10 @@ const baseModel = function(model: string): Model {
 		},
 		async create(options: Params) {
 			const validOptions = this.validOptions(options);
-			const result = await this.db(this.collection).insert(validOptions, ["id"]);
-			return result && result.length ? { id: result[0] } : null;
+			const idKey = this.insertKey;
+			const result = await this.db(this.collection).insert(validOptions, [idKey]);
+			console.log("returns: ", result);
+			return result && result.length ? { [idKey]: result[0] } : null;
 		},
 		async update(options: Params) {
 			const { id, where } = options;

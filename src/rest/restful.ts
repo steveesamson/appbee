@@ -8,20 +8,20 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 
 	map[`get ${baseUrl}`] = async (req: Request, res: Response) => {
 		const model = Models["get" + modelName](req);
-		const [error, rows] = await raa(model.find(req.parameters));
-		if (rows) {
-			res.status(200).json({ data: rows });
+		const { error, data } = await raa(model.find(req.parameters));
+		if (data) {
+			res.status(200).json({ data });
 		} else {
 			console.error(error);
-			res.status(200).json({ error: "Record not found!" });
+			res.status(200).json({ error: error.sqlMessage });
 		}
 	};
 
 	map[`get ${baseUrl}/:id`] = async (req: Request, res: Response) => {
 		const model = Models["get" + modelName](req);
-		const [error, rows] = await raa(model.find(req.parameters));
-		if (rows) {
-			res.status(200).json({ data: rows });
+		const { data, error } = await raa(model.find(req.parameters));
+		if (data) {
+			res.status(200).json({ data });
 		} else {
 			console.error(error.sqlMessage);
 			res.status(200).json({ error: error.sqlMessage });
@@ -30,12 +30,13 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 
 	map[`post ${baseUrl}`] = async (req: Request, res: Response) => {
 		const load = req.parameters;
-		console.log("post:", load);
 		const model = Models["get" + modelName](req);
-		const [error, result] = await raa(model.create(load));
+		const { error, data } = await raa(model.create(load));
 
-		if (result) {
-			const row = await model.find(result);
+		// console.log("saved with: ", error, result);
+		if (data) {
+			const row = await model.find(data);
+			// console.log("New Row: ", row);
 			model.publishCreate(req, row);
 			res.status(200).json({ data: row });
 		} else {
@@ -46,13 +47,13 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 	map[`put ${baseUrl}/:id`] = async (req: Request, res: Response) => {
 		const arg = req.parameters;
 		const model = Models["get" + modelName](req);
-		const [error, result] = await raa(model.update({ ...arg }));
+		const { error, data } = await raa(model.update({ ...arg }));
 
 		if (error) {
 			return res.status(200).json({ error: error.sqlMessage });
 		}
 
-		if (result) {
+		if (data) {
 			const row = await model.find({ id: arg.id });
 			model.publishUpdate(req, row);
 			res.status(200).json({ data: row });
@@ -68,13 +69,13 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 
 		// console.log("delete arg: ", arg);
 		const model = Models["get" + modelName](req);
-		const [error, result] = await raa(model.destroy({ ...arg }));
+		const { error, data } = await raa(model.destroy({ ...arg }));
 
 		if (error) {
 			return res.status(200).json({ error: error.sqlMessage });
 		}
 
-		if (result) {
+		if (data) {
 			const load = { id: arg.id };
 			model.publishDestroy(req, load);
 			res.status(200).json({ data: load });

@@ -40,6 +40,7 @@ export interface Model {
 	db: any;
 	orderBy?: string;
 	orderDirection?: "ASC" | "DESC";
+	insertKey?: string;
 	[key: string]: any;
 }
 export interface ControllerRequest {

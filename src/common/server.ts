@@ -39,7 +39,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const { PUBLIC_DIR, APP_PORT, MOUNT_PATH } = appState();
 
 	// console.log("APP_STATE:", appState());
-	console.log("TYPE:", process.env.SERVER_TYPE);
+	console.log("TYPE:", process.env.SERVER_TYPE, " Sapper?: ", !!sapper);
 
 	app.use(
 		helmet(),

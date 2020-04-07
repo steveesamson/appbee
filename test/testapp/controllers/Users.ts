@@ -26,7 +26,7 @@ let users = [
           return res.status(200).json({data:{count:users.length}});
       }
       if(id){
-            return res.status(200).json({data:users.find( (u:any) => u.id === id)})
+            return res.status(200).json({data:users.find( (u:any) => u.id == id)})
         }
     res.status(200).json({data:users});
   })
@@ -44,8 +44,8 @@ let users = [
      if(!id && !where){
          return res.status(200).json({error:"You need an id/where object to update any model"});
      }
-     users = users.map((u:any) => u.id === id? ({...u,...others}) : (u));
-    res.status(200).json({data:users.find((u:any) => u.id === id)});
+     users = users.map((u:any) => u.id == id? ({...u,...others}) : (u));
+    res.status(200).json({data:users.find((u:any) => u.id == id)});
   });
 
   del(`/users/:id?`, (req: Request, res: Response) => {
@@ -53,8 +53,8 @@ let users = [
      if(!id && !where){
          return res.status(200).json({error:"You need an id/where object to delete any model"});
      }
-     const user = users.find((u:any) => u.id === id);
-     users = users.filter((u:any) => u.id !== id);
+     const user = users.find((u:any) => u.id == id);
+     users = users.filter((u:any) => u.id != id);
     res.status(200).json({data:user});
   });
 
@@ -64,7 +64,7 @@ let users = [
      if(!id && !where){
          return res.status(200).json({error:"You need an id/where object to update any model"});
      }
-     users = users.map((u:any) => u.id === id? ({...u,...others}) : (u));
-    res.status(200).json({data:users.find((u:any) => u.id === id)});
+     users = users.map((u:any) => u.id == id? ({...u,...others}) : (u));
+    res.status(200).json({data:users.find((u:any) => u.id == id)});
   });
 

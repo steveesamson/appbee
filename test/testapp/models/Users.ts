@@ -19,6 +19,7 @@ const Users = {
 		created_time: 'string',
   },
   searchPath:['username','account_name'],
+  insertKey:'id',
   uniqueKeys:['id'],
   
 };
