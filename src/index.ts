@@ -21,6 +21,7 @@ import {
 	Token,
 	compileTypeScript,
 	watchServerFiles,
+	getPlugin,
 } from "./common/utils/index";
 
 import {
@@ -235,6 +236,7 @@ const utils: UtilsType = {
 const serve = process.env.NODE_ENV === "development" ? startDevServer : startCluster;
 export {
 	Models,
+	getPlugin,
 	Route,
 	utils,
 	serve,
