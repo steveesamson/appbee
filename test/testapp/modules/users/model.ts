@@ -1,5 +1,5 @@
 
-const Users = {
+ const Users = {
   attributes:{
     id: 'int',
     upline: 'int',
@@ -24,4 +24,4 @@ const Users = {
   
 };
 
-export = Users;
+export {Users};

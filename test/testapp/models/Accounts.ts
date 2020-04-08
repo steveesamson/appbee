@@ -1,6 +1,0 @@
-
-const Accounts = {
-    
-};
-
-export = Accounts;

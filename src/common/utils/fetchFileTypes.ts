@@ -7,3 +7,5 @@ const curry = (ext: string) => (dir: string) => {
 };
 
 export default curry;
+
+export const listDir = (dir: string) => readdirSync(dir);

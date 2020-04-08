@@ -51,8 +51,8 @@ const startDevServer = async (base: string, sapper?: any): Promise<Application> 
 	base = base || process.cwd();
 	const ok = (p: string): boolean => x(join(base, p));
 
-	if (!ok("controllers") || !ok("models") || !ok("config")) {
-		console.error("Sorry, am bailing; I cannot find 'controllers', 'models' or 'config' folders in your application.");
+	if (!ok("modules") || !ok("config")) {
+		console.error("Sorry, am bailing; I cannot find 'modules' or 'config' folders in your application.");
 		return null;
 	}
 
@@ -65,10 +65,8 @@ const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 		base = base || process.cwd();
 		const ok = (p: string): boolean => x(join(base, p));
 
-		if (!ok("controllers") || !ok("models") || !ok("config")) {
-			console.error(
-				"Sorry, am bailing; I cannot find 'controllers', 'models' or 'config' folders in your application.",
-			);
+		if (!ok("modules") || !ok("config")) {
+			console.error("Sorry, am bailing; I cannot find 'modules' or 'config' folders in your application.");
 			return null;
 		}
 		const { application, store, smtp } = await loadConfig(base);

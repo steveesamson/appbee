@@ -1,4 +1,4 @@
-import { Route, Request, Response } from "../../../src";
+import { Route, Request, Response } from "../../../../src";
 // Route("Users","/users");
 const { get, post,put, patch, del } = Route("Users","/users");
 

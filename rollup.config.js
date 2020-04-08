@@ -2,6 +2,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import tsc from "rollup-plugin-typescript2";
+// import alias from "@rollup/plugin-alias";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -38,6 +39,15 @@ export default (async () => ({
 		"querystring",
 	],
 	plugins: [
+		// alias({
+		// 	entries: [
+		// 		{ find: "common", replacement: __dirname + "/src/common" },
+		// 		{ find: "rest", replacement: __dirname + "/src/rest" },
+		// 		{ find: "restutils", replacement: __dirname + "/src/rest/utils" },
+		// 		{ find: "commonutils", replacement: __dirname + "/src/common/utils" },
+		// 		{ find: "base", replacement: __dirname + "/src" },
+		// 	],
+		// }),
 		resolve({
 			preferBuiltins: false,
 			extensions: [".ts", ".tsx"],

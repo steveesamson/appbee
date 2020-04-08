@@ -4,6 +4,7 @@ import cdc from "./changeDataCapture";
 import mailer from "./mailer";
 import cronMaster from "./cronMaster";
 import mailMaster from "./mailMaster";
+import { getPlugin } from "./plugins";
 
 import { BeeError, SqlError } from "./Error";
 import { writeFileTo, writeStreamTo } from "./writers";
@@ -23,4 +24,5 @@ export {
 	raa,
 	BeeError,
 	SqlError,
+	getPlugin,
 };

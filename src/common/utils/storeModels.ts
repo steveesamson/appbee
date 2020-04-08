@@ -1,7 +1,7 @@
 import path from "path";
 import { Request } from "express";
 import _ from "lodash";
-import filesWithExtension from "./fetchFileTypes";
+import { listDir } from "./fetchFileTypes";
 import baseModel from "../model";
 import { Model, Configuration, GetModels } from "../types";
 import Mails from "../../rest/utils/Mails";
@@ -9,7 +9,6 @@ import Redo from "../../rest/utils/Redo";
 
 const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
-const fetchTypeFiles = filesWithExtension(ext);
 
 const makeModel = (name: string, defaultModel: Model, config: Configuration): void => {
 	const parentModel = baseModel(name),
@@ -33,19 +32,15 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 };
 
 const loadModels = async (base: string, config: Configuration) => {
-	base = path.resolve(base, "models");
+	base = path.resolve(base, "modules");
 
-	let list = fetchTypeFiles(base);
-	list = [...list];
+	const list = listDir(base),
+		len = list.length;
 
-	for (let i = 0; i < list.length; ++i) {
-		const model = list[i],
-			name = path.basename(model, ext),
-			// modelPath = model.indexOf("../../rest/utils/") === -1 ? : model,
-			modelObject = await import(path.resolve(base, model)),
-			defaultModel = modelObject.default;
-
-		makeModel(name, defaultModel, config);
+	for (let i = 0; i < len; ++i) {
+		const model = await import(path.resolve(base, list[i], `model${ext}`)),
+			name = Object.keys(model)[0];
+		makeModel(name, model[name], config);
 	}
 	makeModel("Mails", Mails as any, config);
 	makeModel("Redo", Redo as any, config);

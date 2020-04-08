@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import _ from "lodash";
-import filesWithExtension from "./fetchFileTypes";
+import filesWithExtension, { listDir } from "./fetchFileTypes";
 import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration } from "../types";
 import { routes } from "../../rest/route";
 import baseREST from "../../rest/restful";
@@ -71,7 +71,6 @@ const loadModules = async (base: string, type: string): Promise<Record | CronCon
 
 	for (let i = 0; i < list.length; ++i) {
 		const module = list[i],
-			// name = path.basename(module, ext),
 			moduleObject = await import(path.resolve(base, module));
 
 		modules.push(moduleObject.default);
@@ -81,12 +80,12 @@ const loadModules = async (base: string, type: string): Promise<Record | CronCon
 };
 
 const loadControllers = async (base: string, store: StoreConfig): Promise<RouteMap> => {
-	base = path.resolve(base, "controllers");
+	base = path.resolve(base, "modules");
+	const list = listDir(base),
+		len = list.length;
 
-	const list = fetchTypeFiles(base);
-
-	for (let i = 0; i < list.length; ++i) {
-		await import(path.resolve(base, list[i]));
+	for (let i = 0; i < len; ++i) {
+		await import(path.resolve(base, list[i], `controller${ext}`));
 	}
 	mailController();
 	redoController();

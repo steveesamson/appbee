@@ -151,6 +151,7 @@ export interface Modules {
 	controllers: RouteMap;
 	policies: MiddlewareConfig;
 	crons: CronConfig[];
+	plugins: Record;
 	middlewares: MiddlewareConfig[];
 }
 export interface ioRequest {
