@@ -81,7 +81,6 @@
 		"@types/node-cron": "^2.0.2",
 		"@types/nodemailer": "^6.4.0",
 		"@types/nodemailer-smtp-pool": "^1.0.31",
-		"@types/path-to-regexp": "^1.7.0",
 		"@types/shortid": "^0.0.29",
 		"@types/socket.io": "^2.1.4",
 		"@types/socket.io-client": "^1.4.32",
