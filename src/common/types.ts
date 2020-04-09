@@ -89,6 +89,7 @@ export interface AppConfig {
 	spa: boolType;
 	useMultiTenant: boolType;
 	mountRestOn: string;
+	[key: string]: any;
 }
 
 export interface ViewConfig {
@@ -172,6 +173,7 @@ export interface AppState {
 	VIEW_DIR?: string;
 	SECRET?: string;
 	IO?: any;
+	[key: string]: any;
 }
 
 export interface CallBackFunction {

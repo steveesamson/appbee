@@ -1,6 +1,7 @@
 import path from "path";
 
-import { configure, modules } from "../src/common/utils/configurer";
+import { configure } from "../src/common/utils/configurer";
+import { getPlugin} from "../src/common/utils/plugins";
 const expectedFolders = 'listFolders',
  expectedFiles = 'listFiles';
 
@@ -10,13 +11,14 @@ describe("plugins", () => {
     });
   it("expects listFiles to return 'listFiles'", async () => {
      
-      const { plugins } = modules;
-    expect(plugins.listFiles()).toBe(expectedFiles);
+    const listFiles = getPlugin('listFiles');
+    expect(listFiles()).toBe(expectedFiles);
   });
 
    it("expects listFolders to return 'listFolders'", async () => {
-      const { plugins } = modules;
-    expect(plugins.listFolders()).toBe(expectedFolders);
+      // const { plugins } = modules;
+     const listFolders = getPlugin('listFolders');
+    expect(listFolders()).toBe(expectedFolders);
   });
 
 });

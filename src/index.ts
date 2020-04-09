@@ -57,8 +57,30 @@ const startDevServer = async (base: string, sapper?: any): Promise<Application> 
 		return null;
 	}
 
+	const { application, store, smtp } = await loadConfig(base);
+	const crons = (await loadModules(base, "crons")) as CronConfig[];
+
 	process.env.SERVER_TYPE = "STAND_ALONE";
-	return await createNextServer(base, sapper);
+	const serva = await createNextServer(base, sapper),
+		startWatches = () => {
+			Object.keys(store).forEach(k => {
+				const db = store[k];
+				if (db.cdc) {
+					const ChangeDataCapture = cdc(k);
+					ChangeDataCapture.start();
+				}
+
+				if (db.maillog) {
+					const Mler = mailer(smtp),
+						MailSender = mailMaster(k, Mler);
+					MailSender.start();
+				}
+			});
+
+			cronMaster.init(crons);
+		};
+	startWatches();
+	return serva;
 };
 
 const startCluster = async (base: string, sapper?: any): Promise<Server> => {

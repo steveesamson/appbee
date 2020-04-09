@@ -22,15 +22,19 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const staticDir = view.staticDir || "";
 	const viewDir = view.viewDir || "";
 	const templateDir = view.templateDir || "";
+	const { useMultiTenant, port, mountRestOn, ...restapp } = application;
+	const { secret, ...restsecurity } = security;
 	appState({
-		isMultitenant: application.useMultiTenant === true,
-		APP_PORT: application.port,
-		MOUNT_PATH: application.mountRestOn || "",
+		isMultitenant: useMultiTenant === true,
+		APP_PORT: port,
+		MOUNT_PATH: mountRestOn || "",
 		BASE_DIR: base,
 		PUBLIC_DIR: join(base, staticDir),
 		VIEW_DIR: join(base, viewDir),
 		TEMPLATE_DIR: join(base, templateDir),
-		SECRET: security.secret,
+		SECRET: secret,
+		...restsecurity,
+		...restapp,
 	});
 	const { policies, middlewares } = modules;
 	const router: Router = configureRestRoutes(policies);

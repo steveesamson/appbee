@@ -3,7 +3,7 @@ import _ from "lodash";
 import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
 import { loadModels } from "./storeModels";
-import { loadLibraries } from "./plugins";
+import { loadPlugins } from "./plugins";
 import { configure as configureDataSources } from "./dataSource";
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
@@ -139,7 +139,7 @@ const configure = async (base: string) => {
 
 	modules.policies = await configurePolicies(base, configuration.policy);
 
-	modules.plugins = await loadLibraries(base);
+	modules.plugins = await loadPlugins(base);
 	// console.log("Plugins: ", modules.plugins);
 	await loadModels(base, configuration);
 };

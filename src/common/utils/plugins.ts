@@ -3,10 +3,12 @@ import { Record } from "../types";
 import filesWithExtension from "./fetchFileTypes";
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 const fetchTypeFiles = filesWithExtension(ext);
+interface PluginTypes {
+	[key: string]: Function;
+}
+const plugins: PluginTypes = {};
 
-const plugins: Record = {};
-
-const loadLibraries = async (base: string): Promise<Record> => {
+const loadPlugins = async (base: string): Promise<Record> => {
 	base = path.resolve(base, "plugins");
 
 	const list = fetchTypeFiles(base);
@@ -19,4 +21,4 @@ const loadLibraries = async (base: string): Promise<Record> => {
 };
 const getPlugin = (name: string) => plugins[name];
 
-export { loadLibraries, getPlugin };
+export { loadPlugins, getPlugin };
