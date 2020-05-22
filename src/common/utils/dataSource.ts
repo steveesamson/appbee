@@ -2,17 +2,26 @@ import knex from "knex";
 import { DBConfig, StoreConfig } from "../types";
 
 const DataSources: any = {};
-const createSource = ({ type, host, user, password, database, debug }: DBConfig) =>
-	knex({
+const createSource = ({ type, host, user, password, database, debug = false, port = 0 }: DBConfig) => {
+	const connection = port
+		? {
+				host,
+				user,
+				password,
+				database,
+		  }
+		: {
+				host,
+				user,
+				password,
+				database,
+		  };
+	return knex({
 		debug,
 		client: type,
-		connection: {
-			host,
-			user,
-			password,
-			database,
-		},
+		connection,
 	});
+};
 
 const configure = (store: StoreConfig) => {
 	Object.keys(store).forEach((key: string) => {

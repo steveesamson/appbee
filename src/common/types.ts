@@ -72,10 +72,11 @@ export type boolType = true | false;
 export interface DBConfig {
 	type: dbType;
 	host: string;
+	port?: string | number;
 	user: string;
 	database: string;
 	password: string;
-	debug: boolType;
+	debug?: boolType;
 	cdc?: boolType;
 	maillog?: boolType;
 }
