@@ -2,7 +2,7 @@ import knex from "knex";
 import { DBConfig, StoreConfig } from "../types";
 
 const DataSources: any = {};
-const dataSource = ({ type, host, user, password, database, debug }: DBConfig) =>
+const createSource = ({ type, host, user, password, database, debug }: DBConfig) =>
 	knex({
 		debug,
 		client: type,
@@ -17,11 +17,11 @@ const dataSource = ({ type, host, user, password, database, debug }: DBConfig) =
 const configure = (store: StoreConfig) => {
 	Object.keys(store).forEach((key: string) => {
 		try {
-			DataSources[key] = dataSource(store[key]);
+			DataSources[key] = createSource(store[key]);
 		} catch (e) {
 			console.error(e);
 		}
 	});
 };
 
-export { configure, DataSources };
+export { configure, createSource, DataSources };

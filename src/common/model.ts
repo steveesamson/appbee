@@ -3,6 +3,8 @@ import { Request } from "express";
 import { Record, Model, Params } from "./types";
 import { SqlError } from "./utils/Error";
 import { appState } from "./appState";
+import { Models } from "./utils/storeModels";
+import raa from "./utils/handleAsyncAwait";
 // if (typeof String.prototype.startsWith == "undefined") {
 //   String.prototype.startsWith = function(prefix): boolean {
 //     return this.indexOf(prefix) === 0;
@@ -12,7 +14,9 @@ import { appState } from "./appState";
 const baseModel = function(model: string): Model {
 	const modelName = model.toLowerCase(),
 		broadcast = (load: Record): void => {
-			appState().IO.emit("comets", load);
+			const { IO } = appState();
+			// console.log("IO: ", IO, load);
+			IO.emit("comets", load);
 		};
 	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any) => {
 		if (searchStrings.length) {
@@ -173,6 +177,32 @@ const baseModel = function(model: string): Model {
 			return this.db(this.collection)
 				.where(arg)
 				.del();
+		},
+		async emitToAll(req: Request, _data: Params) {
+			// console.log("Got: ", _data);
+
+			const { room_id, room, verb, tenant } = _data;
+
+			if (verb === "destroy") {
+				const data = {
+					id: room_id,
+				};
+				const param = { room, verb, tenant, data };
+				// console.log(param);
+				broadcast(param);
+			} else {
+				const _model = Models[room];
+				if (typeof _model !== "function") return;
+
+				const model = _model(req);
+				const { error, data } = await raa(model.find({ id: room_id }));
+
+				if (!error) {
+					const param = { room, verb, tenant, data };
+					// console.log(param);
+					broadcast(param);
+				}
+			}
 		},
 	};
 

@@ -4,7 +4,7 @@ import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
 import { loadModels } from "./storeModels";
 import { loadPlugins } from "./plugins";
-import { configure as configureDataSources } from "./dataSource";
+import { configure as configureDataSources, createSource } from "./dataSource";
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
@@ -150,6 +150,7 @@ export {
 	configureDataSources,
 	configureRestRoutes,
 	configure,
+	createSource,
 	ioRoutes,
 	configuration,
 	modules,

@@ -6,16 +6,15 @@ import { appState } from "../appState";
 
 const { http } = request();
 
-http
-	.set("host", "localhost")
-	.set("port", appState().APP_PORT)
-	.setHeader("Content-Type", "application/json");
-
-const sendRedo = (options: Record) => http.post("/redo", options);
-
 const ChangeDataCapture: ChangeDataCaptureType = (_db: string) => {
 	if (!DataSources[_db]) return { start: () => false };
 
+	const { MOUNT_PATH, APP_PORT } = appState();
+	const sendRedo = (options: Record) => http.post(`${MOUNT_PATH}/redo`, options);
+	http
+		.set("host", "localhost")
+		.set("port", APP_PORT)
+		.setHeader("Content-Type", "application/json");
 	const _req: any = { db: DataSources[_db] },
 		Redo = Models.getRedo(_req),
 		redo = async () => {

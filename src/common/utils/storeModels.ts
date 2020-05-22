@@ -1,9 +1,10 @@
 import path from "path";
-import { Request } from "express";
+import fs from "fs";
 import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
 import baseModel from "../model";
-import { Model, Configuration, GetModels } from "../types";
+
+import { Model, Configuration, GetModels, ReqWithDB, Params, Record } from "../types";
 import Mails from "../../rest/utils/Mails";
 import Redo from "../../rest/utils/Redo";
 
@@ -19,7 +20,7 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
 
 	Models["get" + name] = ((mdl: any) => {
-		return (req: Request): Model => {
+		const lookup = (req: ReqWithDB): Model => {
 			const copy = _.clone(mdl);
 			if (!req || !req.db) {
 				console.error("Null db object, check all your database connections. Looks like no db was configured...");
@@ -28,6 +29,11 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 
 			return copy;
 		};
+
+		if (mdl.collection) {
+			Models[mdl.collection] = lookup;
+		}
+		return lookup;
 	})(emblished);
 };
 
@@ -38,6 +44,8 @@ const loadModels = async (base: string, config: Configuration) => {
 		len = list.length;
 
 	for (let i = 0; i < len; ++i) {
+		const dir = path.resolve(base, list[i], `model${ext}`);
+		if (!fs.existsSync(dir)) continue;
 		const model = await import(path.resolve(base, list[i], `model${ext}`)),
 			name = Object.keys(model)[0];
 		makeModel(name, model[name], config);

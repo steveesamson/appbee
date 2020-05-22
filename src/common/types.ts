@@ -145,8 +145,20 @@ export interface Configuration {
 	smtp: Record;
 	policy: PolicyConfig;
 }
-export interface GetModels {
+
+export interface getByCollectionType {
+	[key: string]: (collection: string, req: Request) => Model | null;
+}
+
+export interface ReqWithDB {
+	db?: any;
+}
+export interface getByInstance {
 	[key: string]: (req: Request) => Model;
+}
+
+export interface GetModels {
+	[key: string]: (req: ReqWithDB) => Model;
 }
 export interface Modules {
 	controllers: RouteMap;

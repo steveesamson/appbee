@@ -22,7 +22,7 @@ const transports = {
 	params = (data: any = {}) => JSON.stringify(data);
 
 const createRequest = (type: string) => (url: string, method: string, data?: any) => {
-		const copy = {};
+		const copy: any = {};
 		Object.assign(copy, options, {
 			method: method,
 			path: url,
@@ -35,7 +35,17 @@ const createRequest = (type: string) => (url: string, method: string, data?: any
 				}
 				res.setEncoding("utf8");
 				res.on("data", (body: any) => {
-					resolve({ status: res.statusCode, body: JSON.parse(body) });
+					try {
+						resolve({ status: res.statusCode, body: JSON.parse(body) });
+					} catch (x) {
+						resolve({
+							status: 200,
+							body: {
+								error: `Parse error: cannot parse response from: ${method} ${copy.hostname}:${copy.port}/${url}`,
+								data: null,
+							},
+						});
+					}
 				});
 			});
 			req.on("error", (e: any) => {

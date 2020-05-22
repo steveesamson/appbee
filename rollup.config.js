@@ -60,6 +60,6 @@ export default (async () => ({
 		json({
 			exclude: ["node_modules/**"],
 		}),
-		isProduction && (await import("rollup-plugin-terser")).terser(),
+		// isProduction && (await import("rollup-plugin-terser")).terser(),
 	],
 }))();

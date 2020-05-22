@@ -10,7 +10,14 @@ const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
 import beeMultiparts from "../rest/multiParts";
-import { configureIORoutes, configureRestRoutes, configuration, configure, modules } from "./utils/configurer";
+import {
+	configureIORoutes,
+	configureRestRoutes,
+	configuration,
+	configure,
+	modules,
+	createSource,
+} from "./utils/configurer";
 import { appState } from "./appState";
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
@@ -33,6 +40,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		VIEW_DIR: join(base, viewDir),
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
+		createSource,
 		...restsecurity,
 		...restapp,
 	});

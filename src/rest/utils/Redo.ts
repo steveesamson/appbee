@@ -3,7 +3,7 @@ const Redo = {
 		verb: "string",
 		id: "int",
 		room: "string",
-		room_id: "int",
+		room_id: "string",
 	},
 	uniqueKeys: ["id"],
 };

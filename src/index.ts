@@ -79,7 +79,9 @@ const startDevServer = async (base: string, sapper?: any): Promise<Application> 
 
 			cronMaster.init(crons);
 		};
+
 	startWatches();
+
 	return serva;
 };
 
