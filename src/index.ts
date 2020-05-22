@@ -35,6 +35,7 @@ import {
 	ViewConfig,
 	Model,
 	CronConfig,
+	DBConfig,
 	UtilsType,
 } from "./common/types";
 
@@ -275,6 +276,7 @@ export {
 	Params,
 	Record,
 	ViewConfig,
+	DBConfig,
 	Model,
 	Request,
 	Response,
