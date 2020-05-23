@@ -7,6 +7,7 @@ const createSource = ({ type, host, user, password, database, debug = false, por
 		? {
 				host,
 				user,
+				port,
 				password,
 				database,
 		  }
