@@ -39,15 +39,6 @@ export default (async () => ({
 		"querystring",
 	],
 	plugins: [
-		// alias({
-		// 	entries: [
-		// 		{ find: "common", replacement: __dirname + "/src/common" },
-		// 		{ find: "rest", replacement: __dirname + "/src/rest" },
-		// 		{ find: "restutils", replacement: __dirname + "/src/rest/utils" },
-		// 		{ find: "commonutils", replacement: __dirname + "/src/common/utils" },
-		// 		{ find: "base", replacement: __dirname + "/src" },
-		// 	],
-		// }),
 		resolve({
 			preferBuiltins: false,
 			extensions: [".ts", ".tsx"],
@@ -60,6 +51,6 @@ export default (async () => ({
 		json({
 			exclude: ["node_modules/**"],
 		}),
-		// isProduction && (await import("rollup-plugin-terser")).terser(),
+		isProduction && (await import("rollup-plugin-terser")).terser(),
 	],
 }))();

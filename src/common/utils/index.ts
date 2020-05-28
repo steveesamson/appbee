@@ -7,13 +7,30 @@ import mailMaster from "./mailMaster";
 import { getPlugin } from "./plugins";
 
 import { BeeError, SqlError } from "./Error";
-import { writeFileTo, writeStreamTo } from "./writers";
+import {
+	writeFileTo,
+	writeStreamTo,
+	cropPicture,
+	exportToExcel,
+	getCaptcha,
+	resizeImage,
+	streamToPicture,
+	unlinkFiles,
+	uploadFile,
+} from "./writers";
 import { compileTypeScript, watchServerFiles } from "./rollup";
 
 export { Encrypt, Token } from "./security";
 export {
 	writeFileTo,
 	writeStreamTo,
+	cropPicture,
+	exportToExcel,
+	getCaptcha,
+	resizeImage,
+	streamToPicture,
+	unlinkFiles,
+	uploadFile,
 	compileTypeScript,
 	watchServerFiles,
 	request,

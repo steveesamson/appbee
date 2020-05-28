@@ -65,7 +65,7 @@ export interface RouteMap {
 export interface ModelMap {
 	[key: string]: Model;
 }
-export type dbType = "pg" | "mysql" | "mysql2" | "oracledb" | "mssql" | "sqlite3";
+export type dbType = "pg" | "mysql" | "mysql2" | "oracledb" | "mssql" | "sqlite3" | "mongodb";
 
 export type boolType = true | false;
 
@@ -96,6 +96,7 @@ export interface AppConfig {
 export interface ViewConfig {
 	engine?: string;
 	staticDir?: string;
+	uploadDir?: string;
 	viewDir?: string;
 	indexFile?: string;
 	templateDir?: string;
@@ -213,7 +214,7 @@ export interface WriteFileType {
 	(req: Request, options: Params, cb: CallBackFunction): void;
 }
 export interface WriteStreamType {
-	(req: Request, options: Params, cb: CallBackFunction): void;
+	(req: Request, options: Params): Promise<AsyncResolve>;
 }
 
 export interface MailerType {
@@ -244,7 +245,11 @@ interface IKeyValueRequest {
 interface IWithOptionalDataRequest {
 	(url: string, data?: Record): Promise<Record>;
 }
-
+export interface AsyncResolve {
+	data?: any;
+	error?: any;
+	[key: string]: any;
+}
 export interface HttpRequestType {
 	(props: Record): {
 		http: {
@@ -272,6 +277,13 @@ export interface HttpRequestType {
 export interface UtilsType {
 	writeFileTo: WriteFileType;
 	writeStreamTo: WriteStreamType;
+	cropPicture: ControllerRequest;
+	exportToExcel: ControllerRequest;
+	getCaptcha: ControllerRequest;
+	resizeImage: ControllerRequest;
+	streamToPicture: ControllerRequest;
+	unlinkFiles: ControllerRequest;
+	uploadFile: ControllerRequest;
 	mailer: MailerType;
 	mailMaster: MailMasterType;
 	cronMaster: CronMasterType;

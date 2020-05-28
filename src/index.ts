@@ -7,7 +7,6 @@ import sioRedis from "socket.io-redis";
 import { Application, Request, Response, NextFunction } from "express";
 import { Route } from "./rest/route";
 import {
-	writeFileTo,
 	mailer,
 	mailMaster,
 	cronMaster,
@@ -16,12 +15,20 @@ import {
 	cdc,
 	request,
 	raa,
-	writeStreamTo,
 	Encrypt,
 	Token,
 	compileTypeScript,
 	watchServerFiles,
 	getPlugin,
+	writeStreamTo,
+	writeFileTo,
+	cropPicture,
+	exportToExcel,
+	getCaptcha,
+	resizeImage,
+	streamToPicture,
+	unlinkFiles,
+	uploadFile,
 } from "./common/utils/index";
 
 import {
@@ -243,14 +250,21 @@ const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 	}
 };
 const utils: UtilsType = {
+	writeStreamTo,
 	writeFileTo,
+	cropPicture,
+	exportToExcel,
+	getCaptcha,
+	resizeImage,
+	streamToPicture,
+	unlinkFiles,
+	uploadFile,
 	mailer,
 	mailMaster,
 	cronMaster,
 	cdc,
 	request,
 	raa,
-	writeStreamTo,
 	Encrypt,
 	Token,
 	rollup: {

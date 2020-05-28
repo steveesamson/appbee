@@ -5,7 +5,7 @@
 import Busboy from "busboy";
 import path from "path";
 import os from "os";
-import fs from "fs";
+import fs from "fs-extra";
 import qs from "querystring";
 import _ from "lodash";
 import { appState } from "../common/appState";
@@ -16,7 +16,6 @@ const multipart = () => {
 	const { PUBLIC_DIR } = appState();
 	return (req: any, res: Response, next: NextFunction) => {
 		req = req as Request;
-		const options = req.parameters;
 		let files: any = {},
 			body: any = {},
 			contentType = req.headers["content-type"],
@@ -60,23 +59,41 @@ const multipart = () => {
 		});
 
 		busboy.on("file", (fieldname: string, file: any, filename: string, encoding: string, mimetype: string) => {
-			const saveTo = options.uploadDir
-				? path.join(PUBLIC_DIR, options.uploadDir as string, path.basename(filename))
-				: path.join(os.tmpdir(), path.basename(filename));
+			const saveTo = path.join(os.tmpdir(), path.basename(filename));
 			file.pipe(fs.createWriteStream(saveTo));
+			body["uploadName"] = fieldname;
 			files[fieldname] = {
 				name: filename,
 				encoding: encoding,
 				path: saveTo,
 				ext: path.extname(path.basename(filename)),
 				mime: mimetype,
-				renameTo: function(dest: string, cb: any) {
-					fs.rename(this.path, dest, function(e) {
-						if (e) {
-							cb && cb(e);
-						} else {
-							cb && cb(null);
-						}
+				renameTo: function(dir: string, fileName: string) {
+					return new Promise(re => {
+						fs.ensureDir(dir)
+							.then(() => {
+								// console.log("dir: ", dir);
+								const dest = `${dir}/${fileName}`;
+								// console.log("dest: ", dest);
+
+								fs.rename(saveTo, dest, function(e: any) {
+									if (e) {
+										return re({ error: "Error while uploading -'" + filename + "' " + e.message });
+									}
+									const src = dest.replace(PUBLIC_DIR, "");
+									re({
+										data: {
+											text: "Document uploaded successfully.",
+											src,
+										},
+									});
+								});
+							})
+							.catch(err => {
+								re({
+									error: `Error while creating directory - ${dir} -${(err && err.message) || err.toString()}`,
+								});
+							});
 					});
 				},
 			};

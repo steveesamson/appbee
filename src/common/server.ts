@@ -29,6 +29,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const staticDir = view.staticDir || "";
 	const viewDir = view.viewDir || "";
 	const templateDir = view.templateDir || "";
+	const uploadDir = view.uploadDir || "";
 	const { useMultiTenant, port, mountRestOn, ...restapp } = application;
 	const { secret, ...restsecurity } = security;
 	appState({
@@ -37,6 +38,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		MOUNT_PATH: mountRestOn || "",
 		BASE_DIR: base,
 		PUBLIC_DIR: join(base, staticDir),
+		UPLOAD_DIR: join(base, staticDir, uploadDir),
 		VIEW_DIR: join(base, viewDir),
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
