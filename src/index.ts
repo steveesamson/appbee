@@ -46,6 +46,7 @@ import {
 	DBConfig,
 	UtilsType,
 	JobConfig,
+	PluginTypes,
 } from "./common/types";
 
 import { loadConfig, loadModules } from "./common/utils/loaders";
@@ -293,6 +294,8 @@ export {
 	StoreConfig,
 	LdapConfig,
 	PolicyConfig,
+	JobConfig,
+	CronConfig,
 	MiddlewareConfig,
 	Params,
 	Record,

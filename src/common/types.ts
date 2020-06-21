@@ -293,6 +293,9 @@ export interface HttpRequestType {
 		};
 	};
 }
+export interface PluginTypes {
+	[key: string]: Function;
+}
 export interface UtilsType {
 	writeFileTo: WriteFileType;
 	writeStreamTo: WriteStreamType;

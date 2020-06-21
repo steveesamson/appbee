@@ -1,15 +1,13 @@
 import path from "path";
 import fs from "fs";
-import { Record } from "../types";
+import { PluginTypes } from "../types";
 import filesWithExtension from "./fetchFileTypes";
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 const fetchTypeFiles = filesWithExtension(ext);
-interface PluginTypes {
-	[key: string]: Function;
-}
+
 const plugins: PluginTypes = {};
 
-const loadPlugins = async (base: string): Promise<Record> => {
+const loadPlugins = async (base: string): Promise<PluginTypes> => {
 	base = path.resolve(base, "plugins");
 	if (!fs.existsSync(base)) return {};
 	const list = fetchTypeFiles(base);
