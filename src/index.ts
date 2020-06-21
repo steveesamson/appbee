@@ -89,8 +89,10 @@ const startDevServer = async (base: string, sapper?: any): Promise<Application> 
 				}
 			});
 
-			cronMaster.init(crons);
-			jobMaster.init(jobs);
+			setTimeout(() => {
+				cronMaster.init(crons);
+				jobMaster.init(jobs);
+			}, 2000);
 		};
 
 	startWatches();
@@ -119,10 +121,6 @@ const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 		const workers: cluster.Worker[] = [],
 			startWatches = () => {
 				watchesStarted = true;
-				// const { store, smtp } = configuration;
-				// const { crons } = modules;
-
-				// console.log(cronMaster, mailMaster, mailer, cdc, configuration, modules);
 
 				Object.keys(store).forEach(k => {
 					const db = store[k];
@@ -137,9 +135,10 @@ const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 						MailSender.start();
 					}
 				});
-
-				cronMaster.init(crons);
-				jobMaster.init(jobs);
+				setTimeout(() => {
+					cronMaster.init(crons);
+					jobMaster.init(jobs);
+				}, 2000);
 			};
 
 		cluster
