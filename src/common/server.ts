@@ -17,6 +17,7 @@ import {
 	configure,
 	modules,
 	createSource,
+	DataSources,
 } from "./utils/configurer";
 import { appState } from "./appState";
 
@@ -43,6 +44,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
 		createSource,
+		getSource: (name: string) => DataSources[name],
 		...restsecurity,
 		...restapp,
 	});
