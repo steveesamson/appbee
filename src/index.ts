@@ -10,6 +10,7 @@ import {
 	mailer,
 	mailMaster,
 	cronMaster,
+	jobMaster,
 	BeeError,
 	SqlError,
 	cdc,
@@ -44,6 +45,7 @@ import {
 	CronConfig,
 	DBConfig,
 	UtilsType,
+	JobConfig,
 } from "./common/types";
 
 import { loadConfig, loadModules } from "./common/utils/loaders";
@@ -67,6 +69,7 @@ const startDevServer = async (base: string, sapper?: any): Promise<Application> 
 
 	const { application, store, smtp } = await loadConfig(base);
 	const crons = (await loadModules(base, "crons")) as CronConfig[];
+	const jobs = (await loadModules(base, "jobs")) as JobConfig[];
 
 	process.env.SERVER_TYPE = "STAND_ALONE";
 	const serva = await createNextServer(base, sapper),
@@ -86,6 +89,7 @@ const startDevServer = async (base: string, sapper?: any): Promise<Application> 
 			});
 
 			cronMaster.init(crons);
+			jobMaster.init(jobs);
 		};
 
 	startWatches();
@@ -104,6 +108,7 @@ const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 		}
 		const { application, store, smtp } = await loadConfig(base);
 		const crons = (await loadModules(base, "crons")) as CronConfig[];
+		const jobs = (await loadModules(base, "jobs")) as JobConfig[];
 
 		process.env.NODE_ENV = "production";
 		process.env.SERVER_TYPE = "CLUSTER";
@@ -133,6 +138,7 @@ const startCluster = async (base: string, sapper?: any): Promise<Server> => {
 				});
 
 				cronMaster.init(crons);
+				jobMaster.init(jobs);
 			};
 
 		cluster
@@ -262,6 +268,7 @@ const utils: UtilsType = {
 	mailer,
 	mailMaster,
 	cronMaster,
+	jobMaster,
 	cdc,
 	request,
 	raa,

@@ -16,7 +16,6 @@ describe("plugins", () => {
   });
 
    it("expects listFolders to return 'listFolders'", async () => {
-      // const { plugins } = modules;
      const listFolders = getPlugin('listFolders');
     expect(listFolders()).toBe(expectedFolders);
   });

@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import _ from "lodash";
 import filesWithExtension, { listDir } from "./fetchFileTypes";
-import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration } from "../types";
+import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration, JobConfig } from "../types";
 import { routes } from "../../rest/route";
 import baseREST from "../../rest/restful";
 import { NextFunction, Response } from "express";
@@ -63,8 +63,12 @@ const loadPolicy = async (base: string, policies: string[]): Promise<MiddlewareR
 	return policiesMap;
 };
 
-const loadModules = async (base: string, type: string): Promise<Record | CronConfig[] | MiddlewareConfig[]> => {
+const loadModules = async (
+	base: string,
+	type: string,
+): Promise<Record | CronConfig[] | MiddlewareConfig[] | JobConfig[]> => {
 	base = path.resolve(base, type);
+	if (!fs.existsSync(base)) return [];
 
 	const modules = [],
 		list = fetchTypeFiles(base);

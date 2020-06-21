@@ -3,6 +3,7 @@ import request from "./request";
 import cdc from "./changeDataCapture";
 import mailer from "./mailer";
 import cronMaster from "./cronMaster";
+import jobMaster from "./jobMaster";
 import mailMaster from "./mailMaster";
 import { getPlugin } from "./plugins";
 
@@ -38,6 +39,7 @@ export {
 	mailer,
 	mailMaster,
 	cronMaster,
+	jobMaster,
 	raa,
 	BeeError,
 	SqlError,

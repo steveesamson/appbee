@@ -135,6 +135,12 @@ export interface CronConfig {
 	immediate: boolType;
 	task: () => void;
 }
+export interface JobConfig {
+	name: string;
+	enabled: boolType;
+	start: () => void;
+	stop: () => void;
+}
 export interface MiddlewareConfig {
 	[key: string]: MiddlewareRoutine;
 }
@@ -198,8 +204,21 @@ export interface CronMasterType {
 	init(crons: CronConfig[]): void;
 	start(cronName: string): void;
 	stop(cronName: string): void;
+	add(cron: CronConfig): void;
 	startAll(): void;
 	stopAll(): void;
+	listAll(): void;
+}
+
+export interface JobMasterType {
+	init(jobs: JobConfig[]): void;
+	start(jobName: string): void;
+	stop(jobName: string): void;
+	startAll(): void;
+	stopAll(): void;
+	listAll(): void;
+	disable(jobName: string): void;
+	enable(jobName: string): void;
 }
 
 export interface MailMasterType {
@@ -287,6 +306,7 @@ export interface UtilsType {
 	mailer: MailerType;
 	mailMaster: MailMasterType;
 	cronMaster: CronMasterType;
+	jobMaster: JobMasterType;
 	cdc: ChangeDataCaptureType;
 	request: HttpRequestType;
 	raa: HandleAsyncAwait;
