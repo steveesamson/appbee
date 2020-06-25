@@ -1,43 +1,37 @@
+import shortid from "shortid";
 import { EventBusType } from "../types";
 
 const EventBus = (): EventBusType => {
 	const listeners: { [key: string]: Function | any } = {},
-		addListener = (eventName: string, fn: Function) => {
-			listeners[eventName] = listeners[eventName] || [];
-			listeners[eventName].push(fn);
+		addListener = (eventName: string, fn: Function, key: string) => {
+			listeners[eventName] = listeners[eventName] || {};
+			listeners[eventName][key] = fn;
 		},
-		removeListener = (eventName: string, fn: Function) => {
-			const lis = listeners[eventName];
-			if (!lis) return;
-			for (let i = lis.length; i > 0; i--) {
-				if (lis[i] === fn) {
-					lis.splice(i, 1);
-					break;
-				}
-			}
+		removeListener = (eventName: string, fnId: string) => {
+			const lisMap = listeners[eventName] || {};
+			delete lisMap[fnId];
 		},
 		on = (eventName: string, fn: Function) => {
-			addListener(eventName, fn);
-			return () => removeListener(eventName, fn);
+			const fnId = shortid.generate();
+			addListener(eventName, fn, fnId);
+			return () => removeListener(eventName, fnId);
 		},
 		once = (eventName: string, fn: Function) => {
-			listeners[eventName] = listeners[eventName] || [];
+			const fnId = shortid.generate();
 			const onceWrapper = () => {
 				fn();
-				removeListener(eventName, onceWrapper);
+				removeListener(eventName, fnId);
 			};
-			listeners[eventName].push(onceWrapper);
+			addListener(eventName, onceWrapper, fnId);
 		},
 		emit = (eventName: string, ...args: any[]) => {
-			const fns = listeners[eventName];
-			if (!fns) return false;
+			const fns = Object.values(listeners[eventName] || {});
 			fns.forEach((f: Function) => {
 				f(...args);
 			});
 		},
 		listenerCount = (eventName: string) => {
-			const fns = listeners[eventName] || [];
-			return fns.length;
+			return Object.keys(listeners[eventName] || {}).length;
 		};
 
 	return { on, once, emit, listenerCount };
