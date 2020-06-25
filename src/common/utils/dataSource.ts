@@ -3,7 +3,16 @@ import { DBConfig, StoreConfig } from "../types";
 
 const DataSources: any = {};
 const noSQLs = ["mongodb"];
-const createSource = ({ type, host, user, password, database, debug = false, port = 0 }: DBConfig) => {
+const createSource = ({
+	type,
+	host,
+	user,
+	password,
+	database,
+	multipleStatements = false,
+	debug = false,
+	port = 0,
+}: DBConfig) => {
 	const connection = port
 		? {
 				host,
@@ -11,12 +20,14 @@ const createSource = ({ type, host, user, password, database, debug = false, por
 				port,
 				password,
 				database,
+				multipleStatements,
 		  }
 		: {
 				host,
 				user,
 				password,
 				database,
+				multipleStatements,
 		  };
 
 	return new Promise(async (re, je) => {

@@ -78,6 +78,7 @@ export interface DBConfig {
 	password: string;
 	debug?: boolType;
 	cdc?: boolType;
+	multipleStatements?: boolType;
 	maillog?: boolType;
 }
 
