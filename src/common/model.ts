@@ -4,6 +4,7 @@ import { Record, Model, Params } from "./types";
 import { SqlError } from "./utils/Error";
 import { appState } from "./appState";
 import { Models } from "./utils/storeModels";
+import { eventBus } from "./utils/eventBus";
 import raa from "./utils/handleAsyncAwait";
 // if (typeof String.prototype.startsWith == "undefined") {
 //   String.prototype.startsWith = function(prefix): boolean {
@@ -17,6 +18,13 @@ const baseModel = function(model: string): Model {
 			const { IO } = appState();
 			// console.log("IO: ", IO, load);
 			IO.emit("comets", load);
+			const { verb, room, data } = load;
+			eventBus.emit(`${verb}::${room}`, data);
+		},
+		sendToOthers = (req: Request, load: Record) => {
+			req.io.broadcast.emit("comets", load);
+			const { verb, room, data } = load;
+			eventBus.emit(`${verb}::${room}`, data);
 		};
 	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any) => {
 		if (searchStrings.length) {
@@ -58,7 +66,7 @@ const baseModel = function(model: string): Model {
 					data: load,
 				};
 
-				req.io.broadcast.emit("comets", pload);
+				sendToOthers(req, pload);
 				console.log("PublishCreate to %s", modelName);
 			}
 		},
@@ -69,7 +77,7 @@ const baseModel = function(model: string): Model {
 					data: load,
 					room: modelName,
 				};
-				req.io.broadcast.emit("comets", pload);
+				sendToOthers(req, pload);
 				console.log("PublishUpdate to %s", modelName);
 			}
 		},
@@ -81,7 +89,7 @@ const baseModel = function(model: string): Model {
 					room: modelName,
 				};
 
-				req.io.broadcast.emit("comets", pload);
+				sendToOthers(req, pload);
 				console.log("PublishDestroy to %s", modelName);
 			}
 		},
@@ -146,7 +154,7 @@ const baseModel = function(model: string): Model {
 			const validOptions = this.validOptions(options);
 			const idKey = this.insertKey;
 			const result = await this.db(this.collection).insert(validOptions, [idKey]);
-			console.log("returns: ", result);
+			// console.log("returns: ", result);
 			return result && result.length ? { [idKey]: result[0] } : null;
 		},
 		async update(options: Params) {

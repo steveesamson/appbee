@@ -297,6 +297,12 @@ export interface HttpRequestType {
 export interface PluginTypes {
 	[key: string]: Function;
 }
+export interface EventBusType {
+	on: (eventName: string, fn: Function) => Function;
+	once: (eventName: string, fn: Function) => void;
+	emit: (eventName: string, args?: any[]) => void;
+	listenerCount: (eventName: string) => number;
+}
 export interface UtilsType {
 	writeFileTo: WriteFileType;
 	writeStreamTo: WriteStreamType;
@@ -316,6 +322,7 @@ export interface UtilsType {
 	raa: HandleAsyncAwait;
 	Encrypt: IEncrypt;
 	Token: IToken;
+	eventBus: EventBusType;
 	rollup: {
 		watchServerFiles: WatchServerFilesType;
 		compileTypeScript: CompileTypeScriptType;

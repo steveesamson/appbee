@@ -5,6 +5,7 @@ import mailer from "./mailer";
 import cronMaster from "./cronMaster";
 import jobMaster from "./jobMaster";
 import mailMaster from "./mailMaster";
+import { eventBus } from "./eventBus";
 import { getPlugin } from "./plugins";
 
 import { BeeError, SqlError } from "./Error";
@@ -40,6 +41,7 @@ export {
 	mailMaster,
 	cronMaster,
 	jobMaster,
+	eventBus,
 	raa,
 	BeeError,
 	SqlError,
