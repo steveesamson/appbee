@@ -3,7 +3,7 @@ import { loadModules } from "../../../src/common/utils/loaders";
 
 const loadSMS:JobConfig = {
     name:"loadSMS",
-    enabled:false,
+    status:'stopped',
     start:doIt,
     stop(){
 

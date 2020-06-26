@@ -5,30 +5,24 @@ const cronStack: Record = {};
 
 const cronMaster: CronMasterType = {
 	listAll() {
-		return Object.keys(cronStack);
+		return Object.keys(cronStack).map(k => ({ name: k, enabled: cronStack[k].enabled }));
 	},
 	start(cronName: string) {
 		console.log(`Starting cron:${cronName}...`);
 		const task = cronStack[cronName];
 		task && task.start();
+		task.enabled = true;
 		console.log(`Started cron:${cronName} successfully.`);
 	},
-	startAll() {
-		console.log(`Starting all crons...`);
-		Object.values(cronStack).forEach(v => v.start());
-		console.log(`Started all crons successfully.`);
-	},
+
 	stop(cronName: string) {
 		console.log(`Stopping cron:${cronName}...`);
 		const task = cronStack[cronName];
 		task && task.stop();
+		task.enabled = false;
 		console.log(`Stopped cron:${cronName} successfully.`);
 	},
-	stopAll() {
-		console.log(`Stopping all crons...`);
-		Object.values(cronStack).forEach(v => v.stop());
-		console.log(`Stopped all crons successfully.`);
-	},
+
 	add(cron: CronConfig) {
 		console.log(`Adding new cron: ${cron.name}`);
 
@@ -36,7 +30,9 @@ const cronMaster: CronMasterType = {
 			return console.error("Invalid cron expression: ", cron.name, cron.schedule);
 		}
 		if (cron.enabled) {
-			cronStack[cron.name] = cronRunner.schedule(cron.schedule, cron.task);
+			const runner = cronRunner.schedule(cron.schedule, cron.task);
+			(runner as any).enabled = true;
+			cronStack[cron.name] = runner;
 			if (cron.immediate) {
 				cron.task();
 			}
@@ -51,7 +47,9 @@ const cronMaster: CronMasterType = {
 				continue;
 			}
 			if (e.enabled) {
-				cronStack[e.name] = cronRunner.schedule(e.schedule, e.task);
+				const runner = cronRunner.schedule(e.schedule, e.task);
+				(runner as any).enabled = true;
+				cronStack[e.name] = runner;
 				if (e.immediate) {
 					e.task();
 				}

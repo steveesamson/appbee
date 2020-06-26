@@ -1,6 +1,6 @@
 import { Record, JobConfig, JobMasterType } from "../types";
 
-const jobStack: Record = {};
+const jobStack: { [key: string]: JobConfig } = {};
 
 const jobMaster: JobMasterType = {
 	listAll() {
@@ -9,56 +9,55 @@ const jobMaster: JobMasterType = {
 	start(jobName: string) {
 		console.log(`Starting job:${jobName}...`);
 		const task = jobStack[jobName];
-		if (task) {
-			if (task.enabled) {
-				task.start();
-				console.log(`Started job:${jobName} successfully.`);
-			} else {
-				console.log(`Sorry job:${jobName} not enabled.`);
-			}
+		if (task && task.status === "stopped") {
+			task.start();
+			task.status = "running";
+			console.log(`Started job:${jobName} successfully.`);
+		} else {
+			console.log(`Sorry job:${jobName} not in state for starting.`);
 		}
 	},
 	disable(jobName: string) {
 		console.log(`Disabling job:${jobName}...`);
 		const task = jobStack[jobName];
-		if (task) {
-			task.stop();
-			task.disable = true;
+		if (task && task.status === "stopped") {
+			task.status = "disabled";
+			console.log(`Disabled job:${jobName} successfully.`);
+		} else {
+			console.log(`Sorry job:${jobName} not in state for disabling.`);
 		}
-		console.log(`Disabled job:${jobName} successfully.`);
 	},
 	enable(jobName: string) {
 		console.log(`Enabling job:${jobName}...`);
 		const task = jobStack[jobName];
-		if (task.disabled) {
-			task.disabled = false;
+		if (task && task.status === "disabled") {
+			task.status = "stopped";
+			console.log(`Enabled job:${jobName} successfully.`);
+		} else {
+			console.log(`Sorry job:${jobName} not in state for enabling.`);
 		}
-		console.log(`Enabled job:${jobName} successfully.`);
 	},
 
-	startAll() {
-		console.log(`Starting all crons...`);
-		Object.values(jobStack).forEach(v => v.start());
-		console.log(`Started all crons successfully.`);
-	},
 	stop(jobName: string) {
 		console.log(`Stopping job:${jobName}...`);
 		const task = jobStack[jobName];
-		task && task.stop();
-		console.log(`Stopped job:${jobName} successfully.`);
-	},
-
-	stopAll() {
-		console.log(`Stopping all crons...`);
-		Object.values(jobStack).forEach(v => v.stop());
-		console.log(`Stopped all crons successfully.`);
+		if (task && task.status === "running") {
+			task.stop();
+			task.status = "stopped";
+			console.log(`Stopped job:${jobName} successfully.`);
+		} else {
+			console.log(`Sorry job:${jobName} not in state for stopping.`);
+		}
 	},
 
 	init(jobs: JobConfig[]) {
 		for (let k = 0; k < jobs.length; ++k) {
 			const e = jobs[k];
 			jobStack[e.name] = e;
-			e.enabled && e.start();
+			if (e.status === "stopped") {
+				e.start();
+				e.status = "running";
+			}
 		}
 
 		jobs.length && console.log("Job routine started.");
