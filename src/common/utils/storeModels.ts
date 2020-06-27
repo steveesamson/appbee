@@ -26,7 +26,7 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 				console.error("Null db object, check all your database connections. Looks like no db was configured...");
 			}
 			copy["db"] = req.db;
-
+			copy.storeType = req.db.storeType;
 			return copy;
 		};
 

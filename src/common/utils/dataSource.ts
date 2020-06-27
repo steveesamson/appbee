@@ -32,12 +32,14 @@ const createSource = ({
 
 	return new Promise(async (re, je) => {
 		if (!noSQLs.includes(type)) {
+			const db = knex({
+				debug,
+				client: type,
+				connection,
+			});
+			(db as any).storeType = type;
 			return re({
-				db: knex({
-					debug,
-					client: type,
-					connection,
-				}),
+				db,
 			});
 		}
 
@@ -59,6 +61,7 @@ const createSource = ({
 				console.log("Connected successfully to db[mongo]");
 
 				const db = client.db(database);
+				db.storeType = type;
 				db.close = () => {
 					client.close();
 				};

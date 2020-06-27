@@ -48,6 +48,8 @@ const baseModel = function(model: string): Model {
   */
 	const base: Model = {
 		db: {},
+		storeType: "",
+		canReturnDrivers: ["oracledb", "mssql", "pg"],
 		collection: modelName,
 		instanceName: model,
 		attributes: {},
@@ -153,7 +155,10 @@ const baseModel = function(model: string): Model {
 		async create(options: Params) {
 			const validOptions = this.validOptions(options);
 			const idKey = this.insertKey;
-			const result = await this.db(this.collection).insert(validOptions, [idKey]);
+			const result = await this.db(this.collection).insert(
+				validOptions,
+				this.canReturnDrivers.includes(this.storeType) ? [idKey] : null,
+			);
 			// console.log("returns: ", result);
 			return result && result.length ? { [idKey]: result[0] } : null;
 		},
@@ -169,7 +174,7 @@ const baseModel = function(model: string): Model {
 			const validOptions = this.validOptions(options);
 			return this.db(this.collection)
 				.where(arg)
-				.update(validOptions, ["id"]);
+				.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
 		},
 		async destroy(options: Params) {
 			const { id, where } = options;
