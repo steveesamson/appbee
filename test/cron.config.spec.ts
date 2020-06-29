@@ -9,6 +9,7 @@ describe("cron configs", () => {
     expect(crons).toBeInstanceOf(Array);
     const first = crons[0];
     expect(first).toBeDefined();
+    expect(first.key).toBeDefined();
     expect(first.enabled).toBeTruthy();
     expect(first.immediate).toBeTruthy();
     expect(first.schedule).toBe('*/15 * * * *');

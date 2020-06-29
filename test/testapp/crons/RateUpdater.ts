@@ -1,6 +1,10 @@
 
+import shortid from "shortid";
+import { CronConfig } from "../../../src/common/types";
 
-const RateUpdater = {
+const RateUpdater:CronConfig = {
+    key:shortid.generate(),
+    name:'RateUpdater',
     schedule:'*/15 * * * *',
     enabled:true,
     immediate:true,

@@ -130,6 +130,7 @@ export interface SecurityUtil {
 	Encrypt: IEncrypt;
 }
 export interface CronConfig {
+	key: string;
 	name: string;
 	schedule: string;
 	enabled: boolType;
@@ -203,8 +204,8 @@ export interface CallBackFunction {
 
 export interface CronMasterType {
 	init(crons: CronConfig[]): void;
-	start(cronName: string): void;
-	stop(cronName: string): void;
+	start(cronKey: string): void;
+	stop(cronKey: string): void;
 	add(cron: CronConfig): void;
 	listAll(): void;
 }

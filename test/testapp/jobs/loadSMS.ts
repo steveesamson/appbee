@@ -1,5 +1,4 @@
 import { JobConfig } from "../../../src/common/types";
-import { loadModules } from "../../../src/common/utils/loaders";
 
 const loadSMS:JobConfig = {
     name:"loadSMS",
