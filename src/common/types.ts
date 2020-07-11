@@ -12,6 +12,17 @@ declare module "express" {
 	}
 }
 
+declare global {
+	namespace Express {
+		interface Request {
+			parameters: any;
+			files?: any;
+			db?: any;
+			io?: any;
+			currentUser?: any;
+		}
+	}
+}
 export type Record = {
 	[key: string]: any;
 };
@@ -117,11 +128,11 @@ export interface PolicyConfig {
 	put?: Record;
 }
 export interface IEncrypt {
-	verify(plain: string, hash: string, cb: any): void;
-	hash(plain: string, cb: any): void;
+	verify(plain: string, hash: string): boolean;
+	hash(plain: string): string;
 }
 export interface IToken {
-	verify(token: any, cb: any): void;
+	verify(token: any): any | null;
 	sign(load: any): any;
 }
 
@@ -138,6 +149,7 @@ export interface CronConfig {
 	task: () => void;
 }
 export interface JobConfig {
+	id?: string;
 	name: string;
 	status: "stopped" | "running" | "disabled";
 	start: () => void;
@@ -204,19 +216,19 @@ export interface CallBackFunction {
 
 export interface CronMasterType {
 	init(crons: CronConfig[]): void;
-	start(cronKey: string): void;
-	stop(cronKey: string): void;
+	start(cronKey: string): Record;
+	stop(cronKey: string): Record;
 	add(cron: CronConfig): void;
 	listAll(): void;
 }
 
 export interface JobMasterType {
 	init(jobs: JobConfig[]): void;
-	start(jobName: string): void;
-	stop(jobName: string): void;
+	start(jobName: string): Record;
+	stop(jobName: string): Record;
 	listAll(): void;
-	disable(jobName: string): void;
-	enable(jobName: string): void;
+	disable(jobName: string): Record;
+	enable(jobName: string): Record;
 }
 
 export interface MailMasterType {
@@ -298,6 +310,7 @@ export interface EventBusType {
 	on: (eventName: string, fn: Function) => Function;
 	once: (eventName: string, fn: Function) => void;
 	emit: (eventName: string, args?: any[]) => void;
+	broadcast: (record: Record) => void;
 	listenerCount: (eventName: string) => number;
 }
 export interface UtilsType {

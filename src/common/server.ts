@@ -4,12 +4,14 @@ import express, { Application, Router } from "express";
 import compression from "compression";
 import errorHandler from "errorhandler";
 import helmet from "helmet";
+import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
 import sockeIO from "socket.io";
 const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
 import beeMultiparts from "../rest/multiParts";
+import { sessionUser } from "../rest/middlewares/sessionUser";
 import {
 	configureIORoutes,
 	configureRestRoutes,
@@ -51,6 +53,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const { policies, middlewares } = modules;
 	const router: Router = configureRestRoutes(policies);
 	const app: Application = express();
+	app.set("trust proxy", true);
 
 	const { PUBLIC_DIR, APP_PORT, MOUNT_PATH } = appState();
 
@@ -59,8 +62,13 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 
 	app.use(
 		helmet(),
-		cookieParser(),
+		// cookieParser(),
 		beeMultiparts(),
+		cookieSession({
+			signed: false,
+			secure: process.env.NODE_ENV === "production",
+		}),
+		sessionUser(),
 		methodOverride(),
 		errorHandler(),
 		compression({ threshold: 0 }),

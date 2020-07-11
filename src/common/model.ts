@@ -14,13 +14,14 @@ import raa from "./utils/handleAsyncAwait";
 
 const baseModel = function(model: string): Model {
 	const modelName = model.toLowerCase(),
-		broadcast = (load: Record): void => {
-			const { IO } = appState();
-			// console.log("IO: ", IO, load);
-			IO.emit("comets", load);
-			const { verb, room, data } = load;
-			eventBus.emit(`${verb}::${room}`, data);
-		},
+		// broadcast = (load: Record): void => {
+		// 	const { IO } = appState();
+		// 	// console.log("IO: ", IO, load);
+		// 	IO.emit("comets", load);
+		// 	const { verb, room, data } = load;
+		// 	eventBus.emit(`${verb}::${room}`, data);
+		// },
+		broadcast = (load: Record) => eventBus.broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
 			const { verb, room, data } = load;
@@ -140,7 +141,7 @@ const baseModel = function(model: string): Model {
 		},
 		async rowCount(db: any) {
 			return this.db
-				.count("sub.id as count")
+				.count(`sub.${this.insertKey || "id"} as count`)
 				.from(db.as("sub"))
 				.first();
 		},

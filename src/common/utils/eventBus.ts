@@ -1,5 +1,6 @@
 import shortid from "shortid";
-import { EventBusType } from "../types";
+import { appState } from "../appState";
+import { EventBusType, Record } from "../types";
 
 const EventBus = (): EventBusType => {
 	const listeners: { [key: string]: Function | any } = {},
@@ -32,9 +33,15 @@ const EventBus = (): EventBusType => {
 		},
 		listenerCount = (eventName: string) => {
 			return Object.keys(listeners[eventName] || {}).length;
+		},
+		broadcast = (load: Record): void => {
+			const { IO } = appState();
+			IO.emit("comets", load);
+			const { verb, room, data } = load;
+			eventBus.emit(`${verb}::${room}`, data);
 		};
 
-	return { on, once, emit, listenerCount };
+	return { on, once, emit, listenerCount, broadcast };
 };
 const eventBus = EventBus();
 export { eventBus };
