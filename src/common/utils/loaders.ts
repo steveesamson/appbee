@@ -97,7 +97,12 @@ const loadControllers = async (base: string, store: StoreConfig): Promise<RouteM
 	for (const key in routes) {
 		const route = routes[key],
 			baseRest = baseREST(route.mountPoint as string, key);
-		routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
+		// routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
+		const tmp = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
+		for (const k in route) {
+			delete tmp[k];
+		}
+		routes[key] = { ...route, ...tmp };
 	}
 	return routes;
 };
