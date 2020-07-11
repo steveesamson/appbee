@@ -128,8 +128,8 @@ export interface PolicyConfig {
 	put?: Record;
 }
 export interface IEncrypt {
-	verify(plain: string, hash: string): boolean;
-	hash(plain: string): string;
+	verify(plain: string, hash: string): Promise<boolean>;
+	hash(plain: string): Promise<string>;
 }
 export interface IToken {
 	verify(token: any): any | null;

@@ -22,23 +22,28 @@ describe("Encrypt", () => {
      expect(Encrypt.hash).toBeInstanceOf(Function);
   });
 
-  it("expects hash to generate encrypted string with no error.", (done) => {
-     Encrypt.hash(testPlainString, (e:any,enc:string) =>{
-        expect(e).toBeNull();
-        expect(enc).toBeDefined();
+  it("expects hash to generate encrypted string with no error.", async (done) => {
+     const enc = await Encrypt.hash(testPlainString);
+     expect(enc).toBeDefined();
         testEncryptedString = enc;
         done();
-     })
+   //   , (e:any,enc:string) =>{
+   //      expect(e).toBeNull();
+   //      expect(enc).toBeDefined();
+   //      testEncryptedString = enc;
+   //      done();
+   //   })
   });
 
-   it("expects verify to assure that testPlainString  equals testEncryptedString.", (done) => {
-     Encrypt.verify(testPlainString,testEncryptedString, (e:any,verdit:boolean) =>{
+   it("expects verify to assure that testPlainString  equals testEncryptedString.", async (done) => {
+
+     const verdit = await Encrypt.verify(testPlainString,testEncryptedString);//, (e:any,verdit:boolean) =>{
         
-        expect(e).toBeNull();
+      //   expect(e).toBeNull();
         expect(verdit).toBeDefined();
         expect(verdit).toBe(true);
         done();
-     })
+   //   })
   });
 
 });
@@ -60,14 +65,14 @@ describe("Token", () => {
         expect(enc).toBeDefined();
   });
 
-   it("expects verify to assure that testPlainString  equals testPlainObject.", (done) => {
-     Token.verify(testEncryptedString, (e:any,verdit:any) =>{
+   it("expects verify to assure that testPlainString  equals testPlainObject.", () => {
+     const verdit = Token.verify(testEncryptedString);//, (e:any,verdit:any) =>{
         
-        expect(e).toBeNull();
+      //   expect(e).toBeNull();
         expect(verdit).toBeDefined();
         expect(verdit).toMatchObject(testPlainObject);
-        done();
-     })
+      //   done();
+   //   })
   });
 
 
