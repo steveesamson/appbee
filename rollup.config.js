@@ -31,12 +31,14 @@ export default (async () => ({
 		"http",
 		"https",
 		"cluster",
+		"crypto",
 		"net",
 		"os",
 		"typescript",
 		"glob",
 		"chokidar",
 		"querystring",
+		"util",
 	],
 	plugins: [
 		resolve({
