@@ -29,7 +29,7 @@ const multipart = () => {
 						chunk += chk;
 					})
 					.on("end", () => {
-						if (isJson) {
+						if (isJson && chunk) {
 							body = JSON.parse(chunk);
 							req.body = _.extend(req.body || {}, body);
 							return next();

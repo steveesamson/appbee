@@ -3,14 +3,14 @@ import * as ts from "typescript";
 import { Socket } from "socket.io";
 import { BeeError, SqlError } from "./utils/Error";
 
-declare module "express" {
-	interface Request {
-		files?: any;
-		parameters: any;
-		db?: any;
-		io?: any;
-	}
-}
+// declare module "express" {
+// 	interface Request {
+// 		files?: any;
+// 		parameters: any;
+// 		db?: any;
+// 		io?: any;
+// 	}
+// }
 
 declare global {
 	namespace Express {
@@ -45,6 +45,7 @@ export interface Model {
 	uniqueKeys: string[];
 	searchPath: string[];
 	verbatims: string[]; //['attachments'] excludes from mclean.
+	excludes?: string[];
 	instanceName: string;
 	collection: string;
 	checkConcurrentUpdate: string; //'lastupdated'
@@ -312,6 +313,13 @@ export interface EventBusType {
 	emit: (eventName: string, args?: any[]) => void;
 	broadcast: (record: Record) => void;
 	listenerCount: (eventName: string) => number;
+}
+
+export interface RestfulType {
+	handleGet: (modelName: string) => ControllerRequest;
+	handleCreate: (modelName: string, id?: string) => ControllerRequest;
+	handleUpdate: (modelName: string) => ControllerRequest;
+	handleDelete: (modelName: string) => ControllerRequest;
 }
 export interface UtilsType {
 	writeFileTo: WriteFileType;

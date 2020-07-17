@@ -4,7 +4,7 @@ import _ from "lodash";
 import filesWithExtension, { listDir } from "./fetchFileTypes";
 import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration, JobConfig } from "../types";
 import { routes } from "../../rest/route";
-import baseREST from "../../rest/restful";
+// import baseREST from "../../rest/restful";
 import { NextFunction, Response } from "express";
 import mailController from "../../rest/utils/MailsController";
 import redoController from "../../rest/utils/RedoController";
@@ -94,16 +94,16 @@ const loadControllers = async (base: string, store: StoreConfig): Promise<RouteM
 	mailController();
 	redoController();
 
-	for (const key in routes) {
-		const route = routes[key],
-			baseRest = baseREST(route.mountPoint as string, key);
-		// routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
-		const tmp = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
-		for (const k in route) {
-			delete tmp[k];
-		}
-		routes[key] = { ...route, ...tmp };
-	}
+	// for (const key in routes) {
+	// 	const route = routes[key],
+	// 		baseRest = baseREST(route.mountPoint as string, key);
+	// 	// routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
+	// 	const tmp = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
+	// 	for (const k in route) {
+	// 		delete tmp[k];
+	// 	}
+	// 	routes[key] = { ...route, ...tmp };
+	// }
 	return routes;
 };
 

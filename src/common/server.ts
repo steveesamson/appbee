@@ -11,7 +11,7 @@ const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
 import beeMultiparts from "../rest/multiParts";
-import { sessionUser } from "../rest/middlewares/sessionUser";
+import sessionUser from "../rest/middlewares/sessionUser";
 import {
 	configureIORoutes,
 	configureRestRoutes,
@@ -22,6 +22,15 @@ import {
 	DataSources,
 } from "./utils/configurer";
 import { appState } from "./appState";
+
+declare global {
+	namespace Express {
+		interface Application {
+			io?: SocketIO.Server;
+			server?: http.Server;
+		}
+	}
+}
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
 	// console.log(appState());
@@ -60,15 +69,16 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	// console.log("APP_STATE:", appState());
 	console.log("TYPE:", process.env.SERVER_TYPE, " Sapper?: ", !!sapper);
 
+	const session = cookieSession({
+		signed: false,
+		secure: process.env.NODE_ENV === "production",
+	});
 	app.use(
 		helmet(),
-		// cookieParser(),
+		cookieParser(),
 		beeMultiparts(),
-		cookieSession({
-			signed: false,
-			secure: process.env.NODE_ENV === "production",
-		}),
-		sessionUser(),
+		session,
+		sessionUser,
 		methodOverride(),
 		errorHandler(),
 		compression({ threshold: 0 }),
@@ -82,15 +92,20 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		io = sockeIO(server);
 	io.use(socketIOCookieParser);
 
-	(app as any).server = server;
-	(app as any).io = io;
+	app.server = server;
+	app.io = io;
 	appState({ IO: io });
 
 	configureIORoutes(app);
 
 	app.use(MOUNT_PATH, router);
 
-	sapper && app.use(sapper.middleware());
+	sapper &&
+		app.use(
+			sapper.middleware({
+				session: (req: any, res: any) => ({ currentUser: req.currentUser }),
+			}),
+		);
 	const PORT = process.env.SERVER_TYPE === "CLUSTER" ? 0 : APP_PORT;
 
 	server.listen(PORT, "localhost", () => {

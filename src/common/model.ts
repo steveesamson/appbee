@@ -44,9 +44,7 @@ const baseModel = function(model: string): Model {
 			}
 		}
 	};
-	/*
-  const doSearch = 
-  */
+
 	const base: Model = {
 		db: {},
 		storeType: "",
@@ -57,6 +55,7 @@ const baseModel = function(model: string): Model {
 		uniqueKeys: ["id"],
 		defaultDateValues: {}, //{'withdrawn_date':''yyyy-mm-dd'}
 		checkConcurrentUpdate: "", //'lastupdated'
+		excludes: [],
 		verbatims: [], //['attachments'] excludes from mclean.
 		searchPath: [], //['attachments'] excludes from mclean.
 		orderBy: "",
@@ -151,7 +150,22 @@ const baseModel = function(model: string): Model {
 			if (options.ROW_COUNT) {
 				return await this.rowCount(db);
 			}
-			return this.hasKey(options) ? db.first() : db;
+			if (this.hasKey(options)) {
+				const data = await db.first();
+				if (!options.relax_exclude) {
+					this.excludes.forEach((x: string) => delete data[x]);
+				}
+				return data;
+			} else {
+				const datas = await db;
+				datas.forEach((data: Record) => {
+					if (!options.relax_exclude) {
+						this.excludes.forEach((x: string) => delete data[x]);
+					}
+				});
+				return datas;
+			}
+			// return this.hasKey(options) ? db.first() : db;
 		},
 		async create(options: Params) {
 			const validOptions = this.validOptions(options);
@@ -160,8 +174,7 @@ const baseModel = function(model: string): Model {
 				validOptions,
 				this.canReturnDrivers.includes(this.storeType) ? [idKey] : null,
 			);
-			// console.log("returns: ", result);
-			return result && result.length ? { [idKey]: result[0] } : null;
+			return result?.length ? this.find({ [idKey]: result[0] }) : null;
 		},
 		async update(options: Params) {
 			const { id, where } = options;
@@ -173,9 +186,11 @@ const baseModel = function(model: string): Model {
 			}
 			const arg = id ? { id } : where;
 			const validOptions = this.validOptions(options);
-			return this.db(this.collection)
+			await this.db(this.collection)
 				.where(arg)
 				.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
+
+			return this.find(arg);
 		},
 		async destroy(options: Params) {
 			const { id, where } = options;

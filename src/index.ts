@@ -6,6 +6,8 @@ import { join } from "path";
 import sioRedis from "socket.io-redis";
 import { Application, Request, Response, NextFunction } from "express";
 import { Route } from "./rest/route";
+import { handleCreate, handleDelete, handleUpdate, handleGet } from "./rest/restful";
+
 import {
 	mailer,
 	mailMaster,
@@ -48,6 +50,7 @@ import {
 	UtilsType,
 	JobConfig,
 	PluginTypes,
+	RestfulType,
 } from "./common/types";
 
 import { loadConfig, loadModules } from "./common/utils/loaders";
@@ -281,11 +284,13 @@ const utils: UtilsType = {
 		compileTypeScript,
 	},
 };
+const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
 const serve = process.env.NODE_ENV === "development" ? startDevServer : startCluster;
 export {
 	Models,
 	getPlugin,
 	Route,
+	Restful,
 	utils,
 	serve,
 	appState,

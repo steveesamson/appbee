@@ -6,6 +6,7 @@ import { loadModels } from "./storeModels";
 import { loadPlugins } from "./plugins";
 import { configure as configureDataSources, createSource, DataSources } from "./dataSource";
 import restRouter from "../../rest/restRouter";
+import sessionUser from "../../rest/middlewares/sessionUser";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
 
@@ -27,7 +28,9 @@ const configurePolicies = async (base: string, policies: Record): Promise<Record
 	for (const k in policies) {
 		const policy = policies[k];
 		if (k === "*") {
-			if (typeof policy === "string") {
+			if (Array.isArray(policy)) {
+				policiesMap["global"] = await loadPolicy(base, policy);
+			} else if (typeof policy === "string") {
 				policiesMap["global"] = await loadPolicy(base, policy.split(","));
 			} else if (typeof policy === "boolean") {
 				policiesMap["global"] = policy ? [allowAll] : [denyAll];
@@ -38,14 +41,20 @@ const configurePolicies = async (base: string, policies: Record): Promise<Record
 			for (const o in policy) {
 				const poly = policy[o];
 				if (o === "*") {
-					if (typeof poly === "string") {
+					if (Array.isArray(poly)) {
+						childPoly["global"] = await loadPolicy(base, poly);
+					} else if (typeof poly === "string") {
 						childPoly["global"] = await loadPolicy(base, poly.split(","));
 					} else if (typeof poly === "boolean") {
 						childPoly["global"] = !poly ? [denyAll] : [allowAll];
 					}
 				} else {
-					if (typeof poly === "string") {
+					if (Array.isArray(poly)) {
+						childPoly[`${k} ${o}`] = await loadPolicy(base, poly);
+					} else if (typeof poly === "string") {
 						childPoly[`${k} ${o}`] = await loadPolicy(base, poly.split(","));
+					} else if (typeof poly === "boolean") {
+						childPoly[`${k} ${o}`] = !poly ? [denyAll] : [allowAll];
 					}
 				}
 			}
@@ -71,6 +80,7 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 				nextPolicy = nextPolicyRecord[key];
 
 			let policy = nextPolicy ? nextPolicy : nextGlobalPolicy ? nextGlobalPolicy : globalPolicy ? globalPolicy : [];
+			// policy = [sessionUser, restRouter, ...policy];
 			policy = [restRouter, ...policy];
 
 			(router as any)[method](rpath, policy, handler);
@@ -94,7 +104,20 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 	return router;
 };
 
-const configureIORoutes = (app: any) => {
+/*
+io.on('connection', socket => {
+    let cookieString = socket.request.headers.cookie;
+
+    let req = {connection: {encrypted: false}, headers: {cookie: cookieString}}
+    let res = {getHeader: () =>{}, setHeader: () => {}};
+    //
+    session(req, res, () => {
+        console.log(req.session); // Do something with req.session
+    })
+})
+
+*/
+const configureIORoutes = (app: Express.Application) => {
 	app.io.sockets.on("connection", (socket: Socket) => {
 		console.log("Connected: ", socket.id);
 
@@ -102,6 +125,15 @@ const configureIORoutes = (app: any) => {
 			// console.log("disconnecting...");
 			socket.disconnect();
 		});
+
+		// const cookies = cookie.serialize(socket.request.headers.cookie || ""),
+		// 	// const cookie = socket.request.headers.cookie || "",
+		// 	req = { connection: { encrypted: false }, headers: { cookie: cookies } },
+		// 	res = { getHeader: () => {}, setHeader: () => {} };
+		// //
+		// cookieSession(req, res, () => {
+		// 	console.log("Logging session: ", (req as any).session); // Do something with req.session
+		// });
 
 		["get", "post", "delete", "put", "patch", "head"].forEach((method: string) => {
 			socket.on(method, (req: any, cb: Function) => {

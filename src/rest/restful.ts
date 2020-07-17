@@ -1,9 +1,76 @@
 import { Response, Request } from "express";
-import { RouteConfig } from "../common/types";
+// import { RouteConfig } from "../common/types";
 import raa from "../common/utils/handleAsyncAwait";
 import { Models } from "../common/utils/storeModels";
 
-const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
+const handleGet = (modelName: string) => async (req: Request, res: Response) => {
+		const model = Models[`get${modelName}`](req);
+		const { error, data } = await raa(model.find(req.parameters));
+		if (error) {
+			console.error(error);
+			return res.status(500).json({ error: error.sqlMessage });
+		}
+		res.status(200).json({ data });
+	},
+	handleCreate = (modelName: string, id = "") => async (req: Request, res: Response) => {
+		const load = req.parameters;
+		const model = Models[`get${modelName}`](req);
+		if (id) {
+			load.id = id;
+		}
+		const { error, data } = await raa(model.create(load));
+
+		// console.log("saved with: ", error, result);
+		if (error) {
+			return res.status(500).json({ error: error.sqlMessage });
+		}
+		// const row = await model.find(data);
+		model.publishCreate(req, data);
+		res.status(201).json({ data: data });
+	},
+	handleUpdate = (modelName: string) => async (req: Request, res: Response) => {
+		const arg = req.parameters;
+		const model = Models[`get${modelName}`](req);
+		const { error, data } = await raa(model.update({ ...arg }));
+
+		if (error) {
+			return res.status(500).json({ error: error.sqlMessage });
+		}
+
+		if (data) {
+			// console.log("update: ", data);
+			// const row = await model.find({ id: arg.id });
+			model.publishUpdate(req, data);
+			res.status(202).json({ data });
+		} else {
+			res.status(304).json({
+				error: "Update was not successful, probably this record has been updated since your last fetch.",
+			});
+		}
+	},
+	handleDelete = (modelName: string) => async (req: Request, res: Response) => {
+		const arg = req.parameters;
+
+		// console.log("delete arg: ", arg);
+		const model = Models[`get${modelName}`](req);
+		const { error, data } = await raa(model.destroy({ ...arg }));
+
+		if (error) {
+			return res.status(500).json({ error: error.sqlMessage });
+		}
+
+		if (data) {
+			const load = { id: arg.id };
+			model.publishDestroy(req, load);
+			res.status(202).json({ data: load });
+		} else {
+			res.status(304).json({
+				error: "Delete was not successful, probably this record has been updated since your last fetch",
+			});
+		}
+	};
+
+/*const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 	const map: RouteConfig = {};
 
 	map[`get ${baseUrl}`] = async (req: Request, res: Response) => {
@@ -33,11 +100,11 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 
 		// console.log("saved with: ", error, result);
 		if (error) {
-			return res.status(200).json({ error: error.sqlMessage });
+			return res.status(500).json({ error: error.sqlMessage });
 		}
-		const row = await model.find(data);
-		model.publishCreate(req, row);
-		res.status(200).json({ data: row });
+		// const row = await model.find(data);
+		model.publishCreate(req, data);
+		res.status(201).json({ data: data });
 	};
 
 	map[`put ${baseUrl}/:id`] = async (req: Request, res: Response) => {
@@ -46,15 +113,16 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 		const { error, data } = await raa(model.update({ ...arg }));
 
 		if (error) {
-			return res.status(200).json({ error: error.sqlMessage });
+			return res.status(500).json({ error: error.sqlMessage });
 		}
 
 		if (data) {
-			const row = await model.find({ id: arg.id });
-			model.publishUpdate(req, row);
-			res.status(200).json({ data: row });
+			// console.log("update: ", data);
+			// const row = await model.find({ id: arg.id });
+			model.publishUpdate(req, data);
+			res.status(202).json({ data });
 		} else {
-			res.status(200).json({
+			res.status(304).json({
 				error: "Update was not successful, probably this record has been updated since your last fetch.",
 			});
 		}
@@ -63,20 +131,19 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 	map[`delete ${baseUrl}/:id?`] = async (req: Request, res: Response) => {
 		const arg = req.parameters;
 
-		// console.log("delete arg: ", arg);
 		const model = Models["get" + modelName](req);
 		const { error, data } = await raa(model.destroy({ ...arg }));
 
 		if (error) {
-			return res.status(200).json({ error: error.sqlMessage });
+			return res.status(500).json({ error: error.sqlMessage });
 		}
 
 		if (data) {
 			const load = { id: arg.id };
 			model.publishDestroy(req, load);
-			res.status(200).json({ data: load });
+			res.status(202).json({ data: load });
 		} else {
-			res.status(200).json({
+			res.status(304).json({
 				error: "Delete was not successful, probably this record has been updated since your last fetch",
 			});
 		}
@@ -86,3 +153,5 @@ const baseREST = (baseUrl: string, modelName: string): RouteConfig => {
 };
 
 export default baseREST;
+*/
+export { handleGet, handleCreate, handleUpdate, handleDelete };
