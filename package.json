@@ -1,6 +1,6 @@
 {
 	"name": "appbee",
-	"version": "1.0.41",
+	"version": "1.0.42",
 	"description": "appbee(Application Back-End Engine) is a REST, GraphQL and Socket.io API Backend Engine",
 	"files": [
 		"dist"
