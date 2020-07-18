@@ -41,7 +41,7 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 			// console.log("update: ", data);
 			// const row = await model.find({ id: arg.id });
 			model.publishUpdate(req, data);
-			res.status(202).json({ data });
+			res.status(200).json({ data });
 		} else {
 			res.status(304).json({
 				error: "Update was not successful, probably this record has been updated since your last fetch.",
@@ -62,7 +62,7 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 		if (data) {
 			const load = { id: arg.id };
 			model.publishDestroy(req, load);
-			res.status(202).json({ data: load });
+			res.status(200).json({ data: load });
 		} else {
 			res.status(304).json({
 				error: "Delete was not successful, probably this record has been updated since your last fetch",
