@@ -138,34 +138,39 @@ const baseModel = function(model: string): Model {
 		hasKey(options: Params): boolean {
 			return this.uniqueKeys.some((r: string) => Object.keys(options).includes(r));
 		},
+		removeExcludes(datas: Record[]) {
+			return datas.map((data: Record) => {
+				this.excludes.forEach((x: string) => delete data[x]);
+				return data;
+			});
+		},
 		async rowCount(db: any) {
 			return this.db
 				.count(`sub.${this.insertKey || "id"} as count`)
 				.from(db.as("sub"))
 				.first();
 		},
-		async find(options: Params) {
-			const db: any = this.prepWhere(options);
-
+		async finalize(options: Params, db: any) {
 			if (options.ROW_COUNT) {
 				return await this.rowCount(db);
 			}
 			if (this.hasKey(options)) {
 				const data = await db.first();
-				if (!options.relax_exclude) {
-					this.excludes.forEach((x: string) => delete data[x]);
+				if (!options.relax_exclude && this.excludes.length) {
+					return this.removeExcludes([data])[0];
 				}
 				return data;
 			} else {
-				const datas = await db;
-				datas.forEach((data: Record) => {
-					if (!options.relax_exclude) {
-						this.excludes.forEach((x: string) => delete data[x]);
-					}
-				});
-				return datas;
+				const data = await db;
+				if (!options.relax_exclude && this.excludes.length) {
+					return this.removeExcludes(data);
+				}
+				return data;
 			}
-			// return this.hasKey(options) ? db.first() : db;
+		},
+		async find(options: Params) {
+			const db: any = this.prepWhere(options);
+			return this.finalize(options, db);
 		},
 		async create(options: Params) {
 			const validOptions = this.validOptions(options);

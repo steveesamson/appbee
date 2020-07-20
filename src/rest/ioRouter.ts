@@ -31,6 +31,9 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 			res.status = stat;
 			return res;
 		},
+		send(data: any) {
+			cb({ status: res.status, body: data });
+		},
 	} as any;
 
 	req = req || {};

@@ -44,6 +44,16 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const uploadDir = view.uploadDir || "";
 	const { useMultiTenant, port, mountRestOn, ...restapp } = application;
 	const { secret, ...restsecurity } = security;
+	const { policies, middlewares, controllers } = modules;
+
+	const resources = Object.keys(controllers)
+		.sort()
+		.map((key: string, index: number) => ({
+			name: key,
+			value: key.toLowerCase(),
+			id: index + 1,
+		}));
+
 	appState({
 		isMultitenant: useMultiTenant === true,
 		APP_PORT: port,
@@ -54,12 +64,13 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		VIEW_DIR: join(base, viewDir),
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
+		resources,
 		createSource,
 		getSource: (name: string) => DataSources[name],
 		...restsecurity,
 		...restapp,
 	});
-	const { policies, middlewares } = modules;
+
 	const router: Router = configureRestRoutes(policies);
 	const app: Application = express();
 	app.set("trust proxy", true);
