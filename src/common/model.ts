@@ -2,7 +2,7 @@ import _ from "lodash";
 import { Request } from "express";
 import { Record, Model, Params } from "./types";
 import { SqlError } from "./utils/Error";
-import { appState } from "./appState";
+// import { appState } from "./appState";
 import { Models } from "./utils/storeModels";
 import { eventBus } from "./utils/eventBus";
 import raa from "./utils/handleAsyncAwait";

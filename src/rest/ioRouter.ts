@@ -67,6 +67,7 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 
 	delete req.data;
 	req.body = data;
+	req.method = method;
 
 	const url = Object.keys(ioRoutes[method]).find((p: string) => {
 		const match = m(p);
