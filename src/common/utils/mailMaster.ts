@@ -1,3 +1,4 @@
+import raa from "./handleAsyncAwait";
 import { DataSources } from "./dataSource";
 import { Models } from "./storeModels";
 import { MailMasterType } from "../types";
@@ -8,7 +9,7 @@ const MailMaster: MailMasterType = (_db: string, messanger: any) => {
 	const _req: any = { db: DataSources[_db] },
 		Mails = Models.getMails(_req),
 		fetchMails = async () => {
-			return await Mails.find({ limit: 100 });
+			return await raa(Mails.find({ limit: 100 }));
 		},
 		dispatch = (recs: any) => {
 			const run = () => {
@@ -28,7 +29,7 @@ const MailMaster: MailMasterType = (_db: string, messanger: any) => {
 			run();
 		},
 		start = async () => {
-			const mails = await fetchMails();
+			const { data: mails } = await fetchMails();
 			dispatch(mails);
 		};
 

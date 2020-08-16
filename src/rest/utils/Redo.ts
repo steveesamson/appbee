@@ -1,7 +1,7 @@
 const Redo = {
 	attributes: {
 		verb: "string",
-		id: "int",
+		id: "string",
 		room: "string",
 		room_id: "string",
 	},

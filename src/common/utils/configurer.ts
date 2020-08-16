@@ -6,7 +6,6 @@ import { loadModels } from "./storeModels";
 import { loadPlugins } from "./plugins";
 import { configure as configureDataSources, createSource, DataSources } from "./dataSource";
 import restRouter from "../../rest/restRouter";
-import sessionUser from "../../rest/middlewares/sessionUser";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
 
@@ -23,6 +22,7 @@ const ioRoutes: any = {
 	head: {},
 };
 const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
+	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };
 	const policiesMap: Record = {};
 
 	for (const k in policies) {
@@ -80,7 +80,6 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 				nextPolicy = nextPolicyRecord[key];
 
 			let policy = nextPolicy ? nextPolicy : nextGlobalPolicy ? nextGlobalPolicy : globalPolicy ? globalPolicy : [];
-			// policy = [sessionUser, restRouter, ...policy];
 			policy = [restRouter, ...policy];
 
 			(router as any)[method](rpath, policy, handler);

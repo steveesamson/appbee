@@ -1,4 +1,5 @@
 import request from "./request";
+import raa from "./handleAsyncAwait";
 import { DataSources } from "./dataSource";
 import { Models } from "./storeModels";
 import { Record, ChangeDataCaptureType } from "../types";
@@ -18,9 +19,9 @@ const ChangeDataCapture: ChangeDataCaptureType = (_db: string) => {
 	const _req: any = { db: DataSources[_db] },
 		Redo = Models.getRedo(_req),
 		redo = async () => {
-			return await Redo.find({ limit: 10 });
+			return await raa(Redo.find({ limit: 10 }));
 		},
-		dispatch = (recs: any) => {
+		dispatch = (recs: Record[]) => {
 			const relayIt = async (r: any) => {
 				Object.assign(r, { tenant: _db });
 				sendRedo(r);
@@ -35,7 +36,8 @@ const ChangeDataCapture: ChangeDataCaptureType = (_db: string) => {
 			} else setTimeout(start, 100);
 		},
 		start = async () => {
-			const redos = await redo();
+			const { data: redos, error } = await redo();
+
 			dispatch(redos);
 		};
 
