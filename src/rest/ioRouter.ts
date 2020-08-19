@@ -24,15 +24,18 @@ function encode(body: string) {
 
 const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	const res = {
-		json(data: any) {
-			cb({ status: res.status, body: data });
+		json(body: any) {
+			cb({ status: res.status, body });
 		},
 		status(stat: any) {
 			res.status = stat;
 			return res;
 		},
-		send(data: any) {
-			cb({ status: res.status, body: data });
+		send(body: any) {
+			cb({ status: res.status, body });
+		},
+		error(error: any) {
+			cb({ status: res.status, body: { error } });
 		},
 	} as any;
 
@@ -79,7 +82,9 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	});
 
 	// console.log(req.path, url, req.query, parts);
-	if (!url || !url.trim()) return;
+	if (!url || !url.trim()) {
+		return res.status(404).error("Route not found.");
+	}
 	ioRoutes[method][url](req, res);
 };
 
