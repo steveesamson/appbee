@@ -285,7 +285,8 @@ const utils: UtilsType = {
 	},
 };
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
-const serve = process.env.NODE_ENV === "development" ? startDevServer : startCluster;
+// const serve = process.env.NODE_ENV === "development" ? startDevServer : startCluster;
+const serve = startDevServer;
 export {
 	Models,
 	getPlugin,
