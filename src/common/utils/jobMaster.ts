@@ -34,10 +34,10 @@ class JobMaster {
 	}
 
 	start(jobName: string) {
-		console.log(`Starting job:${jobName}...`);
 		const task = this.jobStack[jobName];
 
 		if (task && task.status === "stopped") {
+			console.log(`Starting job:${jobName}...`);
 			task.start();
 			task.status = "running";
 			console.log(`Started job:${jobName} successfully.`);
@@ -47,13 +47,13 @@ class JobMaster {
 				data: { id: jobName, name: jobName, status: "running" },
 			});
 		}
-		console.log(`Sorry job:${jobName} not in state for starting.`);
+		// console.log(`Sorry job:${jobName} not in state for starting.`);
 	}
 	disable(jobName: string) {
-		console.log(`Disabling job:${jobName}...`);
 		const task = this.jobStack[jobName];
 
 		if (task && task.status === "stopped") {
+			console.log(`Disabling job:${jobName}...`);
 			task.status = "disabled";
 			console.log(`Disabled job:${jobName} successfully.`);
 
@@ -63,12 +63,12 @@ class JobMaster {
 				data: { id: jobName, name: jobName, status: "disabled" },
 			});
 		}
-		console.log(`Sorry job:${jobName} not in state for disabling.`);
+		// console.log(`Sorry job:${jobName} not in state for disabling.`);
 	}
 	enable(jobName: string) {
-		console.log(`Enabling job:${jobName}...`);
 		const task = this.jobStack[jobName];
 		if (task && task.status === "disabled") {
+			console.log(`Enabling job:${jobName}...`);
 			task.status = "stopped";
 			console.log(`Enabled job:${jobName} successfully.`);
 
@@ -78,13 +78,13 @@ class JobMaster {
 				data: { id: jobName, name: jobName, status: "stopped" },
 			});
 		}
-		console.log(`Sorry job:${jobName} not in state for enabling.`);
+		// console.log(`Sorry job:${jobName} not in state for enabling.`);
 	}
 
 	stop(jobName: string) {
-		console.log(`Stopping job:${jobName}...`);
 		const task = this.jobStack[jobName];
 		if (task && task.status === "running") {
+			console.log(`Stopping job:${jobName}...`);
 			task.stop();
 			task.status = "stopped";
 			console.log(`Stopped job:${jobName} successfully.`);
@@ -94,7 +94,7 @@ class JobMaster {
 				data: { id: jobName, name: jobName, status: "stopped" },
 			});
 		}
-		console.log(`Sorry job:${jobName} not in state for stopping.`);
+		// console.log(`Sorry job:${jobName} not in state for stopping.`);
 	}
 }
 

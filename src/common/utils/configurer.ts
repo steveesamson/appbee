@@ -128,7 +128,7 @@ io.on('connection', socket => {
 */
 const configureIORoutes = (app: Express.Application) => {
 	app.io.sockets.on("connection", (socket: Socket) => {
-		console.log("Connected: ", socket.id);
+		// console.log("Connected: ", socket.id);
 
 		socket.once("disconnect", () => {
 			// console.log("disconnecting...");
