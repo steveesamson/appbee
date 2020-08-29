@@ -21,16 +21,9 @@ import {
 	createSource,
 	DataSources,
 } from "./utils/configurer";
+import { eventBus } from "./utils/index";
+import { Record } from "./types";
 import { appState } from "./appState";
-
-declare global {
-	namespace Express {
-		interface Application {
-			io?: SocketIO.Server;
-			server?: http.Server;
-		}
-	}
-}
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
 	// console.log(appState());
@@ -53,6 +46,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 			value: key.toLowerCase(),
 			id: index + 1,
 		}));
+	resources.push({ name: "Core", value: "core", id: resources.length });
 
 	appState({
 		isMultitenant: useMultiTenant === true,
@@ -78,11 +72,12 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const { PUBLIC_DIR, APP_PORT, MOUNT_PATH } = appState();
 
 	// console.log("APP_STATE:", appState());
-	console.log("TYPE:", process.env.SERVER_TYPE, " Sapper?: ", !!sapper);
+	// console.log("TYPE:", process.env.SERVER_TYPE, " Sapper?: ", !!sapper);
 
 	const session = cookieSession({
 		signed: false,
-		secure: process.env.NODE_ENV === "production",
+		secure: false, //process.env.NODE_ENV === "production",
+		// httpOnly: true
 	});
 	app.use(
 		helmet(),
@@ -114,10 +109,27 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	sapper &&
 		app.use(
 			sapper.middleware({
-				session: (req: any, res: any) => ({ currentUser: req.currentUser }),
+				session: (req: any, res: any) => {
+					// res.setHeader("cache-control", "no-cache, no-store");
+					return { currentUser: req.currentUser };
+				},
 			}),
 		);
 	const PORT = process.env.SERVER_TYPE === "CLUSTER" ? 0 : APP_PORT;
+	const openProdComms = () => {
+		process.on("message", (message: Record) => {
+			if (typeof message !== "string" && message.verb) {
+				// console.log("message to worker: ", message);
+				eventBus.broadcast(message);
+			}
+		});
+
+		eventBus.on("service", (message: Record) => {
+			// console.log("prod:eventBus: ", message);
+			//CLUSTER
+			process.send(message);
+		});
+	};
 
 	server.listen(PORT, "localhost", () => {
 		if (PORT !== 0) {
@@ -125,6 +137,9 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		}
 	});
 
+	if (process.env.SERVER_TYPE === "CLUSTER") {
+		openProdComms();
+	}
 	return app;
 };
 

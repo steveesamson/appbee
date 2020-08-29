@@ -9,19 +9,6 @@ function decode(str: string) {
 	return JSON.parse(body);
 }
 
-/**
- * Encode an object into a base64-encoded JSON string.
- *
- * @param {Object} body
- * @return {String}
- * @private
- */
-
-function encode(body: string) {
-	const str = JSON.stringify(body);
-	return new Buffer(str).toString("base64");
-}
-
 const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	const res = {
 		json(body: any) {

@@ -9,7 +9,17 @@ import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
 
-import { RouteConfig, Record, ControllerRequest, MiddlewareConfig, ioRequest, Configuration, Modules } from "../types";
+import {
+	RouteConfig,
+	Record,
+	ControllerRequest,
+	MiddlewareConfig,
+	ioRequest,
+	Configuration,
+	Modules,
+	JobConfig,
+	CronConfig,
+} from "../types";
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
@@ -171,6 +181,8 @@ const configure = async (base: string) => {
 	modules.policies = await configurePolicies(base, configuration.policy);
 
 	modules.plugins = await loadPlugins(base);
+	modules.jobs = (await loadModules(base, "jobs")) as JobConfig[];
+	modules.crons = (await loadModules(base, "crons")) as CronConfig[];
 	// console.log("Plugins: ", modules.plugins);
 	await loadModels(base, configuration);
 };

@@ -1,4 +1,5 @@
 import express, { Response, NextFunction, Request } from "express";
+import http from "http";
 import * as ts from "typescript";
 import { Socket } from "socket.io";
 import { BeeError, SqlError } from "./utils/Error";
@@ -20,6 +21,10 @@ declare global {
 			db?: any;
 			io?: any;
 			currentUser?: any;
+		}
+		interface Application {
+			io?: SocketIO.Server;
+			server?: http.Server;
 		}
 	}
 }
@@ -187,6 +192,7 @@ export interface Modules {
 	controllers: RouteMap;
 	policies: MiddlewareConfig;
 	crons: CronConfig[];
+	jobs: JobConfig[];
 	plugins: Record;
 	middlewares: MiddlewareConfig[];
 }
@@ -216,20 +222,20 @@ export interface CallBackFunction {
 }
 
 export interface CronMasterType {
-	init(crons: CronConfig[]): void;
-	start(cronKey: string): Record;
-	stop(cronKey: string): Record;
+	init(crons: CronConfig[], notifier: (msg: Record) => void): void;
+	start(cronKey: string): void;
+	stop(cronKey: string): void;
 	add(cron: CronConfig): void;
 	listAll(): void;
 }
 
 export interface JobMasterType {
-	init(jobs: JobConfig[]): void;
-	start(jobName: string): Record;
-	stop(jobName: string): Record;
+	init(jobs: JobConfig[], notifier: (msg: Record) => void): void;
+	start(jobName: string): void;
+	stop(jobName: string): void;
 	listAll(): void;
-	disable(jobName: string): Record;
-	enable(jobName: string): Record;
+	disable(jobName: string): void;
+	enable(jobName: string): void;
 }
 
 export interface MailMasterType {
@@ -310,9 +316,8 @@ export interface PluginTypes {
 export interface EventBusType {
 	on: (eventName: string, fn: Function) => Function;
 	once: (eventName: string, fn: Function) => void;
-	emit: (eventName: string, args?: any[]) => void;
+	emit: (eventName: string, data?: Record) => void;
 	broadcast: (record: Record) => void;
-	listenerCount: (eventName: string) => number;
 }
 
 export interface RestfulType {
