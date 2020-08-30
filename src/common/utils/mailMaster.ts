@@ -29,7 +29,10 @@ const MailMaster: MailMasterType = (_db: string, messanger: any) => {
 			run();
 		},
 		start = async () => {
-			const { data: mails } = await fetchMails();
+			const { data: mails, error } = await fetchMails();
+			if (error) {
+				return console.error(error);
+			}
 			dispatch(mails);
 		};
 

@@ -37,7 +37,9 @@ const ChangeDataCapture: ChangeDataCaptureType = (_db: string) => {
 		},
 		start = async () => {
 			const { data: redos, error } = await redo();
-
+			if (error) {
+				return console.error(error);
+			}
 			dispatch(redos);
 		};
 
