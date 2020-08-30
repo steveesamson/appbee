@@ -12,11 +12,19 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 		}
 		res.status(200).json({ data });
 	},
-	handleCreate = (modelName: string, id = "") => async (req: Request, res: Response) => {
+	handleCreate = (modelName: string, idOrIdGenerator: number | string | Function = null) => async (
+		req: Request,
+		res: Response,
+	) => {
 		const load = req.parameters;
 		const model = Models[`get${modelName}`](req);
-		if (id) {
-			load.id = id;
+		if (idOrIdGenerator) {
+			if (typeof idOrIdGenerator === "function") {
+				const realId = idOrIdGenerator();
+				load.id = realId;
+			} else {
+				load.id = idOrIdGenerator;
+			}
 		}
 		const { error, data } = await raa(model.create(load));
 
