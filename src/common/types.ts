@@ -322,7 +322,7 @@ export interface EventBusType {
 
 export interface RestfulType {
 	handleGet: (modelName: string) => ControllerRequest;
-	handleCreate: (modelName: string, id?: string) => ControllerRequest;
+	handleCreate: (modelName: string, idGeneror?: () => string | number) => ControllerRequest;
 	handleUpdate: (modelName: string) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }

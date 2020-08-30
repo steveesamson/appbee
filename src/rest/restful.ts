@@ -12,19 +12,18 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 		}
 		res.status(200).json({ data });
 	},
-	handleCreate = (modelName: string, idOrIdGenerator: number | string | Function = null) => async (
+	handleCreate = (modelName: string, idGenerator: () => string | number = null) => async (
 		req: Request,
 		res: Response,
 	) => {
 		const load = req.parameters;
 		const model = Models[`get${modelName}`](req);
-		if (idOrIdGenerator) {
-			if (typeof idOrIdGenerator === "function") {
-				const realId = idOrIdGenerator();
-				load.id = realId;
-			} else {
-				load.id = idOrIdGenerator;
+		if (idGenerator) {
+			if (typeof idGenerator !== "function") {
+				throw Error("idGenerator must be a funcion that returns a string or number.");
 			}
+			const realId = idGenerator();
+			load.id = realId;
 		}
 		const { error, data } = await raa(model.create(load));
 
