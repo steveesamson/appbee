@@ -6,6 +6,7 @@ import { Models } from "../common/utils/storeModels";
 const handleGet = (modelName: string) => async (req: Request, res: Response) => {
 		const model = Models[`get${modelName}`](req);
 		const { error, data } = await raa(model.find(req.parameters));
+		// console.log("---", error, data);
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: error.sqlMessage });

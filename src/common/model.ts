@@ -13,7 +13,7 @@ import raa from "./utils/handleAsyncAwait";
 // }
 
 const baseModel = function(model: string): Model {
-	const modelName = model.toLowerCase(),
+	const _modelName = model.toLowerCase(),
 		// broadcast = (load: Record): void => {
 		// 	const { IO } = appState();
 		// 	// console.log("IO: ", IO, load);
@@ -27,7 +27,7 @@ const baseModel = function(model: string): Model {
 			const { verb, room, data } = load;
 			eventBus.emit(`${verb}::${room}`, data);
 		};
-	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any) => {
+	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any, modelName: string) => {
 		if (searchStrings.length) {
 			const searchParams = searchStrings.split(/\s/),
 				searchPaths: string[] = [..._searchPaths];
@@ -36,9 +36,9 @@ const baseModel = function(model: string): Model {
 				for (let index = 0; index < searchPaths.length; ++index) {
 					const attr = searchPaths[index];
 					if (index === 0) {
-						db.where(attr.indexOf(".") === -1 ? modelName + "." + attr : attr, "like", `%${sstr}%`);
+						db.where(attr.indexOf(".") === -1 ? `${modelName}.${attr}` : attr, "like", `%${sstr}%`);
 					} else {
-						db.orWhere(attr.indexOf(".") === -1 ? modelName + "." + attr : attr, "like", `%${sstr}%`);
+						db.orWhere(attr.indexOf(".") === -1 ? `${modelName}.${attr}` : attr, "like", `%${sstr}%`);
 					}
 				}
 			}
@@ -49,8 +49,9 @@ const baseModel = function(model: string): Model {
 		db: {},
 		storeType: "",
 		canReturnDrivers: ["oracledb", "mssql", "pg"],
-		collection: modelName,
+		collection: _modelName,
 		instanceName: model,
+		schema: "",
 		attributes: {},
 		uniqueKeys: ["id"],
 		defaultDateValues: {}, //{'withdrawn_date':''yyyy-mm-dd'}
@@ -64,12 +65,12 @@ const baseModel = function(model: string): Model {
 			if (req.io) {
 				const pload = {
 					verb: "create",
-					room: modelName,
+					room: _modelName,
 					data: load,
 				};
 
 				sendToOthers(req, pload);
-				console.log("PublishCreate to %s", modelName);
+				console.log("PublishCreate to %s", _modelName);
 			}
 		},
 		publishUpdate(req: Request, load: Record) {
@@ -77,10 +78,10 @@ const baseModel = function(model: string): Model {
 				const pload = {
 					verb: "update",
 					data: load,
-					room: modelName,
+					room: _modelName,
 				};
 				sendToOthers(req, pload);
-				console.log("PublishUpdate to %s", modelName);
+				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
 		publishDestroy(req: Request, load: Record) {
@@ -88,11 +89,11 @@ const baseModel = function(model: string): Model {
 				const pload = {
 					data: load,
 					verb: "destroy",
-					room: modelName,
+					room: _modelName,
 				};
 
 				sendToOthers(req, pload);
-				console.log("PublishDestroy to %s", modelName);
+				console.log("PublishDestroy to %s", _modelName);
 			}
 		},
 		validOptions(opts: Params) {
@@ -105,9 +106,11 @@ const baseModel = function(model: string): Model {
 			return copy;
 		},
 		prepWhere(options: Params) {
-			const db = this.db(this.collection);
+			const modelName = this.schema ? `${this.schema}.${this.collection}` : this.collection,
+				db = this.db(modelName);
+
 			if (options["search"]) {
-				prepSearch(options["search"], this.searchPath, db);
+				prepSearch(options["search"], this.searchPath, db, modelName);
 			}
 
 			const validOpts = this.validOptions(options);
@@ -146,7 +149,7 @@ const baseModel = function(model: string): Model {
 		},
 		async rowCount(db: any) {
 			return this.db
-				.count(`sub.${this.insertKey || "id"} as count`)
+				.count(`sub.${this.insertKey || "id" || "*"} as count`)
 				.from(db.as("sub"))
 				.first();
 		},
@@ -182,6 +185,7 @@ const baseModel = function(model: string): Model {
 			return result?.length ? this.find({ [idKey]: result[0] }) : null;
 		},
 		async update(options: Params) {
+			const modelName = this.schema ? `${this.schema}.${this.collection}` : this.collection;
 			const { id, where } = options;
 			delete options.id;
 			delete options.where;
@@ -191,13 +195,14 @@ const baseModel = function(model: string): Model {
 			}
 			const arg = id ? { id } : where;
 			const validOptions = this.validOptions(options);
-			await this.db(this.collection)
+			await this.db(modelName)
 				.where(arg)
 				.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
 
 			return this.find(arg);
 		},
 		async destroy(options: Params) {
+			const modelName = this.schema ? `${this.schema}.${this.collection}` : this.collection;
 			const { id, where } = options;
 			delete options.id;
 			delete options.where;
@@ -208,7 +213,7 @@ const baseModel = function(model: string): Model {
 
 			const arg = id ? { id } : where;
 
-			return this.db(this.collection)
+			return this.db(modelName)
 				.where(arg)
 				.del();
 		},

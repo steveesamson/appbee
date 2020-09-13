@@ -17,6 +17,9 @@ class JobMaster {
 			const e = jobs[k];
 			e.id = e.name;
 			this.jobStack[e.name] = e;
+
+			//added
+			this.start(e.name);
 		}
 
 		this.listAll();

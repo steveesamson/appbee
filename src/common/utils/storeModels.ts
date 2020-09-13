@@ -4,9 +4,10 @@ import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
 import baseModel from "../model";
 
-import { Model, Configuration, GetModels, ReqWithDB, Params, Record } from "../types";
+import { Model, Configuration, GetModels, ReqWithDB } from "../types";
 import Mails from "../../rest/utils/Mails";
 import Redo from "../../rest/utils/Redo";
+import { DataSources } from "./dataSource";
 
 const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
@@ -22,9 +23,17 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 	Models["get" + name] = ((mdl: any) => {
 		const lookup = (req: ReqWithDB): Model => {
 			const copy = _.clone(mdl);
+			if (mdl.store) {
+				req.db = DataSources[mdl.store];
+				if (!req || !req.db) {
+					console.error(`Null db object, store: ${mdl.store} not valid.`);
+				}
+			}
+
 			if (!req || !req.db) {
 				console.error("Null db object, check all your database connections. Looks like no db was configured...");
 			}
+
 			copy["db"] = req.db;
 			copy.storeType = req.db.storeType;
 			return copy;

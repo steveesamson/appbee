@@ -78,8 +78,8 @@ class CronMaster {
 				continue;
 			}
 			const runner = cronRunner.schedule(e.schedule, e.task);
-			runner.stop();
-			(runner as any).enabled = false;
+			// runner.stop();
+			(runner as any).enabled = true;
 			(runner as any).name = e.name;
 			(runner as any).id = e.key;
 			(runner as any).expression = e.schedule;
