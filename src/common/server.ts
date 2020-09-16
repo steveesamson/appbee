@@ -46,7 +46,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 			value: key.toLowerCase(),
 			id: index + 1,
 		}));
-	resources.push({ name: "Core", value: "core", id: resources.length });
+	resources.push({ name: "Core", value: "core", id: resources.length + 1 });
 
 	appState({
 		isMultitenant: useMultiTenant === true,
