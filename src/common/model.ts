@@ -2,7 +2,6 @@ import _ from "lodash";
 import { Request } from "express";
 import { Record, Model, Params } from "./types";
 import { SqlError } from "./utils/Error";
-// import { appState } from "./appState";
 import { Models } from "./utils/storeModels";
 import { eventBus } from "./utils/eventBus";
 import raa from "./utils/handleAsyncAwait";
@@ -14,13 +13,6 @@ import raa from "./utils/handleAsyncAwait";
 
 const baseModel = function(model: string): Model {
 	const _modelName = model.toLowerCase(),
-		// broadcast = (load: Record): void => {
-		// 	const { IO } = appState();
-		// 	// console.log("IO: ", IO, load);
-		// 	IO.emit("comets", load);
-		// 	const { verb, room, data } = load;
-		// 	eventBus.emit(`${verb}::${room}`, data);
-		// },
 		broadcast = (load: Record) => eventBus.broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
@@ -116,10 +108,10 @@ const baseModel = function(model: string): Model {
 			const validOpts = this.validOptions(options);
 
 			for (const attr in validOpts) {
-				if (_.isArray(validOpts[attr])) {
-					const nArr =
-						this.attributes[attr] === "string" ? validOpts[attr].map((v: string) => `'${v}'`) : validOpts[attr];
-					db.whereIn(`${modelName}.${attr}`, nArr);
+				if (validOpts[attr] !== undefined && _.isArray(validOpts[attr])) {
+					// const nArr =
+					// 	this.attributes[attr] === "string" ? validOpts[attr].map((v: string) => `'${v}'`) : validOpts[attr];
+					db.whereIn(`${modelName}.${attr}`, validOpts[attr]);
 				} else {
 					db.where(`${modelName}.${attr}`, validOpts[attr]);
 				}
@@ -193,11 +185,24 @@ const baseModel = function(model: string): Model {
 			if (!id && !where) {
 				throw new SqlError("You need an id/where object to update any model");
 			}
-			const arg = id ? { id } : where;
+			const arg = id ? { id } : this.validOptions(where);
 			const validOptions = this.validOptions(options);
-			await this.db(modelName)
-				.where(arg)
-				.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
+			// const validOptions = this.validOptions(arg);
+			const db = this.db(modelName);
+
+			for (const attr in arg) {
+				if (arg[attr] !== undefined && _.isArray(arg[attr])) {
+					// const nArr = this.attributes[attr] === "string" ? arg[attr].map((v: string) => `'${v}'`) : arg[attr];
+					db.whereIn(`${modelName}.${attr}`, arg[attr]);
+				} else {
+					db.where(`${modelName}.${attr}`, arg[attr]);
+				}
+			}
+
+			// await this.db(modelName)
+			// 	.where(arg)
+			// 	.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
+			await db.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
 
 			return this.find(arg);
 		},

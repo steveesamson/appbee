@@ -5,7 +5,7 @@ import multiTenancy from "./multiTenancy";
 const restRouter = (req: Request, res: Response, next: NextFunction) => {
 	const params = req.params || {};
 	const validParams = Object.keys(params).reduce((accumulator: any, currenValue: string) => {
-		if (params[currenValue]) {
+		if (currenValue in params && params[currenValue] !== undefined) {
 			accumulator[currenValue] = params[currenValue];
 		}
 		return accumulator;
