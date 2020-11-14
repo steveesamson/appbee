@@ -51,6 +51,7 @@ const baseModel = function(model: string): Model {
 		excludes: [],
 		verbatims: [], //['attachments'] excludes from mclean.
 		searchPath: [], //['attachments'] excludes from mclean.
+		ranges: [],
 		orderBy: "",
 		insertKey: "id",
 		publishCreate(req: Request, load: Record) {
@@ -111,7 +112,11 @@ const baseModel = function(model: string): Model {
 				if (validOpts[attr] !== undefined && _.isArray(validOpts[attr])) {
 					// const nArr =
 					// 	this.attributes[attr] === "string" ? validOpts[attr].map((v: string) => `'${v}'`) : validOpts[attr];
-					db.whereIn(`${modelName}.${attr}`, validOpts[attr]);
+					if (this.ranges.includes(attr)) {
+						db.whereBetween(`${modelName}.${attr}`, validOpts[attr]);
+					} else {
+						db.whereIn(`${modelName}.${attr}`, validOpts[attr]);
+					}
 				} else {
 					db.where(`${modelName}.${attr}`, validOpts[attr]);
 				}
