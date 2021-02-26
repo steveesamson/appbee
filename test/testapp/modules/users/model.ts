@@ -1,6 +1,6 @@
 
  const Users = {
-  attributes:{
+  schema:{
     id: 'int',
     upline: 'int',
     backlog: 'int',

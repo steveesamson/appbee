@@ -20,7 +20,7 @@ class CronMaster {
 			expression: this.cronStack[k].expression,
 		}));
 
-		this.send({ room: "crons", verb: "refresh", data });
+		this.send({ room: "crons", verb: "refresh", data: { data, recordCount: data.length } });
 	}
 
 	start(cronKey: string) {

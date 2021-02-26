@@ -33,7 +33,7 @@ class JobMaster {
 			name: k,
 			status: this.jobStack[k].status,
 		}));
-		this.send({ room: "jobs", verb: "refresh", data });
+		this.send({ room: "jobs", verb: "refresh", data: { recordCount: data.length, data } });
 	}
 
 	start(jobName: string) {

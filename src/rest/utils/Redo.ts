@@ -1,5 +1,5 @@
 const Redo = {
-	attributes: {
+	schema: {
 		verb: "string",
 		id: "string",
 		room: "string",

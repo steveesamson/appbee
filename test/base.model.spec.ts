@@ -13,9 +13,9 @@ describe('Base Model',() =>{
             expect(UsersModel.instanceName).toBe('Users');
         })
     })
-    describe('attributes',() =>{
-        it('expects attributes to be truthy',() =>{
-            expect(UsersModel.attributes).toBeTruthy();
+    describe('schema',() =>{
+        it('expects schema to be truthy',() =>{
+            expect(UsersModel.schema).toBeTruthy();
         })
     })
     describe('uniqueKeys',() =>{

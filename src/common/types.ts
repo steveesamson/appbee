@@ -32,29 +32,33 @@ export type Record = {
 	[key: string]: any;
 };
 export type Params = Record;
-
+// rowCount, searchPath, checkConcurrentUpdate;
 export interface Model {
-	hasKey(options: Params): boolean;
-	prepWhere(options: Params): void;
-	rowCount(db: any): Promise<Record>;
-	find(param: Params): Promise<Record>;
-	create(param: Params): Promise<Record | null>;
-	update(param: Params): Promise<Record | null>;
-	destroy(param: Params): Promise<Record>;
-	publishCreate(req: Request, load: Record): void;
-	publishUpdate(req: Request, load: Record): void;
-	publishDestroy(req: Request, load: Record): void;
-	validOptions(param: Params): Params;
-	attributes: Record;
-	defaultDateValues: Record; //{'withdrawn_date':''yyyy-mm-dd'}
-	uniqueKeys: string[];
-	searchPath: string[];
-	verbatims: string[]; //['attachments'] excludes from mclean.
+	hasKey?(options: Params): boolean;
+	prepWhere?(options: Params): void;
+	rowCount?(db: any): Promise<Record>;
+	find?(param: Params): Promise<Record>;
+	create?(param: Params): Promise<Record | null>;
+	update?(param: Params): Promise<Record | null>;
+	destroy?(param: Params): Promise<Record>;
+	postCreate?(req: Request, data: Params): void;
+	postUpdate?(req: Request, data: Params): void;
+	postDestroy?(req: Request, data: Params): void;
+	publishCreate?(req: Request, load: Record): void;
+	publishUpdate?(req: Request, load: Record): void;
+	publishDestroy?(req: Request, load: Record): void;
+	validOptions?(param: Params): Params;
+	dbSchema?: string;
+	schema: Record;
+	defaultDateValues?: Record; //{'withdrawn_date':''yyyy-mm-dd'}
+	uniqueKeys?: string[];
+	searchPath?: string[];
+	verbatims?: string[]; //['attachments'] excludes from mclean.
 	excludes?: string[];
-	instanceName: string;
-	collection: string;
-	checkConcurrentUpdate: string; //'lastupdated'
-	db: any;
+	instanceName?: string;
+	collection?: string;
+	checkConcurrentUpdate?: string; //'lastupdated'
+	db?: any;
 	orderBy?: string;
 	orderDirection?: "ASC" | "DESC";
 	insertKey?: string;
@@ -93,6 +97,7 @@ export interface DBConfig {
 	user: string;
 	database: string;
 	password: string;
+	connectionString?: string;
 	debug?: boolType;
 	cdc?: boolType;
 	multipleStatements?: boolType;
@@ -322,7 +327,7 @@ export interface EventBusType {
 
 export interface RestfulType {
 	handleGet: (modelName: string) => ControllerRequest;
-	handleCreate: (modelName: string, idGeneror?: () => string | number) => ControllerRequest;
+	handleCreate: (modelName: string, paramsInjector?: () => Params | string | number) => ControllerRequest;
 	handleUpdate: (modelName: string) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }

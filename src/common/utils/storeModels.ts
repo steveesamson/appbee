@@ -13,17 +13,29 @@ const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 
 const makeModel = (name: string, defaultModel: Model, config: Configuration): void => {
-	const parentModel = baseModel(name),
+	const useStore = Object.keys(config.store).length;
+	const preferredStoreName = defaultModel.store;
+	const dbType = preferredStoreName
+		? config.store[preferredStoreName].type
+		: useStore && config.store.core
+		? config.store.core.type
+		: "";
+
+	// console.log(`canUseStore: ${!!useStore}, preferredStoreName:${preferredStoreName}, dbType:${dbType}`);
+
+	const parentModel = baseModel(name, dbType),
 		baseKeys = parentModel["uniqueKeys"],
 		defaultKeys = defaultModel["uniqueKeys"] || [];
 
-	const emblished = Object.assign({}, Object.keys(config.store).length ? parentModel : {}, defaultModel);
+	const emblished = Object.assign({}, useStore ? parentModel : {}, defaultModel);
 	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
 
 	Models["get" + name] = ((mdl: any) => {
 		const lookup = (req: ReqWithDB): Model => {
 			const copy = _.clone(mdl);
 			if (mdl.store) {
+				// console.log("Store name: ", mdl.store);
+				// console.log("Data sources: ", DataSources[mdl.store]);
 				req.db = DataSources[mdl.store];
 				if (!req || !req.db) {
 					console.error(`Null db object, store: ${mdl.store} not valid.`);

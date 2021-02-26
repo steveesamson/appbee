@@ -2,30 +2,35 @@ import { Response, Request } from "express";
 // import { RouteConfig } from "../common/types";
 import raa from "../common/utils/handleAsyncAwait";
 import { Models } from "../common/utils/storeModels";
+import { Params } from "../index";
 
 const handleGet = (modelName: string) => async (req: Request, res: Response) => {
 		const model = Models[`get${modelName}`](req);
-		const { error, data } = await raa(model.find(req.parameters));
-		// console.log("---", error, data);
+		const { error, ...rest } = await raa(model.find(req.parameters));
 		if (error) {
 			console.error(error);
 			return res.status(500).json({ error: error.sqlMessage });
 		}
-		res.status(200).json({ data });
+		res.status(200).json({ ...rest });
 	},
-	handleCreate = (modelName: string, idGenerator: () => string | number = null) => async (
+	handleCreate = (modelName: string, paramsInjector: () => Params | string | number = null) => async (
 		req: Request,
 		res: Response,
 	) => {
-		const load = req.parameters;
+		let load = req.parameters;
 		const model = Models[`get${modelName}`](req);
-		if (idGenerator) {
-			if (typeof idGenerator !== "function") {
-				throw Error("idGenerator must be a funcion that returns a string or number.");
+		if (paramsInjector) {
+			if (typeof paramsInjector !== "function") {
+				throw Error("Params Injector must be a funcion that returns a string, a number or an object");
 			}
-			const realId = idGenerator();
-			load.id = realId;
+			const injected = paramsInjector();
+			if (typeof injected === "string" || typeof injected === "number") {
+				load = { ...load, id: injected };
+			} else {
+				load = { ...load, ...injected };
+			}
 		}
+
 		const { error, data } = await raa(model.create(load));
 
 		// console.log("saved with: ", error, result);
@@ -46,8 +51,6 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 		}
 
 		if (data) {
-			// console.log("update: ", data);
-			// const row = await model.find({ id: arg.id });
 			model.publishUpdate(req, data);
 			res.status(200).json({ data });
 		} else {

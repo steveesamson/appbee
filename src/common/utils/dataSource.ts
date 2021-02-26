@@ -9,6 +9,7 @@ const createSource = ({
 	user,
 	password,
 	database,
+	connectionString,
 	multipleStatements = false,
 	debug = false,
 	port = 0,
@@ -48,22 +49,22 @@ const createSource = ({
 
 			const credential = user ? `${user}:${password}@` : "";
 			// Connection URL
-			const url = `mongodb://${credential}${host}:${port}`;
+			const url = connectionString ? connectionString : `mongodb://${credential}${host}:${port}`;
 
 			// Create a new MongoClient
-			const client = new MongoClient(url, { useUnifiedTopology: true });
+			const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true });
 
 			// Use connect method to connect to the Server
 			client.connect(function(err: any) {
 				if (err) {
 					return re({ error: err });
 				}
-				console.log("Connected successfully to db[mongo]");
 
 				const db = client.db(database);
+				console.log(`Connected successfully to ${database} db`);
 				db.storeType = type;
-				db.close = () => {
-					client.close();
+				db.close = async () => {
+					await client.close();
 				};
 
 				re({ db });

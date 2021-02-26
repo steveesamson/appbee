@@ -1,5 +1,5 @@
 const Mails = {
-	attributes: {
+	schema: {
 		id: "int",
 		sender_email: "string",
 		receiver_email: "string",
