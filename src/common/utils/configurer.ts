@@ -161,7 +161,7 @@ const configureIORoutes = (app: Express.Application) => {
 	});
 };
 
-const configure = async (base: string) => {
+const configureRestServer = async (base: string) => {
 	//Load configs
 
 	const cfg = await loadConfig(base);
@@ -187,12 +187,26 @@ const configure = async (base: string) => {
 	await loadModels(base, configuration);
 };
 
+const configureWorker = async (base: string) => {
+	//Load configs
+
+	const cfg = await loadConfig(base);
+
+	Object.assign(configuration, cfg);
+	configureDataSources(configuration.store);
+	modules.plugins = await loadPlugins(base);
+	modules.jobs = (await loadModules(base, "jobs")) as JobConfig[];
+	modules.crons = (await loadModules(base, "crons")) as CronConfig[];
+	await loadModels(base, configuration);
+};
+
 export {
 	configureIORoutes,
 	configurePolicies,
 	configureDataSources,
 	configureRestRoutes,
-	configure,
+	configureRestServer,
+	configureWorker,
 	createSource,
 	DataSources,
 	ioRoutes,

@@ -1,13 +1,13 @@
 import path from "path";
 
-import { configure } from "../src/common/utils/configurer";
+import { configureRestServer } from "../src/common/utils/configurer";
 import { getPlugin} from "../src/common/utils/plugins";
 const expectedFolders = 'listFolders',
  expectedFiles = 'listFiles';
 
 describe("plugins", () => {
     beforeAll(async () =>{
-        await configure(path.resolve(__dirname,"testapp"));
+        await configureRestServer(path.resolve(__dirname,"testapp"));
     });
   it("expects listFiles to return 'listFiles'", async () => {
      

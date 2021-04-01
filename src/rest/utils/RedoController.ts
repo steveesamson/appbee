@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Route } from "../route";
-import { Models } from "../../common/utils/model2Store";
+import { Models } from "../../common/utils/storeModels";
 // import raa from "../../common/utils/handleAsyncAwait";
 export default () => {
 	const { post } = Route("Redo", "/redo");

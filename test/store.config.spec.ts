@@ -1,11 +1,11 @@
 import path from "path";
 
-import { configure, configuration } from "../src/common/utils/configurer";
+import { configureRestServer, configuration } from "../src/common/utils/configurer";
 
 describe("stores", () => {
   it("expects appCore to return configured databases", async () => {
 
-     await configure(path.resolve(__dirname,"testapp"));
+     await configureRestServer(path.resolve(__dirname,"testapp"));
      const {store}  = configuration;// || {} as StoreConfig;
 
      expect(store).toBeDefined();

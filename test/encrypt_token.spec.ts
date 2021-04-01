@@ -1,6 +1,6 @@
 import path from "path";
 
-import { configure, configuration} from "../src/common/utils/configurer";
+import { configureRestServer, configuration} from "../src/common/utils/configurer";
 import { Encrypt, Token } from "../src/common/utils/security";
 import { appState } from "../src/common/appState";
 
@@ -8,7 +8,7 @@ let testPlainString = 'Captain America', testEncryptedString:string;
 let testPlainObject:any = {name:'Sally Bay', age:30}, testSignedObject:any;
 describe("Encrypt & Token", () => {
     beforeAll(async( done ) =>{
-       await configure(path.resolve(__dirname,"testapp"));
+       await configureRestServer(path.resolve(__dirname,"testapp"));
        appState({SECRET:configuration.security.secret});
         done();
     })

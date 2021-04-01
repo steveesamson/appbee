@@ -4,7 +4,7 @@ import { Application } from "express";
 
 import { mailer, mailMaster, cronMaster, jobMaster, cdc, eventBus } from "./utils/index";
 
-import { configure, configuration, modules } from "./utils/configurer";
+import { configureRestServer, configuration, modules } from "./utils/configurer";
 import { Record } from "./types";
 import createNextServer from "./server";
 
@@ -17,7 +17,7 @@ export const startDevServer = async (base: string, sapper?: any): Promise<Applic
 		return null;
 	}
 
-	await configure(base);
+	await configureRestServer(base);
 
 	const { smtp, store } = configuration;
 

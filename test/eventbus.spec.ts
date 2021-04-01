@@ -1,12 +1,12 @@
 import path from "path";
 
-import { configure } from "../src/common/utils/configurer";
+import { configureRestServer } from "../src/common/utils/configurer";
 import { eventBus } from "../src/common/utils/eventBus";
 
 
-describe("plugins", () => {
+describe("eventBus", () => {
     beforeAll(async () =>{
-        await configure(path.resolve(__dirname,"testapp"));
+        await configureRestServer(path.resolve(__dirname,"testapp"));
     });
   it("expects jobs to be empty", (done:Function) => {
       eventBus.once('start',() => {

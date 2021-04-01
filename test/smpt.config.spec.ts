@@ -1,6 +1,6 @@
 import path from "path";
 
-import { configure, configuration } from "../src/common/utils/configurer";
+import { configureRestServer, configuration } from "../src/common/utils/configurer";
 const expected = {
     sender: 'Domain Supports <support@domain.net>',
     templateFile:'mail.html',
@@ -16,7 +16,7 @@ const expected = {
 };
 describe("smtp configs", () => {
   it("expects loadConfig to return valid smtp config", async () => {
-     await configure(path.resolve(__dirname,"testapp"));
+     await configureRestServer(path.resolve(__dirname,"testapp"));
       const { smtp } = configuration;
     expect(smtp).toMatchObject(expected);
   });

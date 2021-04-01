@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { Request } from "express";
-import { Record, Model, Params } from "../../types";
+import { Record, Model, Params, GetModels } from "../../types";
 import { SqlError } from "../Error";
-import { Models } from "../storeModels";
+//import { Models } from "../storeModels";
 import { eventBus } from "../eventBus";
 import raa from "../handleAsyncAwait";
 
@@ -52,7 +52,7 @@ const addWheres = (db: any, modelName: string, context: any) => (key: string, va
 	}
 };
 
-const sqlModel = function(model: string): Model {
+const sqlModel = function(model: string, Models: GetModels): Model {
 	const _modelName = model.toLowerCase(),
 		broadcast = (load: Record) => eventBus.broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
@@ -107,7 +107,8 @@ const sqlModel = function(model: string): Model {
 					data: load,
 				};
 
-				sendToOthers(req, pload);
+				// sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
@@ -119,7 +120,8 @@ const sqlModel = function(model: string): Model {
 					data: load,
 					room: _modelName,
 				};
-				sendToOthers(req, pload);
+				// sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
@@ -131,8 +133,9 @@ const sqlModel = function(model: string): Model {
 					verb: "destroy",
 					room: _modelName,
 				};
+				broadcast(pload);
 
-				sendToOthers(req, pload);
+				// sendToOthers(req, pload);
 				console.log("PublishDestroy to %s", _modelName);
 			}
 		},

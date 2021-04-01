@@ -73,8 +73,9 @@ const utils: UtilsType = {
 		compileTypeScript,
 	},
 };
-import { startDevServer } from "./common/development";
-import { startProdServer } from "./common/production";
+import { startDevServer } from "./common/restDev";
+import { startProdServer } from "./common/restProd";
+import { startWorker as start } from "./common/worker";
 
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
 const serve = process.env.NODE_ENV === "development" ? startDevServer : startProdServer;
@@ -86,6 +87,7 @@ export {
 	Restful,
 	utils,
 	serve,
+	start,
 	appState,
 	BeeError,
 	SqlError,

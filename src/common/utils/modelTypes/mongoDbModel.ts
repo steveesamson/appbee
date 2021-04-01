@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { ObjectID } from "mongodb";
 import { Request } from "express";
-import { Record, Model, Params } from "../../types";
+import { Record, Model, Params, GetModels } from "../../types";
 import { SqlError } from "../Error";
-import { Models } from "../storeModels";
+//import { Models } from "../storeModels";
 import { eventBus } from "../eventBus";
 import raa from "../handleAsyncAwait";
 
@@ -19,6 +19,7 @@ const replaceId = (datas: Record[] | Record) => {
 	},
 	withoutExcludes = (context: any) => (datas: Record[] | Record) => {
 		const refactor = (data: Record) => {
+			if (!data) return data;
 			context.excludes.forEach((x: string) => delete data[x]);
 			return data;
 		};
@@ -32,72 +33,72 @@ const replaceId = (datas: Record[] | Record) => {
 			.replace(/=/g, "")
 			.replace(/</g, "")
 			.replace(/~/g, "")
-			.trim(),
-	collectArgs = (opts: Record) => {
-		const wheres: Record = {};
+			.trim();
+// collectArgs = (opts: Record) => {
+// 	const wheres: Record = {};
 
-		const addWheres = (key: string, value: string) => {
-			let ostring = key.trim();
-			// console.log(`key:${key}, value:${value}`);
+// 	const addWheres = (key: string, value: string) => {
+// 		let ostring = key.trim();
+// 		// console.log(`key:${key}, value:${value}`);
 
-			if (ostring.endsWith("<>") || ostring.endsWith("!=")) {
-				ostring = cleanse(ostring);
-				// ostring = ostring === "id" ? "_id" : ostring;
-				wheres[ostring] = {
-					$ne: value,
-				};
-			} else if (ostring.endsWith(">")) {
-				ostring = cleanse(ostring);
-				// ostring = ostring === "id" ? "_id" : ostring;
-				wheres[ostring] = {
-					$gt: value,
-				};
-			} else if (ostring.endsWith(">=")) {
-				ostring = cleanse(ostring);
-				// ostring = ostring === "id" ? "_id" : ostring;
-				wheres[ostring] = {
-					$gte: value,
-				};
-			} else if (ostring.endsWith("<")) {
-				ostring = cleanse(ostring);
-				// ostring = ostring === "id" ? "_id" : ostring;
-				wheres[ostring] = {
-					$lt: value,
-				};
-			} else if (ostring.endsWith("<=")) {
-				ostring = cleanse(ostring);
-				// ostring = ostring === "id" ? "_id" : ostring;
-				wheres[ostring] = {
-					$lte: value,
-				};
-			} else if (_.isArray(value)) {
-				if (ostring.startsWith("~")) {
-					ostring = cleanse(ostring);
-					// ostring = ostring === "id" ? "_id" : ostring;
-					wheres[ostring] = {
-						$nin: value,
-					};
-				} else {
-					ostring = cleanse(ostring);
-					// ostring = ostring === "id" ? "_id" : ostring;
-					wheres[ostring] = {
-						$in: value,
-					};
-				}
-			} else {
-				ostring = cleanse(ostring);
-				// ostring = ostring === "id" ? "_id" : ostring;
-				wheres[ostring] = value;
-			}
-		};
-		for (const key in opts) {
-			addWheres(key, opts[key]);
-		}
+// 		if (ostring.endsWith("<>") || ostring.endsWith("!=")) {
+// 			ostring = cleanse(ostring);
+// 			// ostring = ostring === "id" ? "_id" : ostring;
+// 			wheres[ostring] = {
+// 				$ne: value,
+// 			};
+// 		} else if (ostring.endsWith(">")) {
+// 			ostring = cleanse(ostring);
+// 			// ostring = ostring === "id" ? "_id" : ostring;
+// 			wheres[ostring] = {
+// 				$gt: value,
+// 			};
+// 		} else if (ostring.endsWith(">=")) {
+// 			ostring = cleanse(ostring);
+// 			// ostring = ostring === "id" ? "_id" : ostring;
+// 			wheres[ostring] = {
+// 				$gte: value,
+// 			};
+// 		} else if (ostring.endsWith("<")) {
+// 			ostring = cleanse(ostring);
+// 			// ostring = ostring === "id" ? "_id" : ostring;
+// 			wheres[ostring] = {
+// 				$lt: value,
+// 			};
+// 		} else if (ostring.endsWith("<=")) {
+// 			ostring = cleanse(ostring);
+// 			// ostring = ostring === "id" ? "_id" : ostring;
+// 			wheres[ostring] = {
+// 				$lte: value,
+// 			};
+// 		} else if (_.isArray(value)) {
+// 			if (ostring.startsWith("~")) {
+// 				ostring = cleanse(ostring);
+// 				// ostring = ostring === "id" ? "_id" : ostring;
+// 				wheres[ostring] = {
+// 					$nin: value,
+// 				};
+// 			} else {
+// 				ostring = cleanse(ostring);
+// 				// ostring = ostring === "id" ? "_id" : ostring;
+// 				wheres[ostring] = {
+// 					$in: value,
+// 				};
+// 			}
+// 		} else {
+// 			ostring = cleanse(ostring);
+// 			// ostring = ostring === "id" ? "_id" : ostring;
+// 			wheres[ostring] = value;
+// 		}
+// 	};
+// 	for (const key in opts) {
+// 		addWheres(key, opts[key]);
+// 	}
 
-		return wheres;
-	};
+// 	return wheres;
+// };
 
-const mongoDBModel = function(model: string): Model {
+const mongoDBModel = function(model: string, Models: GetModels): Model {
 	const _modelName = model.toLowerCase(),
 		broadcast = (load: Record) => eventBus.broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
@@ -131,7 +132,8 @@ const mongoDBModel = function(model: string): Model {
 					data: load,
 				};
 
-				sendToOthers(req, pload);
+				// sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
@@ -143,7 +145,8 @@ const mongoDBModel = function(model: string): Model {
 					data: load,
 					room: _modelName,
 				};
-				sendToOthers(req, pload);
+				// sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
@@ -156,7 +159,8 @@ const mongoDBModel = function(model: string): Model {
 					room: _modelName,
 				};
 
-				sendToOthers(req, pload);
+				// sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishDestroy to %s", _modelName);
 			}
 		},
@@ -198,20 +202,83 @@ const mongoDBModel = function(model: string): Model {
 			}
 			return copy;
 		},
+		collectArgs(opts: Record) {
+			const wheres: Record = {};
+
+			const addWheres = (key: string, value: string) => {
+				let ostring = key.trim();
+				// console.log(`key:${key}, value:${value}`);
+
+				if (ostring.endsWith("<>") || ostring.endsWith("!=")) {
+					ostring = cleanse(ostring);
+					// ostring = ostring === "id" ? "_id" : ostring;
+					wheres[ostring] = {
+						$ne: value,
+					};
+				} else if (ostring.endsWith(">")) {
+					ostring = cleanse(ostring);
+					// ostring = ostring === "id" ? "_id" : ostring;
+					wheres[ostring] = {
+						$gt: value,
+					};
+				} else if (ostring.endsWith(">=")) {
+					ostring = cleanse(ostring);
+					// ostring = ostring === "id" ? "_id" : ostring;
+					wheres[ostring] = {
+						$gte: value,
+					};
+				} else if (ostring.endsWith("<")) {
+					ostring = cleanse(ostring);
+					// ostring = ostring === "id" ? "_id" : ostring;
+					wheres[ostring] = {
+						$lt: value,
+					};
+				} else if (ostring.endsWith("<=")) {
+					ostring = cleanse(ostring);
+					// ostring = ostring === "id" ? "_id" : ostring;
+					wheres[ostring] = {
+						$lte: value,
+					};
+				} else if (_.isArray(value)) {
+					if (ostring.startsWith("~")) {
+						ostring = cleanse(ostring);
+						// ostring = ostring === "id" ? "_id" : ostring;
+						wheres[ostring] = {
+							$nin: value,
+						};
+					} else {
+						ostring = cleanse(ostring);
+						// ostring = ostring === "id" ? "_id" : ostring;
+						wheres[ostring] = {
+							$in: value,
+						};
+					}
+				} else {
+					ostring = cleanse(ostring);
+					// ostring = ostring === "id" ? "_id" : ostring;
+					wheres[ostring] = value;
+				}
+			};
+			for (const key in opts) {
+				addWheres(key, opts[key]);
+			}
+
+			return wheres;
+		},
 		prepWhere(options: Params) {
 			const collection = this.db.collection(this.collection);
 			const { projection, offset, limit, orderby, direction, search } = options;
 
 			const validOpts = this.validOptions(options);
-			let query = collectArgs(validOpts);
-			if (this.hasKey(options)) {
-				const opts = projection ? { projection } : {};
-				const cursor = collection.findOne(query, opts);
-				// if (projection) {
-				// 	collection.project(projection);
-				// }
-				return cursor;
-			}
+			let query = this.collectArgs(validOpts);
+			// if (this.hasKey(options)) {
+			// 	const opts = projection ? { projection } : {};
+			// 	const cursor = collection.findOne(query, opts);
+			// 	// if (projection) {
+			// 	// 	collection.project(projection);
+			// 	// }
+			// 	return cursor;
+			// }
 
 			//Using projection for multi
 			const facetArgs = [];
@@ -263,20 +330,29 @@ const mongoDBModel = function(model: string): Model {
 			const { relax_exclude } = options;
 			const removeExcludes = withoutExcludes(this);
 
+			// if (this.hasKey(options)) {
+			// 	const data = await cursor;
+			// 	if (data && !relax_exclude && this.excludes.length) {
+			// 		removeExcludes(data);
+			// 	}
+			// 	return replaceId(data);
+			// } else {
+			const _data = await cursor.toArray();
+			const { data, recordCount } = _data[0];
+
 			if (this.hasKey(options)) {
-				const data = await cursor;
+				let oneData = data[0];
 				if (data && !relax_exclude && this.excludes.length) {
-					removeExcludes(data);
+					oneData = removeExcludes(oneData);
 				}
-				return replaceId(data);
-			} else {
-				const _data = await cursor.toArray();
-				const { data, recordCount } = _data[0];
-				if (data.length && !relax_exclude && this.excludes.length) {
-					return { data: replaceId(removeExcludes(data)), recordCount };
-				}
-				return { data: replaceId(data), recordCount };
+				return replaceId(oneData);
 			}
+
+			if (data.length && !relax_exclude && this.excludes.length) {
+				return { data: replaceId(removeExcludes(data)), recordCount };
+			}
+			return { data: replaceId(data), recordCount };
+			// }
 		},
 		async find(options: Params) {
 			const cursor = this.prepWhere(options);
@@ -300,18 +376,26 @@ const mongoDBModel = function(model: string): Model {
 
 			const { insertedCount, ops } = await collection[insertOperation](validOptions);
 
+			const idKey = this.insertKey;
 			if (insertedCount) {
-				const removeExcludes = withoutExcludes(this);
-				let data = isMultiple ? ops : ops[0];
+				return isMultiple
+					? this.find({ [idKey]: ops.map((a: Params) => a["_id"].toString()) })
+					: this.find({ [idKey]: ops[0]["_id"].toString() });
 
-				if (data && !relax_exclude && this.excludes.length) {
-					data = removeExcludes(data);
-				}
-				return replaceId(data);
+				// if (isMultiple) {
+				// 	return this.find({ id: ops.id.toString() });
+				// }
+				// const removeExcludes = withoutExcludes(this);
+				// let data = isMultiple ? ops : ops[0];
+
+				// if (data && !relax_exclude && this.excludes.length) {
+				// 	data = removeExcludes(data);
+				// }
+				// return replaceId(data);
 			}
 			return null;
 		},
-		async update(options: Params) {
+		async update(options: Params, operationKey = "$set") {
 			const { id, where } = options;
 			delete options.id;
 			delete options.where;
@@ -322,13 +406,13 @@ const mongoDBModel = function(model: string): Model {
 			const arg = id ? { id } : where;
 			const query = this.validOptions(arg);
 			const validOptions = this.validOptions(options);
-			const conditions = collectArgs(query);
+			const conditions = this.collectArgs(query);
 
 			const collection = this.db.collection(this.collection);
 			const isSingle = this.hasKey(arg);
 			const updateOperation = isSingle ? "updateOne" : "updateMany";
 
-			const { modifiedCount } = await collection[updateOperation](conditions, { $set: validOptions });
+			const { modifiedCount } = await collection[updateOperation](conditions, { [operationKey]: validOptions });
 			return modifiedCount ? this.find(arg) : null;
 		},
 		async destroy(options: Params) {
@@ -342,7 +426,7 @@ const mongoDBModel = function(model: string): Model {
 
 			const arg = id ? { id } : where;
 			const args = this.validOptions(arg);
-			const query = collectArgs(args);
+			const query = this.collectArgs(args);
 			const collection = this.db.collection(this.collection);
 			const isSingle = this.hasKey(arg);
 

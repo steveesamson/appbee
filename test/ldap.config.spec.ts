@@ -1,6 +1,6 @@
 import path from "path";
 
-import { configure, configuration } from "../src/common/utils/configurer";
+import { configureRestServer, configuration } from "../src/common/utils/configurer";
 const expected = {
   host: 'localhost',
   port:25,
@@ -9,7 +9,7 @@ const expected = {
 };
 describe("ldap configs", () => {
   it("expects loadConfig to return valid ldap config", async () => {
-    await configure(path.resolve(__dirname,"testapp"));
+    await configureRestServer(path.resolve(__dirname,"testapp"));
     const { ldap } = configuration;
     expect(ldap).toMatchObject(expected);
   });

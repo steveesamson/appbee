@@ -2,16 +2,38 @@ import path from "path";
 import fs from "fs";
 import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
-import baseModel from "../model";
+// import baseModel from "../model";
+// import baseModel from "./baseModel";
 
 import { Model, Configuration, GetModels, ReqWithDB } from "../types";
 import Mails from "../../rest/utils/Mails";
 import Redo from "../../rest/utils/Redo";
 import { DataSources } from "./dataSource";
+//
+import { anyModel } from "./modelTypes/anyModel";
+import { sqlModel } from "./modelTypes/sqlModel";
+import { mongoDBModel } from "./modelTypes/mongoDbModel";
 
 const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 
+const baseModel = function(model: string, dbType = ""): Model {
+	switch (dbType) {
+		case "mongodb":
+			return mongoDBModel(model, Models);
+		case "pg":
+		case "mysql":
+		case "mysql2":
+		case "oracledb":
+		case "mssql":
+		case "sqlite3":
+			return sqlModel(model, Models);
+		default:
+			return anyModel(model, Models);
+	}
+};
+
+// export default baseModel;
 const makeModel = (name: string, defaultModel: Model, config: Configuration): void => {
 	const useStore = Object.keys(config.store).length;
 	const preferredStoreName = defaultModel.store;
@@ -75,4 +97,4 @@ const loadModels = async (base: string, config: Configuration) => {
 	makeModel("Redo", Redo as any, config);
 };
 
-export { Models, loadModels };
+export { Models, loadModels, baseModel };

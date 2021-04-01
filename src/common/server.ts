@@ -16,7 +16,7 @@ import {
 	configureIORoutes,
 	configureRestRoutes,
 	configuration,
-	configure,
+	configureRestServer,
 	modules,
 	createSource,
 	DataSources,
@@ -28,7 +28,7 @@ import { appState } from "./appState";
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
 	// console.log(appState());
 
-	await configure(base);
+	await configureRestServer(base);
 
 	const { view, application, security } = configuration;
 	const staticDir = view.staticDir || "";

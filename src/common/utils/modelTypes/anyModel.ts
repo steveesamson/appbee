@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { Request } from "express";
-import { Record, Model, Params } from "../../types";
-import { Models } from "../storeModels";
+import { Record, Model, Params, GetModels } from "../../types";
+// import { Models } from "../storeModels";
 import { eventBus } from "../eventBus";
 import raa from "../handleAsyncAwait";
 
@@ -15,7 +15,7 @@ const cleanse = (str: string) =>
 		.replace(/~/g, "")
 		.trim();
 
-const anyModel = function(model: string): Model {
+const anyModel = function(model: string, Models: GetModels): Model {
 	const _modelName = model.toLowerCase(),
 		broadcast = (load: Record) => eventBus.broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {

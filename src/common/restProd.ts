@@ -7,7 +7,7 @@ import { join } from "path";
 
 import { mailer, mailMaster, cronMaster, jobMaster, cdc } from "./utils/index";
 
-import { configure, DataSources, configuration, modules, createSource } from "./utils/configurer";
+import { configureRestServer, DataSources, configuration, modules, createSource } from "./utils/configurer";
 import createNextServer from "./server";
 import { Record } from "./types";
 
@@ -27,7 +27,7 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 			return null;
 		}
 
-		await configure(base);
+		await configureRestServer(base);
 
 		const {
 			application: { port, mountRestOn },

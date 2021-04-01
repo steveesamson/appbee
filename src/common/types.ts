@@ -39,7 +39,7 @@ export interface Model {
 	rowCount?(db: any): Promise<Record>;
 	find?(param: Params): Promise<Record>;
 	create?(param: Params): Promise<Record | null>;
-	update?(param: Params): Promise<Record | null>;
+	update?(param: Params, operationKey?: string): Promise<Record | null>;
 	destroy?(param: Params): Promise<Record>;
 	postCreate?(req: Request, data: Params): void;
 	postUpdate?(req: Request, data: Params): void;
@@ -48,6 +48,8 @@ export interface Model {
 	publishUpdate?(req: Request, load: Record): void;
 	publishDestroy?(req: Request, load: Record): void;
 	validOptions?(param: Params): Params;
+	collectArgs?(options: Record): Params;
+	storeType?: string;
 	dbSchema?: string;
 	schema: Record;
 	defaultDateValues?: Record; //{'withdrawn_date':''yyyy-mm-dd'}
@@ -64,6 +66,7 @@ export interface Model {
 	insertKey?: string;
 	[key: string]: any;
 }
+
 export interface ControllerRequest {
 	(req: Request, res: Response): void;
 }
@@ -327,7 +330,7 @@ export interface EventBusType {
 
 export interface RestfulType {
 	handleGet: (modelName: string) => ControllerRequest;
-	handleCreate: (modelName: string, paramsInjector?: () => Params | string | number) => ControllerRequest;
+	handleCreate: (modelName: string, paramsInjector?: (req: Request) => Params | string | number) => ControllerRequest;
 	handleUpdate: (modelName: string) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }

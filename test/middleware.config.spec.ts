@@ -1,11 +1,11 @@
 import path from "path";
 
-import { configure, modules } from "../src/common/utils/configurer";
+import { configureRestServer, modules } from "../src/common/utils/configurer";
 import { MiddlewareConfig } from "../src/common/types";
 
 describe("mwares configs", () => {
   it("expects loadModules to return valid mware config", async () => {
-       await configure(path.resolve(__dirname,"testapp"));
+       await configureRestServer(path.resolve(__dirname,"testapp"));
         const { middlewares } = modules;
         expect(middlewares).toBeInstanceOf(Array);
         const first:MiddlewareConfig = middlewares[0];
