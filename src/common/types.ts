@@ -104,8 +104,8 @@ export type dbType =
 export type boolType = true | false;
 
 export interface StoreConfig {
-	type: dbType;
-	host: string;
+	type?: dbType;
+	host?: string;
 	port?: string | number;
 	user?: string;
 	database?: string;
