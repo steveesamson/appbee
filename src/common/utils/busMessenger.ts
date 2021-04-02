@@ -1,19 +1,12 @@
 import Emitter from "socket.io-emitter";
 import { Record, StoreConfig } from "../types";
 const redis: any = require("redis");
-// export interface StoreConfig {
-// 	host: string;
-// 	port: number;
-// 	retry_strategy: () => number;
-// 	[key: string]: any;
-// }
+
 class BusMessenger {
 	options: StoreConfig = { host: "127.0.0.1", port: 6379, retry_strategy: () => 1000 } as any;
 	constructor() {
 		if (process.env.NODE_ENV === "development") {
-			console.log(
-				`No store was configured for event bus. Defaulting to host:${this.options.host}, port:${this.options.port}`,
-			);
+			console.log(`Event bus. Defaulting to host:${this.options.host}, port:${this.options.port}`);
 		}
 	}
 	configure(options: StoreConfig) {
