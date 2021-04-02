@@ -1,13 +1,13 @@
 import { existsSync as x } from "fs";
 import { join } from "path";
-import { configureWorker } from "./utils/configurer";
+import bm from "./utils/busMessenger";
+import { configureWorker, configuration } from "./utils/configurer";
 
 export interface WorkerApp {
 	(): void;
 }
 export const startWorker = async (base: string, app: WorkerApp): Promise<void> => {
 	base = base || process.cwd();
-	console.log("Worker Base: ", base);
 	const ok = (p: string): boolean => x(join(base, p));
 
 	if (!ok("config")) {
@@ -16,5 +16,8 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 	}
 
 	await configureWorker(base);
+	if (configuration.store.eventBus && process.env.NODE_ENV !== "development") {
+		bm.configure(configuration.store.eventBus as any);
+	}
 	app();
 };

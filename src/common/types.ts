@@ -93,7 +93,7 @@ export type dbType = "pg" | "mysql" | "mysql2" | "oracledb" | "mssql" | "sqlite3
 
 export type boolType = true | false;
 
-export interface DBConfig {
+export interface StoreConfig {
 	type: dbType;
 	host: string;
 	port?: string | number;
@@ -105,10 +105,11 @@ export interface DBConfig {
 	cdc?: boolType;
 	multipleStatements?: boolType;
 	maillog?: boolType;
+	[key: string]: any;
 }
 
-export interface StoreConfig {
-	[key: string]: DBConfig;
+export interface StoreListConfig {
+	[key: string]: StoreConfig;
 }
 
 export interface AppConfig {

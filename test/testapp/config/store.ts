@@ -1,6 +1,7 @@
 import { StoreConfig } from "../../../src";
 
 const store: StoreConfig = {
+  
   // core: {
   //   type: "mysql", 
   //   host: "localhost",

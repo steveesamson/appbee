@@ -51,5 +51,4 @@ class EventBus {
 	}
 }
 const devBus: EventBusType = new EventBus();
-// Object.freeze(eventBus);
 export { devBus };

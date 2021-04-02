@@ -9,6 +9,7 @@ import { mailer, mailMaster, cronMaster, jobMaster, cdc } from "./utils/index";
 
 import { configureRestServer, DataSources, configuration, modules, createSource } from "./utils/configurer";
 import createNextServer from "./server";
+import bm from "./utils/busMessenger";
 import { Record } from "./types";
 
 import { appState } from "./appState";
@@ -28,6 +29,10 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 		}
 
 		await configureRestServer(base);
+
+		if (configuration.store.eventBus) {
+			bm.configure(configuration.store.eventBus as any);
+		}
 
 		const {
 			application: { port, mountRestOn },

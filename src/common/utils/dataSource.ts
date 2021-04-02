@@ -1,5 +1,5 @@
 import knex from "knex";
-import { DBConfig, StoreConfig } from "../types";
+import { StoreConfig, StoreListConfig } from "../types";
 
 const DataSources: any = {};
 const noSQLs = ["mongodb"];
@@ -13,7 +13,7 @@ const createSource = ({
 	multipleStatements = false,
 	debug = false,
 	port = 0,
-}: DBConfig) => {
+}: StoreConfig) => {
 	const connection = port
 		? {
 				host,
@@ -73,7 +73,7 @@ const createSource = ({
 	});
 };
 
-const configure = (store: StoreConfig) => {
+const configure = (store: StoreListConfig) => {
 	Object.keys(store).forEach(async (key: string) => {
 		try {
 			const { db, error } = (await createSource(store[key])) as any;
