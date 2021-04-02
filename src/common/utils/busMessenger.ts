@@ -11,7 +11,7 @@ class BusMessenger {
 	options: StoreConfig = { host: "127.0.0.1", port: 6379, retry_strategy: () => 1000 } as any;
 	constructor() {
 		if (process.env.NODE_ENV === "development") {
-			console.error(
+			console.log(
 				`No store was configured for event bus. Defaulting to host:${this.options.host}, port:${this.options.port}`,
 			);
 		}
