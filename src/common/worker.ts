@@ -7,6 +7,7 @@ export interface WorkerApp {
 }
 export const startWorker = async (base: string, app: WorkerApp): Promise<void> => {
 	base = base || process.cwd();
+	console.log("Worker Base: ", base);
 	const ok = (p: string): boolean => x(join(base, p));
 
 	if (!ok("config")) {

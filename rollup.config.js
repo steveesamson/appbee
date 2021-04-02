@@ -1,8 +1,7 @@
-import resolve from "@rollup/plugin-node-resolve";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import tsc from "rollup-plugin-typescript2";
-// import alias from "@rollup/plugin-alias";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -16,35 +15,16 @@ export default (async () => ({
 			name: "appbee",
 			format: "cjs",
 		},
-		{
-			exports: "named",
-			dir: "dist/esm",
-			name: "appbee",
-			format: "esm",
-		},
+		// {
+		// 	exports: "named",
+		// 	dir: "dist/esm",
+		// 	name: "appbee",
+		// 	format: "esm",
+		// },
 	],
-	external: [
-		...Object.keys(pkg.dependencies || {}),
-		...Object.keys(pkg.devDependencies || {}),
-		"fs",
-		"path",
-		"http",
-		"https",
-		"cluster",
-		"crypto",
-		"net",
-		"os",
-		"typescript",
-		"glob",
-		"chokidar",
-		"querystring",
-		"util",
-	],
+	external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})],
 	plugins: [
-		resolve({
-			preferBuiltins: false,
-			extensions: [".ts", ".tsx"],
-		}),
+		nodeResolve({ browser: false }),
 		commonjs(),
 		tsc({
 			exclude: ["node_modules/**"],

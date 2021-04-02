@@ -13,4 +13,4 @@ function doIt(){
     console.log('Doing it.....')
 }
 
-export = loadSMS;
+export default loadSMS;

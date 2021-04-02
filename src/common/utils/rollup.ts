@@ -1,15 +1,17 @@
-import glob from "glob";
+// import glob from "glob";
+// import chokidar from "chokidar";
 import * as ts from "typescript";
 import fs from "fs";
 import path from "path";
-import chokidar from "chokidar";
 
 //serverFiles e.g. src/server/**/*.ts
 const watchServerFiles = (serverFiles: string) => ({
-	buildStart() {
+	async buildStart() {
 		// const serverDir = "src/server/**/*.ts";
+		const globStub = await import("glob");
+		const glob = globStub.default;
 
-		glob(serverFiles, null, (er, files) => {
+		glob(serverFiles, null, (er: any, files: any[]) => {
 			files.forEach(file => {
 				this.addWatchFile(file);
 			});
@@ -83,6 +85,9 @@ const compileTypeScript = (tsCompilerOptions: ts.CompilerOptions = {}) => {
 
 			console.log("Starting...");
 			compile(startFiles, compilerOptions, (r: boolean) => {});
+
+			const chokidarStub = await import("chokidar");
+			const chokidar = chokidarStub.default;
 
 			const watcher = chokidar.watch(watchDir, {
 				ignored: /[\/\\]\./,

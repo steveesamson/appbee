@@ -14,4 +14,4 @@ const RateUpdater:CronConfig = {
     }
 }
 
-export = RateUpdater;
+export default RateUpdater;
