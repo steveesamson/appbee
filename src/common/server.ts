@@ -6,7 +6,7 @@ import errorHandler from "errorhandler";
 import helmet from "helmet";
 import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
-import sockeIO from "socket.io";
+// import { Server  as IOServer} from "socket.io";
 const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
@@ -95,7 +95,13 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	}
 
 	const server = http.createServer(app),
-		io = sockeIO(server);
+		io = require("socket.io")();
+
+	io.attach(server, {
+		pingInterval: 10000,
+		pingTimeout: 5000,
+		cookie: true,
+	});
 	io.use(socketIOCookieParser);
 
 	app.server = server;
