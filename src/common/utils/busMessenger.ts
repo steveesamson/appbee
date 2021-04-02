@@ -5,9 +5,7 @@ const redis: any = require("redis");
 class BusMessenger {
 	options: StoreConfig = { host: "127.0.0.1", port: 6379, retry_strategy: () => 1000 } as any;
 	constructor() {
-		if (process.env.NODE_ENV === "development") {
-			console.log(`Event bus. Defaulting to host:${this.options.host}, port:${this.options.port}`);
-		}
+		console.log(`Event bus. Defaulting to host:${this.options.host}, port:${this.options.port}`);
 	}
 	configure(options: StoreConfig) {
 		this.options = options;

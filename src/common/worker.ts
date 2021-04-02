@@ -16,8 +16,8 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 	}
 
 	await configureWorker(base);
-	if (configuration.store.eventBus && process.env.NODE_ENV !== "development") {
-		bm.configure(configuration.store.eventBus as any);
+	if (configuration.store.eventBus) {
+		bm.configure(configuration.store.eventBus);
 	}
 	app();
 };

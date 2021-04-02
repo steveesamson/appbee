@@ -31,7 +31,7 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 		await configureRestServer(base);
 
 		if (configuration.store.eventBus) {
-			bm.configure(configuration.store.eventBus as any);
+			bm.configure(configuration.store.eventBus);
 		}
 
 		const {
