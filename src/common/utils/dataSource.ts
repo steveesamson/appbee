@@ -103,5 +103,4 @@ const configure = (store: StoreListConfig) => {
 		}
 	});
 };
-
 export { configure, createSource, DataSources };
