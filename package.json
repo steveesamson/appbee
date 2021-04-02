@@ -14,7 +14,6 @@
 		"predev": "rimraf dist",
 		"lint": "prettier-eslint 'src/**/*.ts' --write",
 		"build": "NODE_ENV=production rollup -c",
-		"build11": "NODE_ENV=production tsc",
 		"prepublishOnly": "npm run build",
 		"preversion": "npm test && npm run lint",
 		"version": "git add -A .",
