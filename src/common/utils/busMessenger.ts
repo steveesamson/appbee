@@ -1,15 +1,14 @@
 import Emitter from "socket.io-emitter";
-import { Record } from "../types";
-const redis = require("redis");
-export interface StoreConfig {
-	host: string;
-	port: number;
-	retry_strategy: () => number;
-	[key: string]: any;
-}
+import { Record, StoreConfig } from "../types";
+const redis: any = require("redis");
+// export interface StoreConfig {
+// 	host: string;
+// 	port: number;
+// 	retry_strategy: () => number;
+// 	[key: string]: any;
+// }
 class BusMessenger {
-	options: StoreConfig = { host: "127.0.0.1", port: 6379, retry_strategy: () => 1000 };
-
+	options: StoreConfig = { host: "127.0.0.1", port: 6379, retry_strategy: () => 1000 } as any;
 	constructor() {
 		if (process.env.NODE_ENV === "development") {
 			console.error(
@@ -28,7 +27,7 @@ class BusMessenger {
 		return JSON.stringify(obj);
 	}
 	useIO() {
-		return Emitter(this.options);
+		return Emitter(this.options as any);
 	}
 	useTransport() {
 		return redis.createClient(this.options);

@@ -89,7 +89,17 @@ export interface RouteMap {
 export interface ModelMap {
 	[key: string]: Model;
 }
-export type dbType = "pg" | "mysql" | "mysql2" | "oracledb" | "mssql" | "sqlite3" | "mongodb";
+export type dbType =
+	| "pg"
+	| "mysql"
+	| "mysql2"
+	| "oracledb"
+	| "mssql"
+	| "sqlite3"
+	| "mongodb"
+	| "redis"
+	| "kafka"
+	| "rabbitmq";
 
 export type boolType = true | false;
 
@@ -97,9 +107,9 @@ export interface StoreConfig {
 	type: dbType;
 	host: string;
 	port?: string | number;
-	user: string;
-	database: string;
-	password: string;
+	user?: string;
+	database?: string;
+	password?: string;
 	connectionString?: string;
 	debug?: boolType;
 	cdc?: boolType;

@@ -2,7 +2,7 @@ import knex from "knex";
 import { StoreConfig, StoreListConfig } from "../types";
 
 const DataSources: any = {};
-const noSQLs = ["mongodb"];
+const SQLs = ["pg", "mysql", "mysql2", "oracledb", "mssql", "sqlite3"];
 const createSource = ({
 	type,
 	host,
@@ -13,6 +13,7 @@ const createSource = ({
 	multipleStatements = false,
 	debug = false,
 	port = 0,
+	retry_strategy = () => 1000,
 }: StoreConfig) => {
 	const connection = port
 		? {
@@ -32,7 +33,7 @@ const createSource = ({
 		  };
 
 	return new Promise(async (re, je) => {
-		if (!noSQLs.includes(type)) {
+		if (SQLs.includes(type)) {
 			const db = knex({
 				debug,
 				client: type,
@@ -69,6 +70,21 @@ const createSource = ({
 
 				re({ db });
 			});
+		}
+
+		if (type === "redis") {
+			const redis = require(type);
+
+			const db = redis.createClient({
+				host,
+				port,
+				retry_strategy,
+			});
+			console.log(`Connected successfully to redis`);
+			db.storeType = type;
+			db.close = db.quit.bind(db);
+
+			re({ db });
 		}
 	});
 };
