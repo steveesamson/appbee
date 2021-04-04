@@ -6,7 +6,7 @@ import { appState } from "../appState";
 import { Record, MailerType } from "../types";
 
 let mailConfig = {};
-
+const { TEMPLATE_DIR } = appState();
 const stud: any = require("stud"),
 	mail = (mailLoad: Record, cb: Function) => {
 		const transporter = nodemailer.createTransport(smtpPool(mailConfig)),
@@ -35,13 +35,15 @@ const Mailer: MailerType = (smtpConfig: any) => {
 	delete smtpConfig.sender;
 	delete smtpConfig.template;
 	delete smtpConfig.templateFile;
+
 	mailConfig = smtpConfig;
+
+	const tpl = fs.readFileSync(join(TEMPLATE_DIR, templateFile), "utf8");
 	// console.log(smtpConfig, tpl)
 	return {
 		sendMail(options: any, cb: Function) {
 			options.from = sender;
-			const { TEMPLATE_DIR } = appState();
-			const tpl = fs.readFileSync(join(TEMPLATE_DIR, templateFile), "utf8");
+
 			stud.template(tpl, options, (error: any, str: string) => {
 				options.html = str;
 				// console.log('going out: ', options)

@@ -2,6 +2,7 @@ node_modules
 
 dist
 bkp
+
 coverage
 TODO
 .DS_Store

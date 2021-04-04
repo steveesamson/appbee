@@ -4,15 +4,12 @@ import sioRedis from "socket.io-redis";
 import { Server, createServer } from "net";
 import { existsSync as x } from "fs";
 import { join } from "path";
-
-import { mailer, mailMaster, cronMaster, jobMaster, cdc } from "./utils/index";
-
-import { configureRestServer, DataSources, configuration, modules, createSource } from "./utils/configurer";
+import { loadConfig } from "./utils/loaders";
+// import { configureRestServer, DataSources, configuration, modules, createSource } from "./utils/configurer";
 import createNextServer from "./server";
-import bm from "./utils/busMessenger";
 import { Record } from "./types";
 
-import { appState } from "./appState";
+// import { appState } from "./appState";
 
 const farmhash: any = require("farmhash");
 
@@ -28,31 +25,12 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 			return null;
 		}
 
-		await configureRestServer(base);
-
-		if (configuration.store.eventBus) {
-			bm.configure(configuration.store.eventBus);
-		}
-
 		const {
-			application: { port, mountRestOn },
-			smtp,
-			store,
-		} = configuration;
-
-		const { jobs, crons } = modules;
-
-		appState({
-			APP_PORT: port,
-			MOUNT_PATH: mountRestOn || "",
-			BASE_DIR: base,
-			createSource,
-			getSource: (name: string) => DataSources[name],
-		});
+			application: { port },
+		} = await loadConfig(base);
 
 		process.env.NODE_ENV = "production";
 		process.env.SERVER_TYPE = "CLUSTER";
-		process.env.MOUNT_PATH = mountRestOn || "";
 		process.env.APP_PORT = `${port}`;
 
 		console.log(`Master ${process.pid} is running`);
@@ -60,30 +38,7 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 		let workers: cluster.Worker[] = [],
 			shutDownRunning = false,
 			restartRunning = false;
-		const sendMessage = (message: Record) => {
-				// console.log("sendMessage: ", message);
-				if (workers.length > 0) {
-					workers[0].send(message);
-				}
-			},
-			startWatches = () => {
-				Object.keys(store).forEach(k => {
-					const db = store[k];
-					if (db.cdc) {
-						const ChangeDataCapture = cdc(k);
-						ChangeDataCapture.start();
-					}
-
-					if (db.maillog) {
-						const Mler = mailer(smtp),
-							MailSender = mailMaster(k, Mler);
-						MailSender.start();
-					}
-				});
-				jobMaster.init(jobs, sendMessage);
-				cronMaster.init(crons, sendMessage);
-			},
-			workerIndex = function(ip: any, len: number) {
+		const workerIndex = function(ip: any, len: number) {
 				return farmhash.fingerprint32(ip) % len; // Farmhash is the fastest and works with IPv6, too
 			},
 			// Create the outside facing server listening on our port.
@@ -145,47 +100,10 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 				console.log("Restarting...");
 				restartRunning = true;
 				restartWorker(0);
-				// for (let i = 0; i < workers.length; ++i) {
-				// 	const next = workers[i];
-				// 	next.on("disconnect", () => {
-				// 		console.log(`worker ${next.process.pid} shut down is complete.`);
-				// 		workers.splice(i, 1);
-				// 		cluster.fork();
-				// 	});
-				// 	next.disconnect();
-				// }
 			},
 			handleEvents = (message: Record) => {
 				// console.log("prod:handleEvents: ", message);
-
-				const { data, event, service_name } = message;
-
-				if (service_name === "jobMaster") {
-					switch (event) {
-						case "listAll":
-							return jobMaster.listAll();
-						case "start":
-							return jobMaster.start(data);
-						case "stop":
-							return jobMaster.stop(data);
-						case "disable":
-							return jobMaster.disable(data);
-						case "enable":
-							return jobMaster.enable(data);
-					}
-				}
-
-				if (service_name === "cronMaster") {
-					switch (event) {
-						case "listAll":
-							return cronMaster.listAll();
-						case "start":
-							return cronMaster.start(data);
-						case "stop":
-							return cronMaster.stop(data);
-					}
-				}
-
+				const { event, service_name } = message;
 				if (service_name === "core") {
 					switch (event) {
 						case "restart":
@@ -225,7 +143,6 @@ export const startProdServer = async (base: string, sapper?: any): Promise<Serve
 			cluster.fork();
 		}
 
-		startWatches();
 		server.listen(port, () => {
 			console.log(`Server running at http://localhost:${port}`);
 		});

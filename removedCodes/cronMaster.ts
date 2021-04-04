@@ -1,5 +1,5 @@
 import cronRunner from "node-cron";
-import { Record, CronConfig, CronMasterType } from "../types";
+import { Record, CronConfig, CronMasterType } from "../src/common/types";
 
 class CronMaster {
 	send: (msg: Record) => void;

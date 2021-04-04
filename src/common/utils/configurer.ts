@@ -8,6 +8,8 @@ import { configure as configureDataSources, createSource, DataSources } from "./
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
+import { eventBus } from "./eventBus";
+import Mailer from "./mailer";
 
 import {
 	RouteConfig,
@@ -17,8 +19,7 @@ import {
 	ioRequest,
 	Configuration,
 	Modules,
-	JobConfig,
-	CronConfig,
+	MailerType,
 } from "../types";
 
 const configuration: Configuration = {} as any;
@@ -31,6 +32,10 @@ const ioRoutes: any = {
 	patch: {},
 	head: {},
 };
+let sender: MailerType = null;
+
+const mailer = (): MailerType => sender;
+
 const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
 	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };
 	const policiesMap: Record = {};
@@ -113,19 +118,6 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 	return router;
 };
 
-/*
-io.on('connection', socket => {
-    let cookieString = socket.request.headers.cookie;
-
-    let req = {connection: {encrypted: false}, headers: {cookie: cookieString}}
-    let res = {getHeader: () =>{}, setHeader: () => {}};
-    //
-    session(req, res, () => {
-        console.log(req.session); // Do something with req.session
-    })
-})
-
-*/
 const configureIORoutes = (app: Express.Application) => {
 	app.io.sockets.on("connection", (socket: Socket) => {
 		// console.log("Connected: ", socket.id);
@@ -178,12 +170,16 @@ const configureRestServer = async (base: string) => {
 
 	configureDataSources(configuration.store);
 
+	if (configuration.store && configuration.store.eventBus) {
+		eventBus({ ...configuration.store.eventBus });
+	}
+	if (configuration.smtp) {
+		sender = Mailer({ ...(configuration.smtp || {}) });
+	}
+
 	modules.policies = await configurePolicies(base, configuration.policy);
 
 	modules.plugins = await loadPlugins(base);
-	modules.jobs = (await loadModules(base, "jobs")) as JobConfig[];
-	modules.crons = (await loadModules(base, "crons")) as CronConfig[];
-	// console.log("Plugins: ", modules.plugins);
 	await loadModels(base, configuration);
 };
 
@@ -194,9 +190,14 @@ const configureWorker = async (base: string) => {
 
 	Object.assign(configuration, cfg);
 	configureDataSources(configuration.store);
+
+	if (configuration.store && configuration.store.eventBus) {
+		eventBus({ ...configuration.store.eventBus });
+	}
+	if (configuration.smtp) {
+		sender = Mailer({ ...(configuration.smtp || {}) });
+	}
 	modules.plugins = await loadPlugins(base);
-	modules.jobs = (await loadModules(base, "jobs")) as JobConfig[];
-	modules.crons = (await loadModules(base, "crons")) as CronConfig[];
 	await loadModels(base, configuration);
 };
 
@@ -211,5 +212,6 @@ export {
 	DataSources,
 	ioRoutes,
 	configuration,
+	mailer,
 	modules,
 };

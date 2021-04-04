@@ -7,8 +7,8 @@ const smtp: Record = {
     port: 465,
     secure:true,
     auth: {
-    user: 'support@domain.net',
-    pass: 'qqhlnmgjvbglzjni'
+        user: 'support@domain.net',
+        pass: 'qqhlnmgjvbglzjni'
     },
     maxConnections: 5,
     maxMessages: 10

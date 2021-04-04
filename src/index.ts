@@ -2,14 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { Route } from "./rest/route";
 import { handleCreate, handleDelete, handleUpdate, handleGet } from "./rest/restful";
 import {
-	mailer,
-	mailMaster,
-	cronMaster,
-	jobMaster,
-	eventBus,
 	BeeError,
 	SqlError,
-	cdc,
 	request,
 	raa,
 	Encrypt,
@@ -26,6 +20,7 @@ import {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
+	eventBus,
 } from "./common/utils/index";
 
 import {
@@ -44,7 +39,7 @@ import {
 	JobConfig,
 	RestfulType,
 } from "./common/types";
-
+import { mailer } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
 import { appState } from "./common/appState";
 
@@ -58,27 +53,23 @@ const utils: UtilsType = {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
-	mailer,
-	mailMaster,
-	cronMaster,
-	jobMaster,
-	eventBus,
-	cdc,
 	request,
 	raa,
 	Encrypt,
 	Token,
+	eventBus,
+	mailer,
 	rollup: {
 		watchServerFiles,
 		compileTypeScript,
 	},
 };
 import { startDevServer } from "./common/restDev";
-import { startProdServer } from "./common/restProd";
+import { startProdServer as serveProd } from "./common/restProd";
 import { startWorker as start } from "./common/worker";
 
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
-const serve = process.env.NODE_ENV === "development" ? startDevServer : startProdServer;
+const serve = (dev: boolean = process.env.NODE_ENV === "development") => (dev ? startDevServer : serveProd);
 
 export {
 	Models,

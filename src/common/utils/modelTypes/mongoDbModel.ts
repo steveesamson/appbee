@@ -1,11 +1,9 @@
 import _ from "lodash";
 import { ObjectID } from "mongodb";
 import { Request } from "express";
-import { Record, Model, Params, GetModels } from "../../types";
+import { Record, Model, Params } from "../../types";
 import { SqlError } from "../Error";
-//import { Models } from "../storeModels";
 import { eventBus } from "../eventBus";
-import raa from "../handleAsyncAwait";
 
 const replaceId = (datas: Record[] | Record) => {
 		const eject = (data: any) => {
@@ -34,77 +32,14 @@ const replaceId = (datas: Record[] | Record) => {
 			.replace(/</g, "")
 			.replace(/~/g, "")
 			.trim();
-// collectArgs = (opts: Record) => {
-// 	const wheres: Record = {};
 
-// 	const addWheres = (key: string, value: string) => {
-// 		let ostring = key.trim();
-// 		// console.log(`key:${key}, value:${value}`);
-
-// 		if (ostring.endsWith("<>") || ostring.endsWith("!=")) {
-// 			ostring = cleanse(ostring);
-// 			// ostring = ostring === "id" ? "_id" : ostring;
-// 			wheres[ostring] = {
-// 				$ne: value,
-// 			};
-// 		} else if (ostring.endsWith(">")) {
-// 			ostring = cleanse(ostring);
-// 			// ostring = ostring === "id" ? "_id" : ostring;
-// 			wheres[ostring] = {
-// 				$gt: value,
-// 			};
-// 		} else if (ostring.endsWith(">=")) {
-// 			ostring = cleanse(ostring);
-// 			// ostring = ostring === "id" ? "_id" : ostring;
-// 			wheres[ostring] = {
-// 				$gte: value,
-// 			};
-// 		} else if (ostring.endsWith("<")) {
-// 			ostring = cleanse(ostring);
-// 			// ostring = ostring === "id" ? "_id" : ostring;
-// 			wheres[ostring] = {
-// 				$lt: value,
-// 			};
-// 		} else if (ostring.endsWith("<=")) {
-// 			ostring = cleanse(ostring);
-// 			// ostring = ostring === "id" ? "_id" : ostring;
-// 			wheres[ostring] = {
-// 				$lte: value,
-// 			};
-// 		} else if (_.isArray(value)) {
-// 			if (ostring.startsWith("~")) {
-// 				ostring = cleanse(ostring);
-// 				// ostring = ostring === "id" ? "_id" : ostring;
-// 				wheres[ostring] = {
-// 					$nin: value,
-// 				};
-// 			} else {
-// 				ostring = cleanse(ostring);
-// 				// ostring = ostring === "id" ? "_id" : ostring;
-// 				wheres[ostring] = {
-// 					$in: value,
-// 				};
-// 			}
-// 		} else {
-// 			ostring = cleanse(ostring);
-// 			// ostring = ostring === "id" ? "_id" : ostring;
-// 			wheres[ostring] = value;
-// 		}
-// 	};
-// 	for (const key in opts) {
-// 		addWheres(key, opts[key]);
-// 	}
-
-// 	return wheres;
-// };
-
-const mongoDBModel = function(model: string, Models: GetModels): Model {
+const mongoDBModel = function(model: string): Model {
 	const _modelName = model.toLowerCase(),
-		broadcast = (load: Record) => eventBus.broadcast(load),
+		broadcast = (load: Record) => eventBus().broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
 			const { verb, room, data } = load;
-			eventBus.emit(`${verb}::${room}`, data);
+			eventBus().emit(`${verb}::${room}`, data);
 		};
 
 	const base: Model = {
@@ -120,6 +55,7 @@ const mongoDBModel = function(model: string, Models: GetModels): Model {
 		ranges: [],
 		orderBy: "",
 		insertKey: "id",
+		setUp() {},
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
 		postDestroy(req: Request, data: Record) {},
@@ -433,32 +369,6 @@ const mongoDBModel = function(model: string, Models: GetModels): Model {
 			const deleteOperation = isSingle ? "deleteOne" : "deleteMany";
 			const { deletedCount } = await collection[deleteOperation](query);
 			return deletedCount ? arg : null;
-		},
-		async emitToAll(req: Request, _data: Params) {
-			// console.log("Got: ", _data);
-
-			const { room_id, room, verb, tenant } = _data;
-
-			if (verb === "destroy") {
-				const data = {
-					id: room_id,
-				};
-				const param = { room, verb, tenant, data };
-				// console.log(param);
-				broadcast(param);
-			} else {
-				const _model = Models[room];
-				if (typeof _model !== "function") return;
-
-				const model = _model(req);
-				const { error, data } = await raa(model.find({ id: room_id }));
-
-				if (!error) {
-					const param = { room, verb, tenant, data };
-					// console.log(param);
-					broadcast(param);
-				}
-			}
 		},
 	};
 

@@ -1,6 +1,6 @@
 import path from "path"
 import io from "socket.io-client";
-import { serve as createServer,utils} from "../src";
+import { serve as createServer, utils} from "../src";
 
 const { http } = utils.request({});
 http.set("hostname","localhost").set("port",8000);
@@ -31,7 +31,7 @@ const startIO =  (done:any) => {
 describe("Rest Controller and IO Controller", () => {
   let core:any = null;
   beforeAll( async (done) =>{
-     core = await createServer(path.resolve(__dirname,"testapp"));
+     core = await createServer()(path.resolve(__dirname,"testapp"));
      done();
   })
 

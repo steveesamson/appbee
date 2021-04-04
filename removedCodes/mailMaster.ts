@@ -1,7 +1,7 @@
-import raa from "./handleAsyncAwait";
-import { DataSources } from "./dataSource";
-import { Models } from "./storeModels";
-import { MailMasterType } from "../types";
+import raa from "../src/common/utils/handleAsyncAwait";
+import { DataSources } from "../src/common/utils/dataSource";
+import { Models } from "../src/common/utils/storeModels";
+import { MailMasterType } from "../src/common/types";
 
 const MailMaster: MailMasterType = (_db: string, messanger: any) => {
 	if (!DataSources[_db]) return { start: () => false };

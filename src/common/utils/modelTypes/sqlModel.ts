@@ -1,10 +1,8 @@
 import _ from "lodash";
 import { Request } from "express";
-import { Record, Model, Params, GetModels } from "../../types";
+import { Record, Model, Params } from "../../types";
 import { SqlError } from "../Error";
-//import { Models } from "../storeModels";
 import { eventBus } from "../eventBus";
-import raa from "../handleAsyncAwait";
 
 const cleanse = (str: string) =>
 	str
@@ -52,13 +50,13 @@ const addWheres = (db: any, modelName: string, context: any) => (key: string, va
 	}
 };
 
-const sqlModel = function(model: string, Models: GetModels): Model {
+const sqlModel = function(model: string): Model {
 	const _modelName = model.toLowerCase(),
-		broadcast = (load: Record) => eventBus.broadcast(load),
+		broadcast = (load: Record) => eventBus().broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
 			const { verb, room, data } = load;
-			eventBus.emit(`${verb}::${room}`, data);
+			eventBus().emit(`${verb}::${room}`, data);
 		};
 	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any, modelName: string) => {
 		if (searchStrings.length) {
@@ -95,6 +93,7 @@ const sqlModel = function(model: string, Models: GetModels): Model {
 		ranges: [],
 		orderBy: "",
 		insertKey: "id",
+		setUp() {},
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
 		postDestroy(req: Request, data: Record) {},
@@ -295,32 +294,7 @@ const sqlModel = function(model: string, Models: GetModels): Model {
 
 			return db.del();
 		},
-		async emitToAll(req: Request, _data: Params) {
-			const { room_id, room, verb, tenant } = _data;
-
-			if (verb === "destroy") {
-				const data = {
-					id: room_id,
-				};
-				const param = { room, verb, tenant, data };
-				// console.log(param);
-				broadcast(param);
-			} else {
-				const _model = Models[room];
-				if (typeof _model !== "function") return;
-
-				const model = _model(req);
-				const { error, data } = await raa(model.find({ id: room_id }));
-
-				if (!error) {
-					const param = { room, verb, tenant, data };
-					// console.log(param);
-					broadcast(param);
-				}
-			}
-		},
 	};
-
 	return base;
 };
 

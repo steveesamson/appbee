@@ -2,12 +2,8 @@ import path from "path";
 import fs from "fs";
 import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
-// import baseModel from "../model";
-// import baseModel from "./baseModel";
 
 import { Model, Configuration, GetModels, ReqWithDB } from "../types";
-import Mails from "../../rest/utils/Mails";
-import Redo from "../../rest/utils/Redo";
 import { DataSources } from "./dataSource";
 //
 import { anyModel } from "./modelTypes/anyModel";
@@ -17,19 +13,19 @@ import { mongoDBModel } from "./modelTypes/mongoDbModel";
 const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 
-const baseModel = function(model: string, dbType = ""): Model {
+const baseModel = function(modelKey: string, dbType = ""): Model {
 	switch (dbType) {
 		case "mongodb":
-			return mongoDBModel(model, Models);
+			return mongoDBModel(modelKey);
 		case "pg":
 		case "mysql":
 		case "mysql2":
 		case "oracledb":
 		case "mssql":
 		case "sqlite3":
-			return sqlModel(model, Models);
+			return sqlModel(modelKey);
 		default:
-			return anyModel(model, Models);
+			return anyModel(modelKey);
 	}
 };
 
@@ -43,6 +39,7 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 		? config.store.core.type
 		: "";
 
+	// const busStore: StoreConfig = config.store ? config.store["eventBus"] : null;
 	// console.log(`canUseStore: ${!!useStore}, preferredStoreName:${preferredStoreName}, dbType:${dbType}`);
 
 	const parentModel = baseModel(name, dbType),
@@ -52,7 +49,7 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 	const emblished = Object.assign({}, useStore ? parentModel : {}, defaultModel);
 	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
 
-	Models["get" + name] = ((mdl: any) => {
+	Models["get" + name] = ((mdl: Model) => {
 		const lookup = (req: ReqWithDB): Model => {
 			const copy = _.clone(mdl);
 			if (mdl.store) {
@@ -76,6 +73,10 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 		if (mdl.collection) {
 			Models[mdl.collection] = lookup;
 		}
+		if (mdl.setUp) {
+			mdl.setUp();
+		}
+
 		return lookup;
 	})(emblished);
 };
@@ -93,8 +94,6 @@ const loadModels = async (base: string, config: Configuration) => {
 			name = Object.keys(model)[0];
 		makeModel(name, model[name], config);
 	}
-	makeModel("Mails", Mails as any, config);
-	makeModel("Redo", Redo as any, config);
 };
 
 export { Models, loadModels, baseModel };

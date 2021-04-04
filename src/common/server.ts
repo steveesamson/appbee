@@ -21,7 +21,7 @@ import {
 	createSource,
 	DataSources,
 } from "./utils/configurer";
-import { eventBus } from "./utils/index";
+import { eventBus } from "./utils/eventBus";
 import { Record } from "./types";
 import { appState } from "./appState";
 
@@ -105,6 +105,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 
 	configureIORoutes(app);
 
+	// const eventBus = configuration.store.eventBus ? prodBus({ ...(configuration.store.eventBus || {}) }) : devBus;
 	app.use(MOUNT_PATH, router);
 
 	sapper &&
@@ -121,11 +122,11 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		process.on("message", (message: Record) => {
 			if (typeof message !== "string" && message.verb) {
 				// console.log("message to worker: ", message);
-				eventBus.broadcast(message);
+				eventBus().broadcast(message);
 			}
 		});
 
-		eventBus.on("service", (message: Record) => {
+		eventBus().on("service", (message: Record) => {
 			// console.log("prod:eventBus: ", message);
 			//CLUSTER
 			process.send(message);

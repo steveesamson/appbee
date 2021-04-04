@@ -1,9 +1,7 @@
 import _ from "lodash";
 import { Request } from "express";
-import { Record, Model, Params, GetModels } from "../../types";
-// import { Models } from "../storeModels";
+import { Record, Model, Params } from "../../types";
 import { eventBus } from "../eventBus";
-import raa from "../handleAsyncAwait";
 
 const cleanse = (str: string) =>
 	str
@@ -15,13 +13,13 @@ const cleanse = (str: string) =>
 		.replace(/~/g, "")
 		.trim();
 
-const anyModel = function(model: string, Models: GetModels): Model {
+const anyModel = function(model: string): Model {
 	const _modelName = model.toLowerCase(),
-		broadcast = (load: Record) => eventBus.broadcast(load),
+		broadcast = (load: Record) => eventBus().broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
 			const { verb, room, data } = load;
-			eventBus.emit(`${verb}::${room}`, data);
+			eventBus().emit(`${verb}::${room}`, data);
 		};
 
 	const base: Model = {
@@ -40,6 +38,7 @@ const anyModel = function(model: string, Models: GetModels): Model {
 		ranges: [],
 		orderBy: "",
 		insertKey: "id",
+		setUp() {},
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
 		postDestroy(req: Request, data: Record) {},
@@ -117,7 +116,6 @@ const anyModel = function(model: string, Models: GetModels): Model {
 		hasKey(options: Params) {
 			return this.uniqueKeys.some((r: string) => Object.keys(options).includes(r) && !_.isArray(options[r]));
 		},
-
 		async finalize(options: Params, db: any) {},
 		async find(options: Params) {
 			return null;
@@ -130,30 +128,6 @@ const anyModel = function(model: string, Models: GetModels): Model {
 		},
 		async destroy(options: Params) {
 			return null;
-		},
-		async emitToAll(req: Request, _data: Params) {
-			const { room_id, room, verb, tenant } = _data;
-
-			if (verb === "destroy") {
-				const data = {
-					id: room_id,
-				};
-				const param = { room, verb, tenant, data };
-				// console.log(param);
-				broadcast(param);
-			} else {
-				const _model = Models[room];
-				if (typeof _model !== "function") return;
-
-				const model = _model(req);
-				const { error, data } = await raa(model.find({ id: room_id }));
-
-				if (!error) {
-					const param = { room, verb, tenant, data };
-					// console.log(param);
-					broadcast(param);
-				}
-			}
 		},
 	};
 

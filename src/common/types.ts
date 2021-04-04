@@ -34,6 +34,7 @@ export type Record = {
 export type Params = Record;
 // rowCount, searchPath, checkConcurrentUpdate;
 export interface Model {
+	setUp?(): void;
 	hasKey?(options: Params): boolean;
 	prepWhere?(options: Params): void;
 	rowCount?(db: any): Promise<Record>;
@@ -210,8 +211,6 @@ export interface GetModels {
 export interface Modules {
 	controllers: RouteMap;
 	policies: MiddlewareConfig;
-	crons: CronConfig[];
-	jobs: JobConfig[];
 	plugins: Record;
 	middlewares: MiddlewareConfig[];
 }
@@ -345,6 +344,10 @@ export interface RestfulType {
 	handleUpdate: (modelName: string) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }
+
+export interface WorkerApp {
+	(): void;
+}
 export interface UtilsType {
 	writeFileTo: WriteFileType;
 	writeStreamTo: WriteStreamType;
@@ -355,16 +358,12 @@ export interface UtilsType {
 	streamToPicture: ControllerRequest;
 	unlinkFiles: ControllerRequest;
 	uploadFile: ControllerRequest;
-	mailer: MailerType;
-	mailMaster: MailMasterType;
-	cronMaster: CronMasterType;
-	jobMaster: JobMasterType;
-	cdc: ChangeDataCaptureType;
+	mailer: () => MailerType;
 	request: HttpRequestType;
 	raa: HandleAsyncAwait;
 	Encrypt: IEncrypt;
 	Token: IToken;
-	eventBus: EventBusType;
+	eventBus: () => EventBusType;
 	rollup: {
 		watchServerFiles: WatchServerFilesType;
 		compileTypeScript: CompileTypeScriptType;

@@ -1,4 +1,4 @@
-import { JobConfig, JobMasterType, Record } from "../types";
+import { JobConfig, JobMasterType, Record } from "../src/common/types";
 
 class JobMaster {
 	send: (msg: Record) => void;

@@ -4,11 +4,8 @@ import _ from "lodash";
 import filesWithExtension, { listDir } from "./fetchFileTypes";
 import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration, JobConfig } from "../types";
 import { routes } from "../../rest/route";
-// import baseREST from "../../rest/restful";
 import { NextFunction, Response } from "express";
-import mailController from "../../rest/utils/MailsController";
-import redoController from "../../rest/utils/RedoController";
-import { StoreConfig } from "../../index";
+import { StoreConfig } from "../types";
 
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 const fetchTypeFiles = filesWithExtension(ext);
@@ -36,7 +33,7 @@ const loadConfig = async (base: string): Promise<Configuration> => {
 		(configs as any)[name] = configObject.default;
 	}
 
-	return <Configuration>configs;
+	return configs;
 };
 
 const loadPolicy = async (base: string, policies: string[]): Promise<MiddlewareRoutine[]> => {
@@ -63,10 +60,7 @@ const loadPolicy = async (base: string, policies: string[]): Promise<MiddlewareR
 	return policiesMap;
 };
 
-const loadModules = async (
-	base: string,
-	type: string,
-): Promise<Record | CronConfig[] | MiddlewareConfig[] | JobConfig[]> => {
+const loadModules = async (base: string, type: string): Promise<Record | MiddlewareConfig[]> => {
 	base = path.resolve(base, type);
 	if (!fs.existsSync(base)) return [];
 
@@ -91,19 +85,6 @@ const loadControllers = async (base: string, store: StoreConfig): Promise<RouteM
 	for (let i = 0; i < len; ++i) {
 		await import(path.resolve(base, list[i], `controller${ext}`));
 	}
-	mailController();
-	redoController();
-
-	// for (const key in routes) {
-	// 	const route = routes[key],
-	// 		baseRest = baseREST(route.mountPoint as string, key);
-	// 	// routes[key] = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
-	// 	const tmp = _.extend({}, Object.keys(store).length ? baseRest : {}, route);
-	// 	for (const k in route) {
-	// 		delete tmp[k];
-	// 	}
-	// 	routes[key] = { ...route, ...tmp };
-	// }
 	return routes;
 };
 

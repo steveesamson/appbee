@@ -1,9 +1,9 @@
-import request from "./request";
-import raa from "./handleAsyncAwait";
-import { DataSources } from "./dataSource";
-import { Models } from "./storeModels";
-import { Record, ChangeDataCaptureType } from "../types";
-import { appState } from "../appState";
+import request from "../src/common/utils/request";
+import raa from "../src/common/utils/handleAsyncAwait";
+import { DataSources } from "../src/common/utils/dataSource";
+import { Models } from "../src/common/utils/storeModels";
+import { Record, ChangeDataCaptureType } from "../src/common/types";
+import { appState } from "../src/common/appState";
 
 const { http } = request();
 
