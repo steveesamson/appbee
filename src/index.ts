@@ -38,6 +38,8 @@ import {
 	UtilsType,
 	JobConfig,
 	RestfulType,
+	EventBusType,
+	MailerType,
 } from "./common/types";
 import { mailer } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
@@ -89,6 +91,8 @@ export {
 	JobConfig,
 	CronConfig,
 	MiddlewareConfig,
+	EventBusType,
+	MailerType,
 	Params,
 	Record,
 	ViewConfig,

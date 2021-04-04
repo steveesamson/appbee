@@ -3,7 +3,7 @@ import shortid from "shortid";
 import { appState } from "../appState";
 import { BusMessenger } from "./busMessenger";
 
-class DevBus {
+class DevBus implements EventBusType {
 	listeners: { [key: string]: Function | any } = {};
 
 	constructor() {
@@ -51,7 +51,7 @@ class DevBus {
 		this.emit(`${verb}::${room}`, data);
 	}
 }
-class ProdBus {
+class ProdBus implements EventBusType {
 	bm: any = null;
 	subscriber: any = null;
 	publisher: any = null;
@@ -101,7 +101,7 @@ class ProdBus {
 }
 const devBus: EventBusType = new DevBus();
 let bus: EventBusType = devBus;
-const eventBus = (busStore?: StoreConfig) => {
+const eventBus = (busStore?: StoreConfig): EventBusType => {
 	if (busStore) {
 		bus = new ProdBus(busStore);
 	}
