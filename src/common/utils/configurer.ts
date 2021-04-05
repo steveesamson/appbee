@@ -9,6 +9,7 @@ import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
 import { eventBus } from "./eventBus";
+import { useRedis } from "./beeQ";
 import Mailer from "./mailer";
 
 import {
@@ -172,6 +173,7 @@ const configureRestServer = async (base: string) => {
 
 	if (configuration.store && configuration.store.eventBus) {
 		eventBus({ ...configuration.store.eventBus });
+		useRedis({ ...configuration.store.eventBus });
 	}
 	if (configuration.smtp) {
 		sender = Mailer({ ...(configuration.smtp || {}) });
@@ -193,6 +195,7 @@ const configureWorker = async (base: string) => {
 
 	if (configuration.store && configuration.store.eventBus) {
 		eventBus({ ...configuration.store.eventBus });
+		useRedis({ ...configuration.store.eventBus });
 	}
 	if (configuration.smtp) {
 		sender = Mailer({ ...(configuration.smtp || {}) });

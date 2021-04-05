@@ -348,6 +348,18 @@ export interface RestfulType {
 export interface WorkerApp {
 	(): void;
 }
+
+export interface BeeQConfig {
+	redis: StoreConfig;
+	isWorker?: false | true;
+	[key: string]: any;
+}
+export interface BeeQueueType {
+	addJob: (jobSpec: Record) => Promise<any>;
+	processJob: (processor: (job: Record, done?: Function) => void, concurrency?: number) => void;
+	on: (event: string, handler: Function) => void;
+}
+
 export interface UtilsType {
 	writeFileTo: WriteFileType;
 	writeStreamTo: WriteStreamType;
@@ -364,6 +376,11 @@ export interface UtilsType {
 	Encrypt: IEncrypt;
 	Token: IToken;
 	eventBus: () => EventBusType;
+	beeQueue: {
+		useRedis: (options: StoreConfig) => void;
+		useWorker: (queueName: string, options?: BeeQConfig) => BeeQueueType;
+		useQueue: (queueName: string, options?: BeeQConfig) => BeeQueueType;
+	};
 	rollup: {
 		watchServerFiles: WatchServerFilesType;
 		compileTypeScript: CompileTypeScriptType;

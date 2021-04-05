@@ -21,6 +21,9 @@ import {
 	unlinkFiles,
 	uploadFile,
 	eventBus,
+	useRedis,
+	useWorker,
+	useQueue,
 } from "./common/utils/index";
 
 import {
@@ -40,6 +43,8 @@ import {
 	RestfulType,
 	EventBusType,
 	MailerType,
+	BeeQConfig,
+	BeeQueueType,
 } from "./common/types";
 import { mailer } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
@@ -61,6 +66,11 @@ const utils: UtilsType = {
 	Token,
 	eventBus,
 	mailer,
+	beeQueue: {
+		useRedis,
+		useWorker,
+		useQueue,
+	},
 	rollup: {
 		watchServerFiles,
 		compileTypeScript,
@@ -93,6 +103,8 @@ export {
 	MiddlewareConfig,
 	EventBusType,
 	MailerType,
+	BeeQConfig,
+	BeeQueueType,
 	Params,
 	Record,
 	ViewConfig,

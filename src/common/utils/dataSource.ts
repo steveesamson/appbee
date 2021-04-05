@@ -1,4 +1,3 @@
-import knex from "knex";
 import { StoreConfig, StoreListConfig } from "../types";
 
 const DataSources: any = {};
@@ -33,6 +32,8 @@ const createSource = ({
 		  };
 
 	return new Promise(async (re, je) => {
+		const knex = require("knex");
+
 		if (SQLs.includes(type)) {
 			const db = knex({
 				debug,

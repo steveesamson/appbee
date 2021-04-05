@@ -17,6 +17,7 @@ import {
 import { compileTypeScript, watchServerFiles } from "./rollup";
 export { Encrypt, Token } from "./security";
 export { eventBus } from "./eventBus";
+export { useRedis, useWorker, useQueue } from "./beeQ";
 export {
 	writeFileTo,
 	writeStreamTo,
