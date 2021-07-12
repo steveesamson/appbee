@@ -18,19 +18,15 @@ import {
 	configuration,
 	configureRestServer,
 	modules,
-	createSource,
-	DataSources,
 } from "./utils/configurer";
-import { eventBus } from "./utils/eventBus";
+import { eventBus, initRedis } from "./utils/index";
 import { Record } from "./types";
 import { appState } from "./appState";
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
-	// console.log(appState());
-
 	await configureRestServer(base);
 
-	const { view, application, security } = configuration;
+	const { view, application, security, bus } = configuration;
 	const staticDir = view.staticDir || "";
 	const viewDir = view.viewDir || "";
 	const templateDir = view.templateDir || "";
@@ -59,12 +55,14 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
 		resources,
-		createSource,
-		getSource: (name: string) => DataSources[name],
 		...restsecurity,
 		...restapp,
 	});
 
+	if (bus) {
+		eventBus(bus);
+		initRedis(bus);
+	}
 	const router: Router = configureRestRoutes(policies);
 	const app: Application = express();
 	app.set("trust proxy", true);
@@ -105,7 +103,6 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 
 	configureIORoutes(app);
 
-	// const eventBus = configuration.store.eventBus ? prodBus({ ...(configuration.store.eventBus || {}) }) : devBus;
 	app.use(MOUNT_PATH, router);
 
 	sapper &&

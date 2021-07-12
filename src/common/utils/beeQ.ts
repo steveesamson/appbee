@@ -1,4 +1,5 @@
 import { BeeQConfig, Record, BeeQueueType } from "../types";
+
 const BeeQueue: any = require("bee-queue");
 
 class BeeQ implements BeeQueueType {
@@ -15,23 +16,24 @@ class BeeQ implements BeeQueueType {
 		}
 		this.queue = new BeeQueue(queueName, options);
 
-		if (isWorker) {
-			this.queue.on("succeeded", (job: Record, result: Record) => {
-				console.log(`Job ${job.id} succeeded with result: ${result}`);
-			});
-		}
-		return this;
+		// if (isWorker) {
+		// 	this.queue.on("succeeded", (job: Record, result: any) => {
+		// 		console.log(`Job ${job.id} succeeded with result: ${result}`);
+		// 	});
+		// }
 	}
 
-	addJob(jobSpec: Record) {
+	addJob(jobSpec: Record, id: any = null) {
 		if (this.kind === "worker") {
 			throw Error('You cannot add jobs to a worker, create a queue via "useQueue"');
 		}
 		return new Promise((r, j) => {
 			const job = this.queue.createJob(jobSpec);
 			try {
-				job.save().then((_job: any) => {
-					console.log(`Job with ID: ${_job.id} was queued successfully.`);
+				if (id) {
+					job.setId(id);
+				}
+				job.save().then(async (_job: any) => {
 					r(_job);
 				});
 			} catch (e) {
@@ -40,24 +42,13 @@ class BeeQ implements BeeQueueType {
 		});
 	}
 
-	processJob(processor: (job: Record, done?: Function) => void, concurrency?: number) {
+	processJob(processor: (job: Record, done: Function) => void, concurrency?: number) {
 		if (this.kind === "queue") {
 			throw Error('You cannot process jobs on a non-worker, create a worker via "useWorker"');
 		}
 		if (!processor) {
 			throw Error("No job processor was supplied to processJob");
 		}
-		// const proxyProcessor = (jb: Record, done: Function) => {
-		// 	const ended = (err: any, msg: any) => {
-		// 		console.log(`Done with error:${err}, msg:${msg}`);
-		// 		if (!err) {
-		// 			//delete from db;
-		// 		}
-		// 		done(err, msg);
-		// 	};
-		// 	processor(jb, ended);
-		// };
-
 		if (concurrency) {
 			this.queue.process(concurrency, processor);
 		} else {
@@ -88,8 +79,8 @@ const useQueue = (queueName: string, options?: BeeQConfig): BeeQueueType => {
 	return queue;
 };
 
-const useRedis = (redisStore: Record) => {
+const initRedis = (redisStore: Record) => {
 	defOptions.redis = redisStore;
 };
 
-export { useQueue, useWorker, useRedis };
+export { useQueue, useWorker, initRedis };

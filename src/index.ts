@@ -21,7 +21,7 @@ import {
 	unlinkFiles,
 	uploadFile,
 	eventBus,
-	useRedis,
+	initRedis,
 	useWorker,
 	useQueue,
 } from "./common/utils/index";
@@ -46,7 +46,7 @@ import {
 	BeeQConfig,
 	BeeQueueType,
 } from "./common/types";
-import { mailer } from "./common/utils/configurer";
+import { mailer, createSource, getSource, getConfig } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
 import { appState } from "./common/appState";
 
@@ -66,8 +66,13 @@ const utils: UtilsType = {
 	Token,
 	eventBus,
 	mailer,
+	getConfig,
+	dataSource: {
+		createSource,
+		getSource,
+	},
 	beeQueue: {
-		useRedis,
+		initRedis,
 		useWorker,
 		useQueue,
 	},

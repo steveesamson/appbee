@@ -2,7 +2,6 @@
  * Created by steve Samson <stevee.samson@gmail.com> on 2/16/14.
  */
 
-import Busboy from "busboy";
 import path from "path";
 import os from "os";
 import fs from "fs-extra";
@@ -13,6 +12,7 @@ import { appState } from "../common/appState";
 import { Response, NextFunction, Request } from "express";
 
 const multipart = () => {
+	const Busboy = require("busboy");
 	const { PUBLIC_DIR } = appState();
 	return (req: any, res: Response, next: NextFunction) => {
 		req = req as Request;

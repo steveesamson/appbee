@@ -4,12 +4,10 @@ import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
 import { loadModels } from "./storeModels";
 import { loadPlugins } from "./plugins";
-import { configure as configureDataSources, createSource, DataSources } from "./dataSource";
+import { configure as configureDataSources, getSource, createSource } from "./dataSource";
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
-import { eventBus } from "./eventBus";
-import { useRedis } from "./beeQ";
 import Mailer from "./mailer";
 
 import {
@@ -21,7 +19,13 @@ import {
 	Configuration,
 	Modules,
 	MailerType,
+	AppConfig,
+	LdapConfig,
+	PolicyConfig,
+	StoreConfig,
+	ViewConfig,
 } from "../types";
+// import { AppConfig, LdapConfig, PolicyConfig, StoreConfig, ViewConfig,  } from "../../index";
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
@@ -160,7 +164,8 @@ const configureRestServer = async (base: string) => {
 	const cfg = await loadConfig(base);
 
 	Object.assign(configuration, cfg);
-
+	await configureDataSources(configuration.store);
+	await loadModels(base, configuration);
 	//Load middlewares
 	const _middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
 	modules.middlewares = _middlewares;
@@ -169,12 +174,6 @@ const configureRestServer = async (base: string) => {
 	const _controllers = await loadControllers(base, configuration.store);
 	modules.controllers = _controllers;
 
-	configureDataSources(configuration.store);
-
-	if (configuration.store && configuration.store.eventBus) {
-		eventBus({ ...configuration.store.eventBus });
-		useRedis({ ...configuration.store.eventBus });
-	}
 	if (configuration.smtp) {
 		sender = Mailer({ ...(configuration.smtp || {}) });
 	}
@@ -182,7 +181,6 @@ const configureRestServer = async (base: string) => {
 	modules.policies = await configurePolicies(base, configuration.policy);
 
 	modules.plugins = await loadPlugins(base);
-	await loadModels(base, configuration);
 };
 
 const configureWorker = async (base: string) => {
@@ -191,18 +189,17 @@ const configureWorker = async (base: string) => {
 	const cfg = await loadConfig(base);
 
 	Object.assign(configuration, cfg);
-	configureDataSources(configuration.store);
+	await configureDataSources(configuration.store);
+	await loadModels(base, configuration);
 
-	if (configuration.store && configuration.store.eventBus) {
-		eventBus({ ...configuration.store.eventBus });
-		useRedis({ ...configuration.store.eventBus });
-	}
 	if (configuration.smtp) {
 		sender = Mailer({ ...(configuration.smtp || {}) });
 	}
 	modules.plugins = await loadPlugins(base);
-	await loadModels(base, configuration);
 };
+
+const getConfig = (type: string): AppConfig | LdapConfig | PolicyConfig | StoreConfig | ViewConfig | Record =>
+	(configuration as any)[type];
 
 export {
 	configureIORoutes,
@@ -211,10 +208,11 @@ export {
 	configureRestRoutes,
 	configureRestServer,
 	configureWorker,
+	getSource,
 	createSource,
-	DataSources,
 	ioRoutes,
 	configuration,
 	mailer,
 	modules,
+	getConfig,
 };

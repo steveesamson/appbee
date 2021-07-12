@@ -50,8 +50,9 @@ const addWheres = (db: any, modelName: string, context: any) => (key: string, va
 	}
 };
 
-const sqlModel = function(model: string): Model {
+const sqlModel = function(model: string, preferredCollection: string): Model {
 	const _modelName = model.toLowerCase(),
+		_collection = preferredCollection ? preferredCollection : _modelName,
 		broadcast = (load: Record) => eventBus().broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
@@ -80,7 +81,7 @@ const sqlModel = function(model: string): Model {
 		db: {},
 		storeType: "",
 		canReturnDrivers: ["oracledb", "mssql", "pg"],
-		collection: _modelName,
+		collection: _collection,
 		instanceName: model,
 		dbSchema: "",
 		schema: {},

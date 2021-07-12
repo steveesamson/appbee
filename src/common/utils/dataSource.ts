@@ -32,9 +32,8 @@ const createSource = ({
 		  };
 
 	return new Promise(async (re, je) => {
-		const knex = require("knex");
-
 		if (SQLs.includes(type)) {
+			const knex = require("knex");
 			const db = knex({
 				debug,
 				client: type,
@@ -63,7 +62,7 @@ const createSource = ({
 				}
 
 				const db = client.db(database);
-				console.log(`Connected successfully to ${database} db`);
+				console.log(`Connected successfully to ${database} db on ${type}`);
 				db.storeType = type;
 				db.close = async () => {
 					await client.close();
@@ -91,17 +90,34 @@ const createSource = ({
 };
 
 const configure = (store: StoreListConfig) => {
-	Object.keys(store).forEach(async (key: string) => {
-		try {
-			const { db, error } = (await createSource(store[key])) as any;
-			if (error) {
-				console.error(error);
-			} else {
-				DataSources[key] = db;
+	const keys = Object.keys(store);
+	return new Promise(r => {
+		const createNextSource = async (key: string) => {
+			try {
+				const { db, error } = (await createSource(store[key])) as any;
+				if (error) {
+					console.error(error);
+				} else {
+					DataSources[key] = db;
+				}
+				if (keys.length) {
+					createNextSource(keys.shift());
+				} else {
+					r(null);
+				}
+			} catch (e) {
+				console.error(e);
+				r(null);
 			}
-		} catch (e) {
-			console.error(e);
+		};
+		if (!keys.length) {
+			r(null);
+		} else {
+			createNextSource(keys.shift());
 		}
 	});
 };
-export { configure, createSource, DataSources };
+const getSource = (sourceName: string): any => {
+	return DataSources[sourceName];
+};
+export { configure, createSource, getSource };

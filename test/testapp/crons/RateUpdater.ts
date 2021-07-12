@@ -1,9 +1,8 @@
 
-import shortid from "shortid";
 import { CronConfig } from "../../../src/common/types";
 
 const RateUpdater:CronConfig = {
-    key:shortid.generate(),
+    key:"jsdkadjad",
     name:'RateUpdater',
     schedule:'*/15 * * * *',
     enabled:true,

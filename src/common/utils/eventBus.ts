@@ -1,11 +1,10 @@
 import { Record, EventBusType, StoreConfig } from "../types";
-import shortid from "shortid";
 import { appState } from "../appState";
 import { BusMessenger } from "./busMessenger";
 
 class DevBus implements EventBusType {
 	listeners: { [key: string]: Function | any } = {};
-
+	shortId: any = require("shortid");
 	constructor() {
 		if (!(DevBus as any).instance) {
 			(DevBus as any).instance = this;
@@ -24,7 +23,7 @@ class DevBus implements EventBusType {
 	}
 
 	once(eventName: string, fn: Function) {
-		const fnId = shortid.generate();
+		const fnId = this.shortId.generate();
 		const onceWrapper = () => {
 			fn();
 			this.removeListener(eventName, fnId);
@@ -32,7 +31,7 @@ class DevBus implements EventBusType {
 		this.addListener(eventName, onceWrapper, fnId);
 	}
 	on(eventName: string, fn: Function) {
-		const fnId = shortid.generate();
+		const fnId = this.shortId.generate();
 		this.addListener(eventName, fn, fnId);
 		return () => this.removeListener(eventName, fnId);
 	}
@@ -47,8 +46,8 @@ class DevBus implements EventBusType {
 	broadcast(load: Record) {
 		const { IO } = appState();
 		IO.emit("comets", load);
-		const { verb, room, data } = load;
-		this.emit(`${verb}::${room}`, data);
+		// const { verb, room, data } = load;
+		// this.emit(`${verb}::${room}`, data);
 	}
 }
 class ProdBus implements EventBusType {
@@ -107,5 +106,4 @@ const eventBus = (busStore?: StoreConfig): EventBusType => {
 	}
 	return bus;
 };
-// const eventBus = (options:Record = null) => options? prodBus(options) : devBus;
 export { eventBus };

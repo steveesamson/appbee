@@ -1,5 +1,6 @@
+import {Model} from "../../../../src/common/types";
 
- const Users = {
+ export const Users:Model = {
   schema:{
     id: 'int',
     upline: 'int',
@@ -23,5 +24,3 @@
   uniqueKeys:['id'],
   
 };
-
-export {Users};

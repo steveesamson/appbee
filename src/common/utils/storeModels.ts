@@ -4,8 +4,8 @@ import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
 
 import { Model, Configuration, GetModels, ReqWithDB } from "../types";
-import { DataSources } from "./dataSource";
-//
+import { getSource } from "./dataSource";
+import { QStore } from "../../rest/utils/QStore";
 import { anyModel } from "./modelTypes/anyModel";
 import { sqlModel } from "./modelTypes/sqlModel";
 import { mongoDBModel } from "./modelTypes/mongoDbModel";
@@ -13,49 +13,45 @@ import { mongoDBModel } from "./modelTypes/mongoDbModel";
 const Models: GetModels = {};
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 
-const baseModel = function(modelKey: string, dbType = ""): Model {
+const baseModel = function(modelKey: string, dbType = "", preferredCollection: string = null): Model {
 	switch (dbType) {
 		case "mongodb":
-			return mongoDBModel(modelKey);
+			return mongoDBModel(modelKey, preferredCollection);
 		case "pg":
 		case "mysql":
 		case "mysql2":
 		case "oracledb":
 		case "mssql":
 		case "sqlite3":
-			return sqlModel(modelKey);
+			return sqlModel(modelKey, preferredCollection);
 		default:
-			return anyModel(modelKey);
+			return anyModel(modelKey, preferredCollection);
 	}
 };
 
 // export default baseModel;
-const makeModel = (name: string, defaultModel: Model, config: Configuration): void => {
+const makeModel = (storeName: string, defaultModel: Model, config: Configuration): void => {
 	const useStore = Object.keys(config.store).length;
 	const preferredStoreName = defaultModel.store;
+	const preferredCollection = defaultModel.collection;
 	const dbType = preferredStoreName
 		? config.store[preferredStoreName].type
 		: useStore && config.store.core
 		? config.store.core.type
 		: "";
 
-	// const busStore: StoreConfig = config.store ? config.store["eventBus"] : null;
-	// console.log(`canUseStore: ${!!useStore}, preferredStoreName:${preferredStoreName}, dbType:${dbType}`);
-
-	const parentModel = baseModel(name, dbType),
+	const parentModel = baseModel(storeName, dbType, preferredCollection),
 		baseKeys = parentModel["uniqueKeys"],
 		defaultKeys = defaultModel["uniqueKeys"] || [];
 
 	const emblished = Object.assign({}, useStore ? parentModel : {}, defaultModel);
 	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
 
-	Models["get" + name] = ((mdl: Model) => {
+	Models["get" + storeName] = ((mdl: Model) => {
 		const lookup = (req: ReqWithDB): Model => {
 			const copy = _.clone(mdl);
 			if (mdl.store) {
-				// console.log("Store name: ", mdl.store);
-				// console.log("Data sources: ", DataSources[mdl.store]);
-				req.db = DataSources[mdl.store];
+				req.db = getSource(mdl.store);
 				if (!req || !req.db) {
 					console.error(`Null db object, store: ${mdl.store} not valid.`);
 				}
@@ -64,15 +60,17 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 			if (!req || !req.db) {
 				console.error("Null db object, check all your database connections. Looks like no db was configured...");
 			}
+			if (req.db) {
+				copy["db"] = req.db;
+				copy.storeType = req.db.storeType;
+			}
 
-			copy["db"] = req.db;
-			copy.storeType = req.db.storeType;
 			return copy;
 		};
 
-		if (mdl.collection) {
-			Models[mdl.collection] = lookup;
-		}
+		// if (mdl.collection) {
+		// 	Models[mdl.collection] = lookup;
+		// }
 		if (mdl.setUp) {
 			mdl.setUp();
 		}
@@ -81,19 +79,54 @@ const makeModel = (name: string, defaultModel: Model, config: Configuration): vo
 	})(emblished);
 };
 
-const loadModels = async (base: string, config: Configuration) => {
+const loadModels = (base: string, config: Configuration) => {
+	// return new Promise(async (r, j) => {
+	// 	base = path.resolve(base, "modules");
+
+	// 	const list = listDir(base),
+	// 		len = list.length;
+
+	// 	makeModel("QStore", QStore, config);
+	// 	for (let i = 0; i < len; ++i) {
+	// 		const dir = path.resolve(base, list[i], `model${ext}`);
+	// 		if (!fs.existsSync(dir)) continue;
+	// 		const model = await import(path.resolve(base, list[i], `model${ext}`)),
+	// 			name = Object.keys(model)[0];
+	// 		makeModel(name, model[name], config);
+	// 	}
+	// 	r(Models);
+	// });
+
 	base = path.resolve(base, "modules");
+	const list = listDir(base);
+	makeModel("QStore", QStore, config);
 
-	const list = listDir(base),
-		len = list.length;
+	return new Promise(r => {
+		const createNextModel = async (l: string) => {
+			try {
+				const dir = path.resolve(base, l, `model${ext}`);
+				if (fs.existsSync(dir)) {
+					const model = await import(dir),
+						name = Object.keys(model)[0];
+					makeModel(name, model[name], config);
+				}
 
-	for (let i = 0; i < len; ++i) {
-		const dir = path.resolve(base, list[i], `model${ext}`);
-		if (!fs.existsSync(dir)) continue;
-		const model = await import(path.resolve(base, list[i], `model${ext}`)),
-			name = Object.keys(model)[0];
-		makeModel(name, model[name], config);
-	}
+				if (list.length) {
+					createNextModel(list.shift());
+				} else {
+					r(null);
+				}
+			} catch (e) {
+				console.error(e);
+				r(null);
+			}
+		};
+		if (!list.length) {
+			r(null);
+		} else {
+			createNextModel(list.shift());
+		}
+	});
 };
 
 export { Models, loadModels, baseModel };

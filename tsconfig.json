@@ -6,6 +6,7 @@
 		"noImplicitAny": true,
 		"outDir": "./dist",
 		"target": "es5",
+		"moduleResolution":"node",
 		"esModuleInterop": true,
 	},
 	"files": ["src/global.d.ts"],

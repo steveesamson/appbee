@@ -1,22 +1,19 @@
-import jwt from "jsonwebtoken";
 import { scrypt, randomBytes } from "crypto";
 import { promisify } from "util";
-
-// import bcrypt from "bcryptjs";
 import { IToken, IEncrypt } from "../types";
 import { appState } from "../appState";
-// const saltRounds = 10;
+
 const scryptAsync = promisify(scrypt);
 
 const Token: IToken = {
 		sign(load: any) {
 			const { SECRET } = appState();
-			return jwt.sign(load, SECRET);
+			return require("jsonwebtoken").sign(load, SECRET);
 		},
 		verify(token: string) {
 			const { SECRET } = appState();
 			try {
-				return jwt.verify(token, SECRET);
+				return require("jsonwebtoken").verify(token, SECRET);
 			} catch (e) {
 				return null;
 			}

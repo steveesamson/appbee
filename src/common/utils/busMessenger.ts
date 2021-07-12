@@ -1,6 +1,4 @@
-import Emitter from "socket.io-emitter";
 import { Record, StoreConfig } from "../types";
-const redis = require("redis");
 
 class BusMessenger {
 	options: StoreConfig = null;
@@ -13,8 +11,9 @@ class BusMessenger {
 			throw new Error("Invalid BusMessenger options.");
 		}
 
+		const Emitter = require("socket.io-emitter");
+		const redis = require("redis");
 		this.options = options;
-
 		this.emitter = Emitter(this.options as any);
 		this.redisClient = redis.createClient(this.options);
 

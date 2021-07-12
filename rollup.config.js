@@ -24,7 +24,7 @@ export default (async () => ({
 	],
 	external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})],
 	plugins: [
-		nodeResolve({ browser: false }),
+		nodeResolve({ browser: false, preferBuiltins: true }),
 		commonjs(),
 		tsc({
 			exclude: ["node_modules/**"],

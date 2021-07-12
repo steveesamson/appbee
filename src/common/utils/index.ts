@@ -1,7 +1,7 @@
 import raa from "./handleAsyncAwait";
 import request from "./request";
 import { getPlugin } from "./plugins";
-import { Models, loadModels, baseModel } from "./storeModels";
+import { loadModels, baseModel, Models } from "./storeModels";
 import { BeeError, SqlError } from "./Error";
 import {
 	writeFileTo,
@@ -17,7 +17,7 @@ import {
 import { compileTypeScript, watchServerFiles } from "./rollup";
 export { Encrypt, Token } from "./security";
 export { eventBus } from "./eventBus";
-export { useRedis, useWorker, useQueue } from "./beeQ";
+export { initRedis, useQueue, useWorker } from "./beeQ";
 export {
 	writeFileTo,
 	writeStreamTo,

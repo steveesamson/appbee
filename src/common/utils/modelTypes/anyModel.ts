@@ -13,19 +13,20 @@ const cleanse = (str: string) =>
 		.replace(/~/g, "")
 		.trim();
 
-const anyModel = function(model: string): Model {
+const anyModel = function(model: string, preferredCollection: string): Model {
 	const _modelName = model.toLowerCase(),
+		_collection = preferredCollection ? preferredCollection : _modelName,
 		broadcast = (load: Record) => eventBus().broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
 			const { verb, room, data } = load;
 			eventBus().emit(`${verb}::${room}`, data);
 		};
-
+	// console.log("Collection is: ", _collection);
 	const base: Model = {
 		db: {},
 		storeType: "",
-		collection: _modelName,
+		collection: _collection,
 		instanceName: model,
 		dbSchema: "",
 		schema: {},

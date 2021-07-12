@@ -1,10 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
-import gm from "gm";
-import { Request, Response, raw } from "express";
-import svgCaptcha from "svg-captcha";
-import shortid from "shortid";
-// import { Request } from "express";
+import { Request, Response } from "express";
 import { Params, WriteFileType, WriteStreamType } from "../types";
 import { appState } from "../appState";
 import raa from "../utils/handleAsyncAwait";
@@ -80,7 +76,8 @@ export const exportToExcel = (req: Request, res: Response) => {
 export const streamToPicture = async (req: Request, res: Response) => {
 	const { UPLOAD_DIR } = appState();
 	const { storeName, saveAs } = req.parameters;
-	const saveName = saveAs || shortid.generate();
+
+	const saveName = saveAs || require("shortid").generate();
 
 	const { error, data } = await raa(writeStreamTo(req, { saveAs: `${UPLOAD_DIR}/${storeName}/${saveName}.jpg` }));
 	res.status(200).json({ error, data });
@@ -91,7 +88,7 @@ export const cropPicture = (req: Request, res: Response) => {
 	const { src, w, h, x, y } = req.parameters;
 
 	const imagePath = PUBLIC_DIR + src;
-
+	const gm = require("gm");
 	//        console.log(path);
 
 	gm(imagePath)
@@ -107,6 +104,7 @@ export const cropPicture = (req: Request, res: Response) => {
 };
 
 export const getCaptcha = (req: Request, res: Response) => {
+	const svgCaptcha = require("svg-captcha");
 	const capOpts = {
 			ignoreChars: "0o1il",
 			noise: 3,
@@ -159,6 +157,7 @@ export const resizeImage = (req: Request, res: Response) => {
 	if (!src) {
 		return res.status(200).json({ error: "No image source provided, src" });
 	}
+	const gm = require("gm");
 
 	const coords = {
 			w: Number(w),

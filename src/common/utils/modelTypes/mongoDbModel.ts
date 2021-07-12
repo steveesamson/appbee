@@ -33,8 +33,9 @@ const replaceId = (datas: Record[] | Record) => {
 			.replace(/~/g, "")
 			.trim();
 
-const mongoDBModel = function(model: string): Model {
+const mongoDBModel = function(model: string, preferredCollection: string): Model {
 	const _modelName = model.toLowerCase(),
+		_collection = preferredCollection ? preferredCollection : _modelName,
 		broadcast = (load: Record) => eventBus().broadcast(load),
 		sendToOthers = (req: Request, load: Record) => {
 			req.io.broadcast.emit("comets", load);
@@ -45,7 +46,7 @@ const mongoDBModel = function(model: string): Model {
 	const base: Model = {
 		db: {},
 		storeType: "",
-		collection: _modelName,
+		collection: _collection,
 		instanceName: model,
 		schema: {},
 		uniqueKeys: ["id", "_id"],

@@ -192,6 +192,7 @@ export interface Configuration {
 	application: AppConfig;
 	smtp: Record;
 	policy: PolicyConfig;
+	bus: StoreConfig;
 }
 
 export interface getByCollectionType {
@@ -340,7 +341,7 @@ export interface EventBusType {
 
 export interface RestfulType {
 	handleGet: (modelName: string) => ControllerRequest;
-	handleCreate: (modelName: string, paramsInjector?: (req: Request) => Params | string | number) => ControllerRequest;
+	handleCreate: (modelName: string, paramsInjector?: (req: Request) => Record | string | number) => ControllerRequest;
 	handleUpdate: (modelName: string) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }
@@ -354,11 +355,22 @@ export interface BeeQConfig {
 	isWorker?: false | true;
 	[key: string]: any;
 }
+
+// export interface RSMQueueConfig {
+// 	client?: any;
+// 	options?: StoreConfig;
+// 	ns?: string;
+// }
 export interface BeeQueueType {
-	addJob: (jobSpec: Record) => Promise<any>;
+	addJob: (jobSpec: Record, id?: any, restoring?: boolean) => Promise<any>;
 	processJob: (processor: (job: Record, done?: Function) => void, concurrency?: number) => void;
 	on: (event: string, handler: Function) => void;
 }
+
+// export interface RSMQueueType {
+// 	addJob: (jobSpec: Record) => Promise<any>;
+// 	processJob: (processor: (job: Record, done?: Function) => void) => void;
+// }
 
 export interface UtilsType {
 	writeFileTo: WriteFileType;
@@ -377,10 +389,15 @@ export interface UtilsType {
 	Token: IToken;
 	eventBus: () => EventBusType;
 	beeQueue: {
-		useRedis: (options: StoreConfig) => void;
-		useWorker: (queueName: string, options?: BeeQConfig) => BeeQueueType;
-		useQueue: (queueName: string, options?: BeeQConfig) => BeeQueueType;
+		initRedis: (options: StoreConfig) => void;
+		useWorker?: (queueName: string, options?: BeeQConfig) => BeeQueueType;
+		useQueue: (queueName: string, options?: StoreConfig) => BeeQueueType;
 	};
+	dataSource: {
+		createSource: (options: StoreConfig) => any;
+		getSource: (name: string) => any;
+	};
+	getConfig: (type: string) => AppConfig | ViewConfig | LdapConfig | StoreConfig | PolicyConfig | Record;
 	rollup: {
 		watchServerFiles: WatchServerFilesType;
 		compileTypeScript: CompileTypeScriptType;

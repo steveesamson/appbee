@@ -1,7 +1,8 @@
 import { existsSync as x } from "fs";
 import { join } from "path";
-import { configureWorker, configuration, createSource, DataSources } from "./utils/configurer";
+import { configureWorker, configuration } from "./utils/configurer";
 import { WorkerApp } from "./types";
+import { eventBus, initRedis } from "./utils/index";
 import { appState } from "./appState";
 
 export const startWorker = async (base: string, app: WorkerApp): Promise<void> => {
@@ -14,7 +15,7 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 	}
 	await configureWorker(base);
 
-	const { view, application, security } = configuration;
+	const { view, application, security, bus } = configuration;
 	const templateDir = view.templateDir || "";
 	const { useMultiTenant, port, mountRestOn } = application;
 	const { secret, ...restsecurity } = security;
@@ -26,10 +27,12 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 		BASE_DIR: base,
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
-		createSource,
-		getSource: (name: string) => DataSources[name],
 		...restsecurity,
 	});
 
+	if (bus) {
+		eventBus(bus);
+		initRedis(bus);
+	}
 	app();
 };
