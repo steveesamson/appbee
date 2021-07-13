@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { PluginTypes } from "../types";
+import { PluginTypes } from "../typeDefs";
 import filesWithExtension from "./fetchFileTypes";
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 const fetchTypeFiles = filesWithExtension(ext);

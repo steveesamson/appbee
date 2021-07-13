@@ -1,6 +1,6 @@
 import http from "http";
 import https from "https";
-import { Record } from "../types";
+import { Record } from "../typeDefs";
 
 interface IRequest {
 	status: number;

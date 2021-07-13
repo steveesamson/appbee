@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Request } from "express";
-import { Record, Model, Params } from "../../types";
+import { Record, Model, Params } from "../../typeDefs";
 import { eventBus } from "../eventBus";
 
 const cleanse = (str: string) =>

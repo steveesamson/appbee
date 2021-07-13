@@ -1,4 +1,4 @@
-import { AppState } from "./types";
+import { AppState } from "./typeDefs";
 
 const state: AppState = {} as any;
 

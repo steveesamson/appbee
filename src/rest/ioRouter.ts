@@ -1,7 +1,7 @@
 import _ from "lodash";
 import qs from "querystring";
 import { match as m } from "path-to-regexp";
-import { ioRequest } from "../common/types";
+import { ioRequest } from "../common/typeDefs";
 import { Token } from "../common/utils/security";
 
 function decode(str: string) {

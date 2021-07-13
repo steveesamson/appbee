@@ -1,17 +1,8 @@
 import express, { Response, NextFunction, Request } from "express";
 import http from "http";
 import * as ts from "typescript";
-import { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 import { BeeError, SqlError } from "./utils/Error";
-
-// declare module "express" {
-// 	interface Request {
-// 		files?: any;
-// 		parameters: any;
-// 		db?: any;
-// 		io?: any;
-// 	}
-// }
 
 declare global {
 	namespace Express {
@@ -23,7 +14,7 @@ declare global {
 			currentUser?: any;
 		}
 		interface Application {
-			io?: SocketIO.Server;
+			io?: Server;
 			server?: http.Server;
 		}
 	}

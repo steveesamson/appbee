@@ -1,4 +1,4 @@
-import { StoreConfig, StoreListConfig } from "../types";
+import { StoreConfig, StoreListConfig } from "../typeDefs";
 
 const DataSources: any = {};
 const SQLs = ["pg", "mysql", "mysql2", "oracledb", "mssql", "sqlite3"];

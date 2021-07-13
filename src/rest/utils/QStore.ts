@@ -1,4 +1,4 @@
-import { Model } from "../../common/types";
+import { Model } from "../../common/typeDefs";
 
 export const QStore: Model = {
 	schema: {

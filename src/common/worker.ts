@@ -1,7 +1,7 @@
 import { existsSync as x } from "fs";
 import { join } from "path";
 import { configureWorker, configuration } from "./utils/configurer";
-import { WorkerApp } from "./types";
+import { WorkerApp } from "./typeDefs";
 import { eventBus, initRedis } from "./utils/index";
 import { appState } from "./appState";
 

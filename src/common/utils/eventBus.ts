@@ -1,4 +1,4 @@
-import { Record, EventBusType, StoreConfig } from "../types";
+import { Record, EventBusType, StoreConfig } from "../typeDefs";
 import { appState } from "../appState";
 import { BusMessenger } from "./busMessenger";
 

@@ -1,6 +1,6 @@
 import { scrypt, randomBytes } from "crypto";
 import { promisify } from "util";
-import { IToken, IEncrypt } from "../types";
+import { IToken, IEncrypt } from "../typeDefs";
 import { appState } from "../appState";
 
 const scryptAsync = promisify(scrypt);

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { ObjectID } from "mongodb";
 import { Request } from "express";
-import { Record, Model, Params } from "../../types";
+import { Record, Model, Params } from "../../typeDefs";
 import { SqlError } from "../Error";
 import { eventBus } from "../eventBus";
 

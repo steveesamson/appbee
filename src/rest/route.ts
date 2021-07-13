@@ -1,4 +1,4 @@
-import { ControllerRequest, RouteConfig, RouteMap } from "../common/types";
+import { ControllerRequest, RouteConfig, RouteMap } from "../common/typeDefs";
 import { normalizePath } from "../common/utils/pathNormailizer";
 const routes: RouteMap = {};
 

@@ -45,7 +45,7 @@ import {
 	MailerType,
 	BeeQConfig,
 	BeeQueueType,
-} from "./common/types";
+} from "./common/typeDefs";
 import { mailer, createSource, getSource, getConfig } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
 import { appState } from "./common/appState";

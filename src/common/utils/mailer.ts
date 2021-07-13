@@ -3,7 +3,7 @@ import { join } from "path";
 import nodemailer from "nodemailer";
 import smtpPool from "nodemailer-smtp-pool";
 import { appState } from "../appState";
-import { Record, MailerType } from "../types";
+import { Record, MailerType } from "../typeDefs";
 
 let mailConfig = {};
 

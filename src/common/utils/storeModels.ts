@@ -3,7 +3,7 @@ import fs from "fs";
 import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
 
-import { Model, Configuration, GetModels, ReqWithDB } from "../types";
+import { Model, Configuration, GetModels, ReqWithDB } from "../typeDefs";
 import { getSource } from "./dataSource";
 import { QStore } from "../../rest/utils/QStore";
 import { anyModel } from "./modelTypes/anyModel";

@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import { Request, Response } from "express";
-import { Params, WriteFileType, WriteStreamType } from "../types";
+import { Params, WriteFileType, WriteStreamType } from "../typeDefs";
 import { appState } from "../appState";
 import raa from "../utils/handleAsyncAwait";
 

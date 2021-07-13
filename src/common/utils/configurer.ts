@@ -24,7 +24,7 @@ import {
 	PolicyConfig,
 	StoreConfig,
 	ViewConfig,
-} from "../types";
+} from "../typeDefs";
 // import { AppConfig, LdapConfig, PolicyConfig, StoreConfig, ViewConfig,  } from "../../index";
 
 const configuration: Configuration = {} as any;

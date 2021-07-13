@@ -1,4 +1,4 @@
-import { BeeQConfig, Record, BeeQueueType } from "../types";
+import { BeeQConfig, Record, BeeQueueType } from "../typeDefs";
 
 const BeeQueue: any = require("bee-queue");
 

@@ -1,4 +1,4 @@
-import { Record, StoreConfig } from "../types";
+import { Record, StoreConfig } from "../typeDefs";
 
 class BusMessenger {
 	options: StoreConfig = null;

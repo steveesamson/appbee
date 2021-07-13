@@ -2,10 +2,18 @@ import path from "path";
 import fs from "fs";
 import _ from "lodash";
 import filesWithExtension, { listDir } from "./fetchFileTypes";
-import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration, JobConfig } from "../types";
+import {
+	Record,
+	RouteMap,
+	CronConfig,
+	MiddlewareConfig,
+	MiddlewareRoutine,
+	Configuration,
+	JobConfig,
+} from "../typeDefs";
 import { routes } from "../../rest/route";
 import { NextFunction, Response } from "express";
-import { StoreConfig } from "../types";
+import { StoreConfig } from "../typeDefs";
 
 const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
 const fetchTypeFiles = filesWithExtension(ext);
