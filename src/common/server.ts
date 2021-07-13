@@ -6,7 +6,9 @@ import errorHandler from "errorhandler";
 import helmet from "helmet";
 import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
-import socketIO from "socket.io";
+import { Server } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { createClient } from "redis";
 const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
@@ -20,8 +22,8 @@ import {
 	modules,
 } from "./utils/configurer";
 import { eventBus, initRedis } from "./utils/index";
-import { Record } from "./types";
 import { appState } from "./appState";
+// const sioRedis: any = require("socket.io-redis");
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
 	await configureRestServer(base);
@@ -93,10 +95,15 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	}
 
 	const server = http.createServer(app),
-		io = socketIO(server);
+		io = new Server(server, { transports: ["websocket"] });
 
 	io.use(socketIOCookieParser);
-
+	if (bus) {
+		const { port, host } = bus;
+		const pubClient = createClient({ host, port: Number(port) });
+		const subClient = pubClient.duplicate();
+		io.adapter(createAdapter(pubClient, subClient));
+	}
 	app.server = server;
 	app.io = io;
 	appState({ IO: io });
@@ -114,31 +121,9 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 				},
 			}),
 		);
-	const PORT = process.env.SERVER_TYPE === "CLUSTER" ? 0 : APP_PORT;
-	const openProdComms = () => {
-		process.on("message", (message: Record) => {
-			if (typeof message !== "string" && message.verb) {
-				// console.log("message to worker: ", message);
-				eventBus().broadcast(message);
-			}
-		});
 
-		eventBus().on("service", (message: Record) => {
-			// console.log("prod:eventBus: ", message);
-			//CLUSTER
-			process.send(message);
-		});
-	};
+	server.listen(APP_PORT, () => console.log(`Server running at http://localhost:${APP_PORT}`));
 
-	server.listen(PORT, "localhost", () => {
-		if (PORT !== 0) {
-			console.log(`Server running at http://localhost:${PORT}`);
-		}
-	});
-
-	if (process.env.SERVER_TYPE === "CLUSTER") {
-		openProdComms();
-	}
 	return app;
 };
 

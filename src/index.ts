@@ -81,12 +81,11 @@ const utils: UtilsType = {
 		compileTypeScript,
 	},
 };
-import { startDevServer } from "./common/restDev";
-import { startProdServer as serveProd } from "./common/restProd";
+import { startRestServer } from "./common/restServer";
 import { startWorker as start } from "./common/worker";
 
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
-const serve = (dev: boolean = process.env.NODE_ENV === "development") => (dev ? startDevServer : serveProd);
+const serve = startRestServer;
 
 export {
 	Models,

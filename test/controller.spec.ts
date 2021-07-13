@@ -8,7 +8,7 @@ let inserteID:any =null;
 let socket:any = null,
 Transport:any = {};
 const startIO =  (done:any) => {
-	socket = io("http://localhost:8000");
+	socket = io("http://localhost:8000",{transports:['websocket']});
 	socket.on('connect', () =>{
 
 		Transport.sync = async (url:string, method:string, data:any={}) => {
@@ -31,7 +31,7 @@ const startIO =  (done:any) => {
 describe("Rest Controller and IO Controller", () => {
   let core:any = null;
   beforeAll( async (done) =>{
-     core = await createServer()(path.resolve(__dirname,"testapp"));
+     core = await createServer(path.resolve(__dirname,"testapp"));
      done();
   })
 
