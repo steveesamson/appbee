@@ -1,6 +1,6 @@
 {
 	"name": "appbee",
-	"version": "1.1.21",
+	"version": "1.1.25",
 	"description": "appbee(Application Back-End Engine) is a REST, GraphQL and Socket.io API Backend Engine",
 	"files": [
 		"dist"
@@ -43,7 +43,6 @@
 		"cors": "^2.8.5",
 		"errorhandler": "^1.5.1",
 		"express": "^4.17.1",
-		"farmhash": "^3.0.0",
 		"fs-extra": "^9.0.0",
 		"gm": "^1.23.1",
 		"graphql": "^14.5.8",
@@ -58,7 +57,6 @@
 		"nodemailer": "^6.4.2",
 		"nodemailer-smtp-pool": "^2.8.3",
 		"path-to-regexp": "^6.1.0",
-		"rsmq": "^0.12.3",
 		"shortid": "^2.2.15",
 		"socket.io": "^2.4.0",
 		"socket.io-cookie": "^0.0.1",

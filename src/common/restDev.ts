@@ -11,7 +11,7 @@ export const startDevServer = async (base: string, sapper?: any): Promise<Applic
 		console.error("Sorry, am bailing; I cannot find 'modules' or 'config' folders in your application.");
 		return null;
 	}
-	process.env.NODE_ENV = "development";
-	process.env.SERVER_TYPE = "STAND_ALONE";
+	// process.env.NODE_ENV = "development";
+	// process.env.SERVER_TYPE = "STAND_ALONE";
 	return await createNextServer(base, sapper);
 };

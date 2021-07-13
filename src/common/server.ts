@@ -22,6 +22,7 @@ import {
 import { eventBus, initRedis } from "./utils/index";
 import { Record } from "./types";
 import { appState } from "./appState";
+const sioRedis = require("socket.io-redis");
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
 	await configureRestServer(base);
@@ -93,9 +94,10 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	}
 
 	const server = http.createServer(app),
-		io = socketIO(server);
+		io = socketIO(server, { transports: ["websocket"] });
 
 	io.use(socketIOCookieParser);
+	io.adapter(sioRedis({ host: "localhost", port: 6379 }));
 
 	app.server = server;
 	app.io = io;
@@ -114,31 +116,8 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 				},
 			}),
 		);
-	const PORT = process.env.SERVER_TYPE === "CLUSTER" ? 0 : APP_PORT;
-	const openProdComms = () => {
-		process.on("message", (message: Record) => {
-			if (typeof message !== "string" && message.verb) {
-				// console.log("message to worker: ", message);
-				eventBus().broadcast(message);
-			}
-		});
+	server.listen(APP_PORT, () => console.log(`Server running at http://localhost:${APP_PORT}`));
 
-		eventBus().on("service", (message: Record) => {
-			// console.log("prod:eventBus: ", message);
-			//CLUSTER
-			process.send(message);
-		});
-	};
-
-	server.listen(PORT, "localhost", () => {
-		if (PORT !== 0) {
-			console.log(`Server running at http://localhost:${PORT}`);
-		}
-	});
-
-	if (process.env.SERVER_TYPE === "CLUSTER") {
-		openProdComms();
-	}
 	return app;
 };
 
