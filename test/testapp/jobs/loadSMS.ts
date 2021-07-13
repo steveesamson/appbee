@@ -1,4 +1,4 @@
-import { JobConfig } from "../../../src/common/types";
+import { JobConfig } from "../../../src/common/typeDefs";
 
 const loadSMS:JobConfig = {
     name:"loadSMS",

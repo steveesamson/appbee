@@ -3,7 +3,7 @@ import path from "path";
 import { configureRestServer } from "../src/common/utils/configurer";
 import { loadModules} from "../src/common/utils/loaders";
 
-import { JobConfig } from "../src/common/types";
+import { JobConfig } from "../src/common/typeDefs";
 
 describe("plugins", () => {
     beforeAll(async () =>{

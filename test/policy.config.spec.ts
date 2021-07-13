@@ -1,7 +1,7 @@
 import path from "path";
 
 import { configureRestServer, configuration } from "../src/common/utils/configurer";
-import { PolicyConfig } from "../src/common/types";
+import { PolicyConfig } from "../src/common/typeDefs";
 const expected:PolicyConfig = {
     '*': true,//Global
     // post:{

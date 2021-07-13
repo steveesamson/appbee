@@ -1,7 +1,7 @@
 import path from "path";
 
 import { loadModules } from "../src/common/utils/loaders";
-import { CronConfig } from "../src/common/types";
+import { CronConfig } from "../src/common/typeDefs";
 
 describe("cron configs", () => {
   it("expects loadModules to return valid cron config", async () => {

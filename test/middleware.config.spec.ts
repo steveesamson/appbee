@@ -1,7 +1,7 @@
 import path from "path";
 
 import { configureRestServer, modules } from "../src/common/utils/configurer";
-import { MiddlewareConfig } from "../src/common/types";
+import { MiddlewareConfig } from "../src/common/typeDefs";
 
 describe("mwares configs", () => {
   it("expects loadModules to return valid mware config", async () => {

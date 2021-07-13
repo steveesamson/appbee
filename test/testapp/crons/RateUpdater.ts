@@ -1,5 +1,5 @@
 
-import { CronConfig } from "../../../src/common/types";
+import { CronConfig } from "../../../src/common/typeDefs";
 
 const RateUpdater:CronConfig = {
     key:"jsdkadjad",

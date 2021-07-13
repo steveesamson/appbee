@@ -1,4 +1,4 @@
-import {Model} from "../../../../src/common/types";
+import {Model} from "../../../../src/common/typeDefs";
 
  export const Users:Model = {
   schema:{
