@@ -1,11 +1,11 @@
-import { Record, StoreConfig } from "../types";
+import { Record, RedisStoreConfig, StoreConfig } from "../types";
 
 class BusMessenger {
 	options: StoreConfig = null;
 	emitter: any = null;
 	redisClient: any = null;
 
-	constructor(options: StoreConfig = null) {
+	constructor(options: RedisStoreConfig = null) {
 		// console.log(`Using default config for event bus to use host:${this.options.host}, port:${this.options.port}`);
 		if (!options) {
 			throw new Error("Invalid BusMessenger options.");

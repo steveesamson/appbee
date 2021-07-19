@@ -103,6 +103,13 @@ export type dbType =
 	| "rabbitmq";
 
 export type boolType = true | false;
+export interface RedisStoreConfig {
+	host?: string;
+	port?: number;
+	user?: string;
+	password?: string;
+	url?: string;
+}
 
 export interface StoreConfig {
 	type?: dbType;
@@ -122,10 +129,11 @@ export interface StoreConfig {
 export interface StoreListConfig {
 	[key: string]: StoreConfig;
 }
-
+export type SocketType = ["polling"] | ["websocket"] | ["polling", "websocket"];
 export interface AppConfig {
 	port: number;
 	spa: boolType;
+	ioTransport?: SocketType;
 	useMultiTenant: boolType;
 	mountRestOn: string;
 	[key: string]: any;
@@ -192,7 +200,7 @@ export interface Configuration {
 	application: AppConfig;
 	smtp: Record;
 	policy: PolicyConfig;
-	bus: StoreConfig;
+	bus: RedisStoreConfig;
 }
 
 export interface getByCollectionType {
@@ -351,7 +359,7 @@ export interface WorkerApp {
 }
 
 export interface BeeQConfig {
-	redis: StoreConfig;
+	redis: RedisStoreConfig;
 	isWorker?: false | true;
 	[key: string]: any;
 }

@@ -20,7 +20,6 @@ import {
 	modules,
 } from "./utils/configurer";
 import { eventBus, initRedis } from "./utils/index";
-import { Record } from "./types";
 import { appState } from "./appState";
 const sioRedis = require("socket.io-redis");
 
@@ -32,7 +31,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const viewDir = view.viewDir || "";
 	const templateDir = view.templateDir || "";
 	const uploadDir = view.uploadDir || "";
-	const { useMultiTenant, port, mountRestOn, ...restapp } = application;
+	const { useMultiTenant, port, mountRestOn, ioTransport, ...restapp } = application;
 	const { secret, ...restsecurity } = security;
 	const { policies, middlewares, controllers } = modules;
 
@@ -94,10 +93,13 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	}
 
 	const server = http.createServer(app),
-		io = socketIO(server, { transports: ["websocket"] });
+		io = socketIO(server, { transports: ioTransport || ["polling", "websocket"] });
 
 	io.use(socketIOCookieParser);
-	io.adapter(sioRedis({ host: "localhost", port: 6379 }));
+	if (bus) {
+		// { host: "localhost", port: 6379 }
+		io.adapter(sioRedis(bus));
+	}
 
 	app.server = server;
 	app.io = io;

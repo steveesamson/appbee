@@ -1,4 +1,4 @@
-import { BeeQConfig, Record, BeeQueueType } from "../types";
+import { BeeQConfig, Record, BeeQueueType, RedisStoreConfig } from "../types";
 
 const BeeQueue: any = require("bee-queue");
 
@@ -79,7 +79,7 @@ const useQueue = (queueName: string, options?: BeeQConfig): BeeQueueType => {
 	return queue;
 };
 
-const initRedis = (redisStore: Record) => {
+const initRedis = (redisStore: RedisStoreConfig) => {
 	defOptions.redis = redisStore;
 };
 

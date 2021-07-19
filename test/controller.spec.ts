@@ -1,6 +1,7 @@
 import path from "path"
 import io from "socket.io-client";
 import { serve as createServer, utils} from "../src";
+import { configuration} from "../src/common/utils/configurer"
 
 const { http } = utils.request({});
 http.set("hostname","localhost").set("port",8000);
@@ -8,7 +9,9 @@ let inserteID:any =null;
 let socket:any = null,
 Transport:any = {};
 const startIO =  (done:any) => {
-	socket = io("http://localhost:8000",{transports:['websocket']});
+  const { application } = configuration;
+	const { ioTransport,} = application;
+	socket = io("http://localhost:8000",{ transports: ioTransport || ["polling", "websocket"] });
 	socket.on('connect', () =>{
 
 		Transport.sync = async (url:string, method:string, data:any={}) => {
