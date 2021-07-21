@@ -221,8 +221,12 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			const facetArgs = [];
 
 			if (search) {
-				const searchTerms = { $text: { $search: search } };
-				query = { ...query, ...searchTerms };
+				const cleaned = search.split(" ").filter((a: string) => !!a.trim());
+				let searches: any[] = [];
+				for (const fd of this.searchPath) {
+					searches = [...searches, { [fd]: { $in: cleaned.map((s: string) => new RegExp(`.*${s}.*`, "i")) } }];
+				}
+				query = { ...query, $or: searches };
 			}
 			facetArgs.push({ $skip: parseInt(offset || "0", 10) });
 			if (limit) {
