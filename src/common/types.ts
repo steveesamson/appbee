@@ -1,17 +1,6 @@
-import express, { Response, NextFunction, Request } from "express";
+import { Response, NextFunction, Request } from "express";
 import http from "http";
-import * as ts from "typescript";
 import { Socket } from "socket.io";
-import { BeeError, SqlError } from "./utils/Error";
-
-// declare module "express" {
-// 	interface Request {
-// 		files?: any;
-// 		parameters: any;
-// 		db?: any;
-// 		io?: any;
-// 	}
-// }
 
 declare global {
 	namespace Express {
@@ -288,14 +277,6 @@ export interface HandleAsyncAwait {
 	(promise: Promise<any>): any;
 }
 
-export interface CompileTypeScriptType {
-	(tsCompilerOptions: ts.CompilerOptions): any;
-}
-
-export interface WatchServerFilesType {
-	(serverFiles: string): { buildStart(): void };
-}
-
 interface IWithDataRequest {
 	(url: string, data: Record): Promise<Record>;
 }
@@ -364,21 +345,11 @@ export interface BeeQConfig {
 	[key: string]: any;
 }
 
-// export interface RSMQueueConfig {
-// 	client?: any;
-// 	options?: StoreConfig;
-// 	ns?: string;
-// }
 export interface BeeQueueType {
 	addJob: (jobSpec: Record, id?: any, restoring?: boolean) => Promise<any>;
 	processJob: (processor: (job: Record, done?: Function) => void, concurrency?: number) => void;
 	on: (event: string, handler: Function) => void;
 }
-
-// export interface RSMQueueType {
-// 	addJob: (jobSpec: Record) => Promise<any>;
-// 	processJob: (processor: (job: Record, done?: Function) => void) => void;
-// }
 
 export interface UtilsType {
 	writeFileTo: WriteFileType;
@@ -406,8 +377,4 @@ export interface UtilsType {
 		getSource: (name: string) => any;
 	};
 	getConfig: (type: string) => AppConfig | ViewConfig | LdapConfig | StoreConfig | PolicyConfig | Record;
-	rollup: {
-		watchServerFiles: WatchServerFilesType;
-		compileTypeScript: CompileTypeScriptType;
-	};
 }

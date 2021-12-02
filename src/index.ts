@@ -8,8 +8,6 @@ import {
 	raa,
 	Encrypt,
 	Token,
-	compileTypeScript,
-	watchServerFiles,
 	getPlugin,
 	writeStreamTo,
 	writeFileTo,
@@ -76,10 +74,6 @@ const utils: UtilsType = {
 		initRedis,
 		useWorker,
 		useQueue,
-	},
-	rollup: {
-		watchServerFiles,
-		compileTypeScript,
 	},
 };
 import { startDevServer } from "./common/restDev";

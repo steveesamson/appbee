@@ -14,7 +14,6 @@ import {
 	unlinkFiles,
 	uploadFile,
 } from "./writers";
-import { compileTypeScript, watchServerFiles } from "./rollup";
 export { Encrypt, Token } from "./security";
 export { eventBus } from "./eventBus";
 export { initRedis, useQueue, useWorker } from "./beeQ";
@@ -28,8 +27,6 @@ export {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
-	compileTypeScript,
-	watchServerFiles,
 	request,
 	raa,
 	BeeError,
