@@ -1,5 +1,4 @@
 import { Response, Request } from "express";
-// import { RouteConfig } from "../common/types";
 import raa from "../common/utils/handleAsyncAwait";
 import { Models } from "../common/utils/storeModels";
 import { Params } from "../index";
@@ -24,10 +23,12 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 				throw Error("Params Injector must be a funcion that returns a string, a number or an object");
 			}
 			const injected = paramsInjector(req);
-			if (typeof injected === "string" || typeof injected === "number") {
-				load = { ...load, id: injected };
+			const patch = typeof injected === "string" || typeof injected === "number" ? { id: injected } : injected;
+			if (load.body && Array.isArray(load.body)) {
+				const { body } = load;
+				load.body = body.map((ld: Params) => ({ ...ld, ...patch }));
 			} else {
-				load = { ...load, ...injected };
+				load = { ...load, ...patch };
 			}
 		}
 
@@ -41,11 +42,13 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 		model.publishCreate(req, data);
 		res.status(201).json({ data: data });
 	},
-	handleUpdate = (modelName: string) => async (req: Request, res: Response) => {
+	handleUpdate = (modelName: string, options: Params = { opType: "$set", upsert: false }) => async (
+		req: Request,
+		res: Response,
+	) => {
 		const arg = req.parameters;
 		const model = Models[`get${modelName}`](req);
-		const { error, data } = await raa(model.update({ ...arg }));
-		console.log("handleUpdate", data, error);
+		const { error, data } = await raa(model.update({ ...arg }, options));
 		if (error) {
 			return res.status(500).json({ error: error.sqlMessage });
 		}

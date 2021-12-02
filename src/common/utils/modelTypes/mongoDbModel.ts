@@ -111,6 +111,11 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 				} else {
 					const type = this.schema[tkey];
 					switch (type.trim()) {
+						case "boolean":
+							copy[key] = _.isArray(opts[key])
+								? opts[key].map((i: any) => !!i && `${i}`.toLowerCase() === "true")
+								: !!opts[key] && `${opts[key]}`.toLowerCase() === "true";
+							break;
 						case "number":
 						case "float":
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => Number(i)) : Number(opts[key]);
@@ -118,10 +123,10 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 						case "objectId":
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => new ObjectID(i)) : new ObjectID(opts[key]);
 							break;
-						// case "date":
-						// case "timestamp":
-						// 	copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => new Date(i)) : new Date(opts[key]);
-						// 	break;
+						case "date":
+						case "timestamp":
+							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => new Date(i)) : new Date(opts[key]);
+							break;
 						case "array":
 							copy[key] = _.isArray(opts[key]) ? opts[key] : [opts[key]];
 							break;
@@ -228,10 +233,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 				}
 				query = { ...query, $or: searches };
 			}
-			facetArgs.push({ $skip: parseInt(offset || "0", 10) });
-			if (limit) {
-				facetArgs.push({ $limit: parseInt(limit, 10) });
-			}
+
 			if (orderby) {
 				const ob = orderby.trim() === "id" ? "_id" : orderby.trim();
 				const dir = (direction || "ASC").toUpperCase();
@@ -243,7 +245,10 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			} else {
 				facetArgs.push({ $sort: { _id: 1 } });
 			}
-
+			facetArgs.push({ $skip: parseInt(offset || "0", 10) });
+			if (limit) {
+				facetArgs.push({ $limit: parseInt(limit, 10) });
+			}
 			const cursor = collection.aggregate([
 				{ $match: { ...query } },
 				{
@@ -336,24 +341,29 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			}
 			return null;
 		},
-		async update(options: Params, operationKey = "$set") {
-			const { id, where } = options;
-			delete options.id;
-			delete options.where;
-
+		// async update(params: Params, operationKey = "$set") {
+		async update(params: Params, options: Params = { opType: "$set", upsert: false }) {
+			const { id, where } = params;
+			delete params.id;
+			delete params.where;
+			const { opType, upsert } = options;
 			if (!id && !where) {
 				throw new SqlError("You need an id/where object to update any model");
 			}
 			const arg = id ? { id } : where;
 			const query = this.validOptions(arg);
-			const validOptions = this.validOptions(options);
+			const validOptions = this.validOptions(params);
 			const conditions = this.collectArgs(query);
 
 			const collection = this.db.collection(this.collection);
 			const isSingle = this.hasKey(arg);
 			const updateOperation = isSingle ? "updateOne" : "updateMany";
 
-			const { modifiedCount } = await collection[updateOperation](conditions, { [operationKey]: validOptions });
+			const { modifiedCount } = await collection[updateOperation](
+				conditions,
+				{ [opType]: validOptions },
+				{ upsert: upsert || false },
+			);
 			return modifiedCount ? this.find(arg) : null;
 		},
 		async destroy(options: Params) {

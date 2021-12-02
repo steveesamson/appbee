@@ -23,6 +23,7 @@ export default (async () => ({
 		// },
 	],
 	external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})],
+	// external: [...Object.keys(pkg.devDependencies || {})],
 	plugins: [
 		nodeResolve({ browser: false, preferBuiltins: true }),
 		commonjs(),

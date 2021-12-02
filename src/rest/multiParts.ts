@@ -80,11 +80,11 @@ const multipart = () => {
 									if (e) {
 										return re({ error: "Error while uploading -'" + filename + "' " + e.message });
 									}
-									const src = dest.replace(PUBLIC_DIR, "");
+									// const src = dest.replace(PUBLIC_DIR, "");
 									re({
 										data: {
 											text: "Document uploaded successfully.",
-											src,
+											src: dest,
 										},
 									});
 								});

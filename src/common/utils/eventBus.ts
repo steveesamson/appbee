@@ -74,7 +74,6 @@ class ProdBus implements EventBusType {
 		this.subscriber.subscribe(eventName);
 		return () => {
 			this.subscriber.unsubscribe();
-			// this.subscriber.quit();
 		};
 	}
 	once(eventName: string, fn: Function) {
@@ -82,7 +81,6 @@ class ProdBus implements EventBusType {
 			if (channel !== eventName) return;
 			fn(this.bm.toObject(message));
 			this.subscriber.unsubscribe();
-			// this.subscriber.quit();
 		};
 		this.subscriber.on("message", onceWrapper);
 		this.subscriber.subscribe(eventName);
@@ -92,10 +90,8 @@ class ProdBus implements EventBusType {
 	}
 
 	broadcast(load: Record) {
-		console.log("prod event bus broadcast:", load);
+		// console.log("prod event bus broadcast:", load);
 		this.bm.emit("comets", load);
-		// const { verb, room, data } = load;
-		//emit(`${verb}::${room}`, data);
 	}
 }
 const devBus: EventBusType = new DevBus();

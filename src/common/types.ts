@@ -40,7 +40,7 @@ export interface Model {
 	rowCount?(db: any): Promise<Record>;
 	find?(param: Params): Promise<Record>;
 	create?(param: Params): Promise<Record | null>;
-	update?(param: Params, operationKey?: string): Promise<Record | null>;
+	update?(param: Params, options?: Params): Promise<Record | null>;
 	destroy?(param: Params): Promise<Record>;
 	postCreate?(req: Request, data: Params): void;
 	postUpdate?(req: Request, data: Params): void;
@@ -350,7 +350,7 @@ export interface EventBusType {
 export interface RestfulType {
 	handleGet: (modelName: string) => ControllerRequest;
 	handleCreate: (modelName: string, paramsInjector?: (req: Request) => Record | string | number) => ControllerRequest;
-	handleUpdate: (modelName: string) => ControllerRequest;
+	handleUpdate: (modelName: string, options?: Params) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }
 

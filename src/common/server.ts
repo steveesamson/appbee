@@ -7,6 +7,7 @@ import helmet from "helmet";
 import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
 import socketIO from "socket.io";
+
 const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
@@ -24,6 +25,8 @@ import { appState } from "./appState";
 const sioRedis = require("socket.io-redis");
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
+	const { NODE_ENV }: any = process.env;
+	const dev: boolean = NODE_ENV === "development";
 	await configureRestServer(base);
 
 	const { view, application, security, bus } = configuration;
@@ -52,6 +55,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		PUBLIC_DIR: join(base, staticDir),
 		UPLOAD_DIR: join(base, staticDir, uploadDir),
 		VIEW_DIR: join(base, viewDir),
+		STATIC_DIR: staticDir,
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
 		resources,
