@@ -1,6 +1,6 @@
 import { Response, NextFunction, Request } from "express";
 import http from "http";
-import { Socket } from "socket.io";
+import { Socket, Server } from "socket.io";
 
 declare global {
 	namespace Express {
@@ -12,7 +12,7 @@ declare global {
 			currentUser?: any;
 		}
 		interface Application {
-			io?: SocketIO.Server;
+			io?: Server;
 			server?: http.Server;
 		}
 	}
@@ -121,6 +121,7 @@ export interface StoreListConfig {
 export type SocketType = ["polling"] | ["websocket"] | ["polling", "websocket"];
 export interface AppConfig {
 	port: number;
+	host?: string;
 	spa: boolType;
 	ioTransport?: SocketType;
 	useMultiTenant: boolType;
@@ -340,7 +341,7 @@ export interface WorkerApp {
 }
 
 export interface BeeQConfig {
-	redis: RedisStoreConfig;
+	redis: any;
 	isWorker?: false | true;
 	[key: string]: any;
 }

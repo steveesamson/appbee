@@ -6,9 +6,10 @@ import errorHandler from "errorhandler";
 import helmet from "helmet";
 import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
-import socketIO from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
+import { Server } from "socket.io";
+import { createClient } from "redis";
 
-const socketIOCookieParser: any = require("socket.io-cookie");
 import methodOverride from "method-override";
 
 import beeMultiparts from "../rest/multiParts";
@@ -22,11 +23,12 @@ import {
 } from "./utils/configurer";
 import { eventBus, initRedis } from "./utils/index";
 import { appState } from "./appState";
-const sioRedis = require("socket.io-redis");
+import { hostname } from "os";
+
+const socketIOCookieParser: any = require("socket.io-cookie");
 
 const createAServer = async (base: string, sapper?: any): Promise<Application> => {
 	const { NODE_ENV }: any = process.env;
-	const dev: boolean = NODE_ENV === "development";
 	await configureRestServer(base);
 
 	const { view, application, security, bus } = configuration;
@@ -34,7 +36,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const viewDir = view.viewDir || "";
 	const templateDir = view.templateDir || "";
 	const uploadDir = view.uploadDir || "";
-	const { useMultiTenant, port, mountRestOn, ioTransport, ...restapp } = application;
+	const { useMultiTenant, port, host, mountRestOn, ioTransport, ...restapp } = application;
 	const { secret, ...restsecurity } = security;
 	const { policies, middlewares, controllers } = modules;
 
@@ -50,6 +52,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	appState({
 		isMultitenant: useMultiTenant === true,
 		APP_PORT: port,
+		APP_HOST: host,
 		MOUNT_PATH: mountRestOn || "",
 		BASE_DIR: base,
 		PUBLIC_DIR: join(base, staticDir),
@@ -62,19 +65,20 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		...restsecurity,
 		...restapp,
 	});
+	let redisClient = null;
 
 	if (bus) {
-		eventBus(bus);
-		initRedis(bus);
+		redisClient = createClient(bus);
+		console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
+		eventBus(redisClient.duplicate());
+		initRedis(redisClient.duplicate());
 	}
+
 	const router: Router = configureRestRoutes(policies);
 	const app: Application = express();
 	app.set("trust proxy", true);
 
-	const { PUBLIC_DIR, APP_PORT, MOUNT_PATH } = appState();
-
-	// console.log("APP_STATE:", appState());
-	// console.log("TYPE:", process.env.SERVER_TYPE, " Sapper?: ", !!sapper);
+	const { PUBLIC_DIR, APP_PORT, APP_HOST = "127.0.0.1", MOUNT_PATH } = appState();
 
 	const session = cookieSession({
 		signed: false,
@@ -96,16 +100,21 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		app.use(middlewares as any);
 	}
 
-	const server = http.createServer(app),
-		io = socketIO(server, { transports: ioTransport || ["polling", "websocket"] });
+	const ioServerOptions = redisClient
+		? {
+				adapter: createAdapter(redisClient, redisClient.duplicate()),
+				transports: ioTransport || ["polling", "websocket"],
+		  }
+		: {
+				transports: ioTransport || ["polling", "websocket"],
+		  };
+
+	const httpServer = http.createServer(app),
+		io = new Server(httpServer, ioServerOptions);
 
 	io.use(socketIOCookieParser);
-	if (bus) {
-		// { host: "localhost", port: 6379 }
-		io.adapter(sioRedis(bus));
-	}
 
-	app.server = server;
+	app.server = httpServer;
 	app.io = io;
 	appState({ IO: io });
 
@@ -122,7 +131,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 				},
 			}),
 		);
-	server.listen(APP_PORT, () => console.log(`Server running at http://localhost:${APP_PORT}`));
+	httpServer.listen(APP_PORT, () => console.log(`Server running at http://${APP_HOST}:${APP_PORT}`));
 
 	return app;
 };

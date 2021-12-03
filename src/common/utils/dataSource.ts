@@ -78,8 +78,10 @@ const createSource = ({
 			const db = redis.createClient({
 				host,
 				port,
+				password,
 				retry_strategy,
 			});
+
 			console.log(`Connected successfully to redis`);
 			db.storeType = type;
 			db.close = db.quit.bind(db);

@@ -1,5 +1,5 @@
 import path from "path"
-import io from "socket.io-client";
+import {io} from "socket.io-client";
 import { serve as createServer, utils} from "../src";
 import { configuration} from "../src/common/utils/configurer"
 

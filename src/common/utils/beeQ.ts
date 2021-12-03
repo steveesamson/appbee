@@ -1,4 +1,4 @@
-import { BeeQConfig, Record, BeeQueueType, RedisStoreConfig } from "../types";
+import { BeeQConfig, Record, BeeQueueType } from "../types";
 
 const BeeQueue: any = require("bee-queue");
 
@@ -6,12 +6,12 @@ class BeeQ implements BeeQueueType {
 	queue: any = null;
 	kind: "worker" | "queue";
 
-	constructor(queueName: string, props: BeeQConfig, isWorker: any = null) {
-		let options: BeeQConfig = { ...props, getEvents: false, isWorker: false };
+	constructor(queueName: string, redis: any, isWorker: any = null) {
+		let options: BeeQConfig = { redis, getEvents: false, isWorker: false };
 		this.kind = "queue";
 
 		if (isWorker) {
-			options = { ...props, removeOnSuccess: true, getEvents: true, isWorker: true };
+			options = { redis, removeOnSuccess: true, getEvents: true, isWorker: true };
 			this.kind = "worker";
 		}
 		this.queue = new BeeQueue(queueName, options);
@@ -61,26 +61,26 @@ class BeeQ implements BeeQueueType {
 	}
 }
 const map: Record = {};
-const defOptions: BeeQConfig = {} as any;
-const useWorker = (queueName: string, options?: BeeQConfig): BeeQueueType => {
+let redisClient: any = null;
+const useWorker = (queueName: string): BeeQueueType => {
 	const mapName = `${queueName}-worker`;
 	if (map[mapName]) return map[mapName];
-	const props = options ? options : defOptions;
-	const worker = new BeeQ(queueName, props, true);
+	const worker = new BeeQ(queueName, redisClient, true);
 	map[mapName] = worker;
 	return worker;
 };
-const useQueue = (queueName: string, options?: BeeQConfig): BeeQueueType => {
+const useQueue = (queueName: string): BeeQueueType => {
 	const mapName = `${queueName}-queue`;
 	if (map[mapName]) return map[mapName];
-	const props = options ? options : defOptions;
-	const queue = new BeeQ(queueName, props);
+	const queue = new BeeQ(queueName, redisClient);
 	map[mapName] = queue;
 	return queue;
 };
 
-const initRedis = (redisStore: RedisStoreConfig) => {
-	defOptions.redis = redisStore;
+const initRedis = (_redisClient: any) => {
+	if (_redisClient) {
+		redisClient = _redisClient;
+	}
 };
 
 export { useQueue, useWorker, initRedis };

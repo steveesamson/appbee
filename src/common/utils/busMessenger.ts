@@ -1,29 +1,19 @@
-import { Record, RedisStoreConfig, StoreConfig } from "../types";
+import { Record } from "../types";
+import { Emitter } from "@socket.io/redis-emitter";
 
 class BusMessenger {
-	options: StoreConfig = null;
 	emitter: any = null;
 	redisClient: any = null;
 
-	constructor(options: RedisStoreConfig = null) {
-		// console.log(`Using default config for event bus to use host:${this.options.host}, port:${this.options.port}`);
-		if (!options) {
-			throw new Error("Invalid BusMessenger options.");
+	constructor(redisClient: any = null) {
+		if (!redisClient) {
+			throw new Error("Invalid BusMessenger options, no redis client instance.");
 		}
 
-		const Emitter = require("socket.io-emitter");
-		const redis = require("redis");
-		this.options = options;
-		this.emitter = Emitter(this.options as any);
-		this.redisClient = redis.createClient(this.options);
-
-		console.log(`Configuring event bus to use host:${this.options.host}, port:${this.options.port}`);
+		this.redisClient = redisClient;
+		this.emitter = new Emitter(redisClient.duplicate());
 	}
 
-	configure(options: StoreConfig) {
-		this.options = options;
-		console.log(`Configuring event bus to use host:${this.options.host}, port:${this.options.port}`);
-	}
 	toObject(str: string) {
 		return JSON.parse(str);
 	}
