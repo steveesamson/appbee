@@ -9,6 +9,7 @@ declare global {
 			files?: any;
 			db?: any;
 			io?: any;
+			session?: any;
 			currentUser?: any;
 		}
 		interface Application {
