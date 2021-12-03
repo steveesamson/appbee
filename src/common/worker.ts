@@ -32,10 +32,9 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 	});
 
 	if (bus) {
-		const redisClient = createClient(bus);
-		console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
-		eventBus(redisClient.duplicate());
-		initRedis(redisClient.duplicate());
+		// console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
+		eventBus(bus);
+		initRedis(bus);
 	}
 
 	app();

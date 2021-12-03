@@ -1,4 +1,4 @@
-import { Record, EventBusType } from "../types";
+import { Record, EventBusType, RedisStoreConfig } from "../types";
 import { appState } from "../appState";
 import { BusMessenger } from "./busMessenger";
 
@@ -55,13 +55,13 @@ class ProdBus implements EventBusType {
 	subscriber: any = null;
 	publisher: any = null;
 
-	constructor(redisClient: any) {
+	constructor(config: RedisStoreConfig) {
 		if (!(ProdBus as any).instance) {
 			(ProdBus as any).instance = this;
 		}
-		this.bm = new BusMessenger(redisClient);
-		this.publisher = redisClient; //this.bm.useTransport();
-		this.subscriber = redisClient.duplicate();
+		this.bm = new BusMessenger(config);
+		this.publisher = this.bm.useTransport();
+		this.subscriber = this.publisher.duplicate();
 		return (ProdBus as any).instance;
 	}
 
@@ -97,9 +97,9 @@ class ProdBus implements EventBusType {
 const devBus: EventBusType = new DevBus();
 let bus: EventBusType = devBus;
 
-const eventBus = (redisClient?: any): EventBusType => {
-	if (redisClient) {
-		bus = new ProdBus(redisClient);
+const eventBus = (config?: RedisStoreConfig): EventBusType => {
+	if (config) {
+		bus = new ProdBus(config);
 	}
 	return bus;
 };

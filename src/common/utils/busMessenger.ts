@@ -1,17 +1,18 @@
-import { Record } from "../types";
+import { Record, RedisStoreConfig } from "../types";
 import { Emitter } from "@socket.io/redis-emitter";
+import { createClient } from "redis";
 
 class BusMessenger {
 	emitter: any = null;
 	redisClient: any = null;
 
-	constructor(redisClient: any = null) {
-		if (!redisClient) {
-			throw new Error("Invalid BusMessenger options, no redis client instance.");
+	constructor(config: RedisStoreConfig = null) {
+		if (!config) {
+			throw new Error("Invalid BusMessenger options.");
 		}
 
-		this.redisClient = redisClient;
-		this.emitter = new Emitter(redisClient.duplicate());
+		this.redisClient = createClient(config);
+		this.emitter = new Emitter(this.redisClient.duplicate());
 	}
 
 	toObject(str: string) {

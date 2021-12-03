@@ -23,7 +23,6 @@ import {
 } from "./utils/configurer";
 import { eventBus, initRedis } from "./utils/index";
 import { appState } from "./appState";
-import { hostname } from "os";
 
 const socketIOCookieParser: any = require("socket.io-cookie");
 
@@ -66,12 +65,11 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		...restapp,
 	});
 	let redisClient = null;
-
 	if (bus) {
 		redisClient = createClient(bus);
-		console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
-		eventBus(redisClient.duplicate());
-		initRedis(redisClient.duplicate());
+		// console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
+		eventBus(bus);
+		initRedis(bus);
 	}
 
 	const router: Router = configureRestRoutes(policies);
