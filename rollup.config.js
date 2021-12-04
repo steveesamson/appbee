@@ -15,12 +15,12 @@ export default (async () => ({
 			name: "appbee",
 			format: "cjs",
 		},
-		// {
-		// 	exports: "named",
-		// 	dir: "dist/esm",
-		// 	name: "appbee",
-		// 	format: "esm",
-		// },
+		{
+			exports: "named",
+			dir: "dist/esm",
+			name: "appbee",
+			format: "esm",
+		},
 	],
 	external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})],
 	// external: [...Object.keys(pkg.devDependencies || {})],

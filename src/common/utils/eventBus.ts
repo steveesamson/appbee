@@ -5,6 +5,7 @@ import { BusMessenger } from "./busMessenger";
 class DevBus implements EventBusType {
 	listeners: { [key: string]: Function | any } = {};
 	shortId: any = require("shortid");
+	name = "DevBus";
 	constructor() {
 		if (!(DevBus as any).instance) {
 			(DevBus as any).instance = this;
@@ -54,6 +55,7 @@ class ProdBus implements EventBusType {
 	bm: any = null;
 	subscriber: any = null;
 	publisher: any = null;
+	name = "BusMessenger";
 
 	constructor(redis: any) {
 		if ((ProdBus as any).instance) {

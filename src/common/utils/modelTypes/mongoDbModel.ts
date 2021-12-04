@@ -36,6 +36,7 @@ const replaceId = (datas: Record[] | Record) => {
 
 const mongoDBModel = function(model: string, preferredCollection: string): Model {
 	const { eventBus } = appState();
+	console.log("mongoDBModel eventBus: ", eventBus().name);
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
 		broadcast = (load: Record) => eventBus().broadcast(load),

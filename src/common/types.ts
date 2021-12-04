@@ -328,6 +328,7 @@ export interface PluginTypes {
 	[key: string]: Function;
 }
 export interface EventBusType {
+	name: string;
 	on: (eventName: string, fn: Function) => Function;
 	once: (eventName: string, fn: Function) => void;
 	emit: (eventName: string, data?: Record) => void;

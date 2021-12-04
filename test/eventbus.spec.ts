@@ -10,7 +10,9 @@ describe("eventBus", () => {
         eventBus = initEventBus();
     });
   it("expects jobs to be empty", (done:Function) => {
-      eventBus().once('start',() => {
+      const bus = eventBus();
+      console.log('Which eventBus: ', bus.name)
+      bus.once('start',() => {
         expect(true).toBe(true);
         done();
       })

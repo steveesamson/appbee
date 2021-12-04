@@ -3,7 +3,6 @@ import { Emitter } from "@socket.io/redis-emitter";
 
 class BusMessenger {
 	emitter: any = null;
-
 	constructor(redisClient: any = null) {
 		if (!redisClient) {
 			throw new Error("Invalid BusMessenger options.");
