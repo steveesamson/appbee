@@ -39,14 +39,8 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		broadcast = (load: Record) => {
 			const { eventBus } = appState();
 			const bus = eventBus();
-			console.log("mongoDBModel eventBus: ", bus.name);
 			bus.broadcast(load);
 		};
-	// sendToOthers = (req: Request, load: Record) => {
-	// 	req.io.broadcast.emit("comets", load);
-	// 	const { verb, room, data } = load;
-	// 	eventBus().emit(`${verb}::${room}`, data);
-	// };
 
 	const base: Model = {
 		db: {},
@@ -74,7 +68,6 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 					data: load,
 				};
 
-				// sendToOthers(req, pload);
 				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
 			}
@@ -87,7 +80,6 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 					data: load,
 					room: _modelName,
 				};
-				// sendToOthers(req, pload);
 				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
@@ -101,7 +93,6 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 					room: _modelName,
 				};
 
-				// sendToOthers(req, pload);
 				broadcast(pload);
 				console.log("PublishDestroy to %s", _modelName);
 			}

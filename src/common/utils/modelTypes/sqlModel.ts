@@ -2,7 +2,6 @@ import _ from "lodash";
 import { Request } from "express";
 import { Record, Model, Params } from "../../types";
 import { SqlError } from "../Error";
-// import { eventBus } from "../eventBus";
 import { appState } from "../../appState";
 
 const cleanse = (str: string) =>
@@ -52,15 +51,14 @@ const addWheres = (db: any, modelName: string, context: any) => (key: string, va
 };
 
 const sqlModel = function(model: string, preferredCollection: string): Model {
-	const { eventBus } = appState();
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
-		broadcast = (load: Record) => eventBus().broadcast(load),
-		sendToOthers = (req: Request, load: Record) => {
-			req.io.broadcast.emit("comets", load);
-			const { verb, room, data } = load;
-			eventBus().emit(`${verb}::${room}`, data);
+		broadcast = (load: Record) => {
+			const { eventBus } = appState();
+			const bus = eventBus();
+			bus.broadcast(load);
 		};
+
 	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any, modelName: string) => {
 		if (searchStrings.length) {
 			const searchParams = searchStrings.split(/\s/),
@@ -109,7 +107,6 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 					data: load,
 				};
 
-				// sendToOthers(req, pload);
 				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
 			}
@@ -122,7 +119,6 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 					data: load,
 					room: _modelName,
 				};
-				// sendToOthers(req, pload);
 				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
@@ -136,8 +132,6 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 					room: _modelName,
 				};
 				broadcast(pload);
-
-				// sendToOthers(req, pload);
 				console.log("PublishDestroy to %s", _modelName);
 			}
 		},

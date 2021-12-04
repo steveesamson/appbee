@@ -15,16 +15,14 @@ const cleanse = (str: string) =>
 		.trim();
 
 const anyModel = function(model: string, preferredCollection: string): Model {
-	const { eventBus } = appState();
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
-		broadcast = (load: Record) => eventBus().broadcast(load),
-		sendToOthers = (req: Request, load: Record) => {
-			req.io.broadcast.emit("comets", load);
-			const { verb, room, data } = load;
-			eventBus().emit(`${verb}::${room}`, data);
+		broadcast = (load: Record) => {
+			const { eventBus } = appState();
+			const bus = eventBus();
+			bus.broadcast(load);
 		};
-	// console.log("Collection is: ", _collection);
+
 	const base: Model = {
 		db: {},
 		storeType: "",
@@ -53,8 +51,7 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 					room: _modelName,
 					data: load,
 				};
-
-				sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
@@ -66,7 +63,7 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 					data: load,
 					room: _modelName,
 				};
-				sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
@@ -79,7 +76,7 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 					room: _modelName,
 				};
 
-				sendToOthers(req, pload);
+				broadcast(pload);
 				console.log("PublishDestroy to %s", _modelName);
 			}
 		},
