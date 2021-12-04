@@ -7,7 +7,7 @@ describe("bus", () => {
     
      await configureRestServer(path.resolve(__dirname,"testapp"));
      const {bus}  = configuration;
-     expect(bus).toBeUndefined();
-    //  expect(bus).toBeDefined();
+    //  expect(bus).toBeUndefined();
+     expect(bus).toBeDefined();
   });
 });

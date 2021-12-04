@@ -8,7 +8,6 @@ import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { Server } from "socket.io";
-import { createClient } from "redis";
 
 import methodOverride from "method-override";
 
@@ -21,7 +20,7 @@ import {
 	configureRestServer,
 	modules,
 } from "./utils/configurer";
-import { eventBus, initRedis } from "./utils/index";
+import { initEventBus, initQueue, connectRedis } from "./utils/index";
 import { appState } from "./appState";
 
 const socketIOCookieParser: any = require("socket.io-cookie");
@@ -64,12 +63,25 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		...restsecurity,
 		...restapp,
 	});
-	let redisClient = null;
+
+	let redisClient: any = null;
 	if (bus) {
-		redisClient = createClient(bus);
-		// console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
-		eventBus(bus);
-		initRedis(bus);
+		redisClient = await connectRedis(bus, "server");
+		if (!redisClient) {
+			return process.exit(1);
+		}
+		const { useQueue, useWorker } = initQueue(redisClient.duplicate());
+		const eventBus = initEventBus(redisClient.duplicate());
+		appState({
+			useQueue,
+			useWorker,
+			eventBus,
+		});
+	} else {
+		const eventBus = initEventBus();
+		appState({
+			eventBus,
+		});
 	}
 
 	const router: Router = configureRestRoutes(policies);

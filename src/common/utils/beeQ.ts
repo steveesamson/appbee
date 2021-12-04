@@ -1,5 +1,4 @@
-import { createClient } from "redis";
-import { BeeQConfig, Record, BeeQueueType, RedisStoreConfig } from "../types";
+import { BeeQConfig, Record, BeeQueueType } from "../types";
 
 const BeeQueue: any = require("bee-queue");
 
@@ -17,6 +16,7 @@ class BeeQ implements BeeQueueType {
 		}
 		this.queue = new BeeQueue(queueName, options);
 
+		console.log(`Created ${this.kind} for ${queueName}.`);
 		// if (isWorker) {
 		// 	this.queue.on("succeeded", (job: Record, result: any) => {
 		// 		console.log(`Job ${job.id} succeeded with result: ${result}`);
@@ -62,27 +62,30 @@ class BeeQ implements BeeQueueType {
 	}
 }
 const map: Record = {};
-let redisClient: any = null;
-const useWorker = (queueName: string): BeeQueueType => {
+
+const _useWorker = (redis: any) => (queueName: string): BeeQueueType => {
 	const mapName = `${queueName}-worker`;
 	if (map[mapName]) return map[mapName];
-	const worker = new BeeQ(queueName, redisClient.duplicate(), true);
+	const worker = new BeeQ(queueName, redis, true);
 	map[mapName] = worker;
 	return worker;
 };
-const useQueue = (queueName: string): BeeQueueType => {
+
+const _useQueue = (redis: any) => (queueName: string): BeeQueueType => {
 	const mapName = `${queueName}-queue`;
 	if (map[mapName]) return map[mapName];
-	const queue = new BeeQ(queueName, redisClient.duplicate());
+	const queue = new BeeQ(queueName, redis);
 	map[mapName] = queue;
 	return queue;
 };
 
-const initRedis = (config: RedisStoreConfig) => {
-	if (config) {
-		redisClient = createClient(config);
-		console.log("Redis client created for Queue.");
-	}
+const initQueue = (redisClient: any) => {
+	const queueRedis = redisClient.duplicate();
+	const workerRedis = redisClient.duplicate();
+	return {
+		useQueue: _useQueue(queueRedis),
+		useWorker: _useWorker(workerRedis),
+	};
 };
 
-export { useQueue, useWorker, initRedis };
+export { initQueue };

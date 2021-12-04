@@ -5,7 +5,7 @@ import { ioRequest } from "../common/types";
 import { Token } from "../common/utils/security";
 
 function decode(str: string) {
-	const body = new Buffer(str, "base64").toString("utf8");
+	const body = Buffer.from(str, "base64").toString("utf8"); //new Buffer(str, "base64").toString("utf8");
 	return JSON.parse(body);
 }
 

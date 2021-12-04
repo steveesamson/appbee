@@ -1,18 +1,15 @@
-import { Record, RedisStoreConfig } from "../types";
+import { Record } from "../types";
 import { Emitter } from "@socket.io/redis-emitter";
-import { createClient } from "redis";
 
 class BusMessenger {
 	emitter: any = null;
-	redisClient: any = null;
 
-	constructor(config: RedisStoreConfig = null) {
-		if (!config) {
+	constructor(redisClient: any = null) {
+		if (!redisClient) {
 			throw new Error("Invalid BusMessenger options.");
 		}
-
-		this.redisClient = createClient(config);
-		this.emitter = new Emitter(this.redisClient.duplicate());
+		this.emitter = new Emitter(redisClient);
+		console.log("Emitter created >> BusMessenger");
 	}
 
 	toObject(str: string) {
@@ -24,8 +21,8 @@ class BusMessenger {
 	emit(eventName: string, args: Record) {
 		this.emitter.emit(eventName, args);
 	}
-	useTransport() {
-		return this.redisClient;
-	}
+	// useTransport() {
+	// 	return this.redisClient;
+	// }
 }
 export { BusMessenger };

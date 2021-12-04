@@ -3,7 +3,8 @@ import { ObjectID } from "mongodb";
 import { Request } from "express";
 import { Record, Model, Params } from "../../types";
 import { SqlError } from "../Error";
-import { eventBus } from "../eventBus";
+// import { eventBus } from "../eventBus";
+import { appState } from "../../appState";
 
 const replaceId = (datas: Record[] | Record) => {
 		const eject = (data: any) => {
@@ -34,6 +35,7 @@ const replaceId = (datas: Record[] | Record) => {
 			.trim();
 
 const mongoDBModel = function(model: string, preferredCollection: string): Model {
+	const { eventBus } = appState();
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
 		broadcast = (load: Record) => eventBus().broadcast(load),

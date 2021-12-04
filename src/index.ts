@@ -18,10 +18,8 @@ import {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
-	eventBus,
-	initRedis,
-	useWorker,
-	useQueue,
+	initEventBus,
+	initQueue,
 } from "./common/utils/index";
 
 import {
@@ -63,17 +61,11 @@ const utils: UtilsType = {
 	raa,
 	Encrypt,
 	Token,
-	eventBus,
 	mailer,
 	getConfig,
 	dataSource: {
 		createSource,
 		getSource,
-	},
-	beeQueue: {
-		initRedis,
-		useWorker,
-		useQueue,
 	},
 };
 import { startDevServer } from "./common/restDev";

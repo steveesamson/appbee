@@ -2,7 +2,8 @@ import _ from "lodash";
 import { Request } from "express";
 import { Record, Model, Params } from "../../types";
 import { SqlError } from "../Error";
-import { eventBus } from "../eventBus";
+// import { eventBus } from "../eventBus";
+import { appState } from "../../appState";
 
 const cleanse = (str: string) =>
 	str
@@ -51,6 +52,7 @@ const addWheres = (db: any, modelName: string, context: any) => (key: string, va
 };
 
 const sqlModel = function(model: string, preferredCollection: string): Model {
+	const { eventBus } = appState();
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
 		broadcast = (load: Record) => eventBus().broadcast(load),

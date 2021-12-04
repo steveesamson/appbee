@@ -1,9 +1,8 @@
 import { existsSync as x } from "fs";
 import { join } from "path";
-import { createClient } from "redis";
 import { configureWorker, configuration } from "./utils/configurer";
 import { WorkerApp } from "./types";
-import { eventBus, initRedis } from "./utils/index";
+import { connectRedis, initEventBus, initQueue } from "./utils/index";
 import { appState } from "./appState";
 
 export const startWorker = async (base: string, app: WorkerApp): Promise<void> => {
@@ -33,8 +32,23 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 
 	if (bus) {
 		// console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
-		eventBus(bus);
-		initRedis(bus);
+
+		const redisClient: any = await connectRedis(bus, "worker");
+		if (!redisClient) {
+			return process.exit(1);
+		}
+		const { useWorker, useQueue } = initQueue(redisClient);
+		const eventBus = initEventBus(redisClient.duplicate());
+		appState({
+			useWorker,
+			useQueue,
+			eventBus,
+		});
+	} else {
+		const eventBus = initEventBus();
+		appState({
+			eventBus,
+		});
 	}
 
 	app();

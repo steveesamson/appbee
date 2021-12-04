@@ -15,8 +15,9 @@ import {
 	uploadFile,
 } from "./writers";
 export { Encrypt, Token } from "./security";
-export { eventBus } from "./eventBus";
-export { initRedis, useQueue, useWorker } from "./beeQ";
+export { initEventBus } from "./eventBus";
+export { initQueue } from "./beeQ";
+export { connectRedis } from "./redis";
 export {
 	writeFileTo,
 	writeStreamTo,

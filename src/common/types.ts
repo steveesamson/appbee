@@ -226,12 +226,16 @@ export interface AppState {
 	TEMPLATE_DIR?: string;
 	SERVER_TYPE?: string;
 	APP_PORT?: number;
+	APP_HOST?: string;
 	MOUNT_PATH?: string;
 	BASE_DIR?: string;
 	PUBLIC_DIR?: string;
 	VIEW_DIR?: string;
 	SECRET?: string;
 	IO?: any;
+	eventBus: () => EventBusType;
+	useWorker?: (queueName: string) => BeeQueueType;
+	useQueue?: (queueName: string) => BeeQueueType;
 	[key: string]: any;
 }
 
@@ -368,12 +372,12 @@ export interface UtilsType {
 	raa: HandleAsyncAwait;
 	Encrypt: IEncrypt;
 	Token: IToken;
-	eventBus: () => EventBusType;
-	beeQueue: {
-		initRedis: (options: StoreConfig) => void;
-		useWorker?: (queueName: string, options?: BeeQConfig) => BeeQueueType;
-		useQueue: (queueName: string, options?: StoreConfig) => BeeQueueType;
-	};
+	// eventBus: () => EventBusType;
+	// beeQueue: {
+	// 	initRedis: (options: RedisStoreConfig) => void;
+	// 	useWorker?: (queueName: string, options?: BeeQConfig) => Promise<BeeQueueType>;
+	// 	useQueue: (queueName: string, options?: StoreConfig) => Promise<BeeQueueType>;
+	// };
 	dataSource: {
 		createSource: (options: StoreConfig) => any;
 		getSource: (name: string) => any;
