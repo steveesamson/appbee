@@ -339,9 +339,10 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		},
 		// async update(params: Params, operationKey = "$set") {
 		async update(params: Params, options: Params = { opType: "$set", upsert: false }) {
-			const { id, where } = params;
+			const { id, where, $unset: _toRemove = [] } = params;
 			delete params.id;
 			delete params.where;
+			delete params.$unset;
 			const { opType, upsert } = options;
 			if (!id && !where) {
 				throw new SqlError("You need an id/where object to update any model");
@@ -355,9 +356,14 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			const isSingle = this.hasKey(arg);
 			const updateOperation = isSingle ? "updateOne" : "updateMany";
 
+			const $unset = _toRemove.reduce((acc: Record, field: string) => {
+				return { ...acc, [field]: "" };
+			}, {});
+			const removal = _toRemove.length ? { $unset } : {};
+
 			const { modifiedCount } = await collection[updateOperation](
 				conditions,
-				{ [opType]: validOptions },
+				{ [opType]: validOptions, ...removal },
 				{ upsert: upsert || false },
 			);
 			return modifiedCount ? this.find(arg) : null;
