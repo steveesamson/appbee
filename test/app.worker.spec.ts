@@ -10,7 +10,7 @@ const app =  async () =>{
     const {useQueue}  = appState();
     const q = useQueue('foobar');
     const {id, data, status} = await q.addJob({x:1,y:2});
-    console.log(`JOB: id:${id}, data:${data}, status:${status}`);
+    // console.log(`JOB: id:${id}, data:${data}, status:${status}`);
 };
 
 describe("Worker", () => {

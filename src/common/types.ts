@@ -111,6 +111,7 @@ export interface StoreConfig {
 	connectionString?: string;
 	debug?: boolType;
 	cdc?: boolType;
+	poolSize?: number;
 	multipleStatements?: boolType;
 	maillog?: boolType;
 	[key: string]: any;
