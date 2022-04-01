@@ -18,12 +18,12 @@ import {
 	ioRequest,
 	Configuration,
 	Modules,
-	MailerType,
 	AppConfig,
 	LdapConfig,
 	PolicyConfig,
 	StoreConfig,
 	ViewConfig,
+	SendMailType,
 } from "../types";
 // import { AppConfig, LdapConfig, PolicyConfig, StoreConfig, ViewConfig,  } from "../../index";
 
@@ -37,9 +37,9 @@ const ioRoutes: any = {
 	patch: {},
 	head: {},
 };
-let sender: MailerType = null;
+let sender: SendMailType = null;
 
-const mailer = (): MailerType => sender;
+const mailer = (): SendMailType => sender;
 
 const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
 	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };

@@ -72,10 +72,12 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 		}
 		const { useQueue, useWorker } = initQueue(redisClient.duplicate());
 		const eventBus = initEventBus(redisClient.duplicate());
+		const redis = redisClient.duplicate();
 		appState({
 			useQueue,
 			useWorker,
 			eventBus,
+			redis,
 		});
 	} else {
 		const eventBus = initEventBus();

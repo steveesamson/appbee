@@ -3,7 +3,7 @@ import { join } from "path";
 import nodemailer from "nodemailer";
 import smtpPool from "nodemailer-smtp-pool";
 import { appState } from "../appState";
-import { Record, MailerType } from "../types";
+import { Record, MailerType, SendMailType, MailOptions } from "../types";
 
 let mailConfig = {};
 
@@ -29,24 +29,43 @@ const stud: any = require("stud"),
 			transporter.close();
 		});
 	};
+const htmlToText = (html: string) => html.replace(/<[^>]+>/gi, "");
 
-const Mailer: MailerType = (smtpConfig: any) => {
-	const { sender, templateFile } = smtpConfig;
+const Mailer = (smtpConfig: Record): SendMailType => {
+	const { sender } = smtpConfig;
 	delete smtpConfig.sender;
 	delete smtpConfig.template;
 	delete smtpConfig.templateFile;
 	mailConfig = smtpConfig;
 	// console.log(smtpConfig, tpl)
 	return {
-		sendMail(options: any, cb: Function) {
-			options.from = sender;
-			const { TEMPLATE_DIR } = appState();
-			const tpl = fs.readFileSync(join(TEMPLATE_DIR, templateFile), "utf8");
-			stud.template(tpl, options, (error: any, str: string) => {
-				options.html = str;
-				// console.log('going out: ', options)
+		sendMail(options: MailOptions, cb: Function) {
+			const { message, html, template } = options;
+			if (!template && !message && !html) return console.log(`No template/message for ${options.subject}`);
+			if (!options.from) {
+				options.from = sender;
+			}
+
+			if (template) {
+				const { TEMPLATE_DIR } = appState();
+				const tpl = fs.readFileSync(join(TEMPLATE_DIR, template), "utf8");
+				stud.template(tpl, options, (error: any, str: string) => {
+					options.html = str;
+					if (!options.message) {
+						options.message = htmlToText(options.html);
+					}
+					// console.log('going out: ', options)
+					mail(options, cb);
+				});
+			} else if (message) {
+				if (!options.html) {
+					options.html = `<div>${message}</div>`;
+				}
 				mail(options, cb);
-			});
+			} else if (html) {
+				options.message = htmlToText(html);
+				mail(options, cb);
+			}
 		},
 	};
 };

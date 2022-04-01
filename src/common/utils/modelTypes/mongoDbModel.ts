@@ -36,10 +36,12 @@ const replaceId = (datas: Record[] | Record) => {
 const mongoDBModel = function(model: string, preferredCollection: string): Model {
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
-		broadcast = (load: Record) => {
+		broadcast = (load: Record[]) => {
 			const { eventBus } = appState();
 			const bus = eventBus();
-			bus.broadcast(load);
+			for (const data of load) {
+				bus.broadcast(data);
+			}
 		};
 
 	const base: Model = {
@@ -59,14 +61,25 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
 		postDestroy(req: Request, data: Record) {},
+		pipeline() {
+			return [];
+		},
 		publishCreate(req: Request, load: Record) {
 			this.postCreate(req, load);
 			if (req.io) {
-				const pload = {
-					verb: "create",
-					room: _modelName,
-					data: load,
-				};
+				const pload = Array.isArray(load)
+					? load.map(data => ({
+							verb: "create",
+							data,
+							room: _modelName,
+					  }))
+					: [
+							{
+								verb: "create",
+								data: load,
+								room: _modelName,
+							},
+					  ];
 
 				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
@@ -75,11 +88,19 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		publishUpdate(req: Request, load: Record) {
 			this.postUpdate(req, load);
 			if (req.io) {
-				const pload = {
-					verb: "update",
-					data: load,
-					room: _modelName,
-				};
+				const pload = Array.isArray(load)
+					? load.map(data => ({
+							verb: "update",
+							data,
+							room: _modelName,
+					  }))
+					: [
+							{
+								verb: "update",
+								data: load,
+								room: _modelName,
+							},
+					  ];
 				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
@@ -87,11 +108,19 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		publishDestroy(req: Request, load: Record) {
 			this.postDestroy(req, load);
 			if (req.io) {
-				const pload = {
-					data: load,
-					verb: "destroy",
-					room: _modelName,
-				};
+				const pload = Array.isArray(load)
+					? load.map(data => ({
+							verb: "destroy",
+							data,
+							room: _modelName,
+					  }))
+					: [
+							{
+								verb: "destroy",
+								data: load,
+								room: _modelName,
+							},
+					  ];
 
 				broadcast(pload);
 				console.log("PublishDestroy to %s", _modelName);
@@ -209,14 +238,6 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 
 			const validOpts = this.validOptions(options);
 			let query = this.collectArgs(validOpts);
-			// if (this.hasKey(options)) {
-			// 	const opts = projection ? { projection } : {};
-			// 	const cursor = collection.findOne(query, opts);
-			// 	// if (projection) {
-			// 	// 	collection.project(projection);
-			// 	// }
-			// 	return cursor;
-			// }
 
 			//Using projection for multi
 			const facetArgs = [];
@@ -245,8 +266,10 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			if (limit) {
 				facetArgs.push({ $limit: parseInt(limit, 10) });
 			}
+			const pipe = this.pipeline();
 			const cursor = collection.aggregate([
 				{ $match: { ...query } },
+				...pipe,
 				{
 					$facet: {
 						metadata: [{ $count: "recordCount" }],

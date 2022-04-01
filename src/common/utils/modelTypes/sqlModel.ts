@@ -53,10 +53,12 @@ const addWheres = (db: any, modelName: string, context: any) => (key: string, va
 const sqlModel = function(model: string, preferredCollection: string): Model {
 	const _modelName = model.toLowerCase(),
 		_collection = preferredCollection ? preferredCollection : _modelName,
-		broadcast = (load: Record) => {
+		broadcast = (load: Record[]) => {
 			const { eventBus } = appState();
 			const bus = eventBus();
-			bus.broadcast(load);
+			for (const data of load) {
+				bus.broadcast(data);
+			}
 		};
 
 	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any, modelName: string) => {
@@ -101,11 +103,19 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 		publishCreate(req: Request, load: Record) {
 			this.postCreate(req, load);
 			if (req.io) {
-				const pload = {
-					verb: "create",
-					room: _modelName,
-					data: load,
-				};
+				const pload = Array.isArray(load)
+					? load.map(data => ({
+							verb: "create",
+							data,
+							room: _modelName,
+					  }))
+					: [
+							{
+								verb: "create",
+								data: load,
+								room: _modelName,
+							},
+					  ];
 
 				broadcast(pload);
 				console.log("PublishCreate to %s", _modelName);
@@ -114,11 +124,19 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 		publishUpdate(req: Request, load: Record) {
 			this.postUpdate(req, load);
 			if (req.io) {
-				const pload = {
-					verb: "update",
-					data: load,
-					room: _modelName,
-				};
+				const pload = Array.isArray(load)
+					? load.map(data => ({
+							verb: "update",
+							data,
+							room: _modelName,
+					  }))
+					: [
+							{
+								verb: "update",
+								data: load,
+								room: _modelName,
+							},
+					  ];
 				broadcast(pload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
@@ -126,11 +144,20 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 		publishDestroy(req: Request, load: Record) {
 			this.postDestroy(req, load);
 			if (req.io) {
-				const pload = {
-					data: load,
-					verb: "destroy",
-					room: _modelName,
-				};
+				const pload = Array.isArray(load)
+					? load.map(data => ({
+							verb: "destroy",
+							data,
+							room: _modelName,
+					  }))
+					: [
+							{
+								verb: "destroy",
+								data: load,
+								room: _modelName,
+							},
+					  ];
+
 				broadcast(pload);
 				console.log("PublishDestroy to %s", _modelName);
 			}

@@ -39,10 +39,12 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 		}
 		const { useWorker, useQueue } = initQueue(redisClient);
 		const eventBus = initEventBus(redisClient.duplicate());
+		const redis = redisClient.duplicate();
 		appState({
 			useWorker,
 			useQueue,
 			eventBus,
+			redis,
 		});
 	} else {
 		const eventBus = initEventBus();

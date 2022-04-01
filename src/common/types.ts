@@ -1,5 +1,6 @@
 import express, { Response, NextFunction, Request } from "express";
 import http from "http";
+import { RedisClient } from "redis";
 import { Socket, Server } from "socket.io";
 
 declare global {
@@ -26,6 +27,7 @@ export type Params = Record;
 export interface Model {
 	setUp?(): void;
 	hasKey?(options: Params): boolean;
+	pipeline?(): Record;
 	prepWhere?(options: Params): void;
 	rowCount?(db: any): Promise<Record>;
 	find?(param: Params): Promise<Record>;
@@ -99,6 +101,7 @@ export interface RedisStoreConfig {
 	user?: string;
 	password?: string;
 	url?: string;
+	flushOnStart?: boolean;
 }
 
 export interface StoreConfig {
@@ -237,6 +240,7 @@ export interface AppState {
 	eventBus: () => EventBusType;
 	useWorker?: (queueName: string) => BeeQueueType;
 	useQueue?: (queueName: string) => BeeQueueType;
+	redis?: any;
 	[key: string]: any;
 }
 
@@ -277,7 +281,18 @@ export interface WriteStreamType {
 }
 
 export interface MailerType {
-	(smtpConfig: any): any;
+	(smtpConfig: Record): SendMailType;
+}
+export interface MailOptions {
+	message?: string;
+	template?: string;
+	from?: string;
+	html?: string;
+	to: string;
+	subject: string;
+}
+export interface SendMailType {
+	sendMail: (options: MailOptions, cb: Function) => void;
 }
 
 export interface HandleAsyncAwait {
@@ -369,7 +384,7 @@ export interface UtilsType {
 	streamToPicture: ControllerRequest;
 	unlinkFiles: ControllerRequest;
 	uploadFile: ControllerRequest;
-	mailer: () => MailerType;
+	mailer: () => SendMailType;
 	request: HttpRequestType;
 	raa: HandleAsyncAwait;
 	Encrypt: IEncrypt;
