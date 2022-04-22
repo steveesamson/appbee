@@ -3,7 +3,7 @@ import { join } from "path";
 import { Application } from "express";
 import createNextServer from "./server";
 
-export const startDevServer = async (base: string, sapper?: any): Promise<Application> => {
+export const startDevServer = async (base: string): Promise<Application> => {
 	base = base || process.cwd();
 	const ok = (p: string): boolean => x(join(base, p));
 
@@ -13,5 +13,5 @@ export const startDevServer = async (base: string, sapper?: any): Promise<Applic
 	}
 	// process.env.NODE_ENV = "development";
 	// process.env.SERVER_TYPE = "STAND_ALONE";
-	return await createNextServer(base, sapper);
+	return await createNextServer(base);
 };

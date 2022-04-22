@@ -5,7 +5,7 @@ import { listDir } from "./fetchFileTypes";
 
 import { Model, Configuration, GetModels, ReqWithDB } from "../types";
 import { getSource } from "./dataSource";
-import { QStore } from "../../rest/utils/QStore";
+// import { QStore } from "../../rest/utils/QStore";
 import { anyModel } from "./modelTypes/anyModel";
 import { sqlModel } from "./modelTypes/sqlModel";
 import { mongoDBModel } from "./modelTypes/mongoDbModel";
@@ -80,26 +80,8 @@ const makeModel = (storeName: string, defaultModel: Model, config: Configuration
 };
 
 const loadModels = (base: string, config: Configuration) => {
-	// return new Promise(async (r, j) => {
-	// 	base = path.resolve(base, "modules");
-
-	// 	const list = listDir(base),
-	// 		len = list.length;
-
-	// 	makeModel("QStore", QStore, config);
-	// 	for (let i = 0; i < len; ++i) {
-	// 		const dir = path.resolve(base, list[i], `model${ext}`);
-	// 		if (!fs.existsSync(dir)) continue;
-	// 		const model = await import(path.resolve(base, list[i], `model${ext}`)),
-	// 			name = Object.keys(model)[0];
-	// 		makeModel(name, model[name], config);
-	// 	}
-	// 	r(Models);
-	// });
-
 	base = path.resolve(base, "modules");
 	const list = listDir(base);
-	makeModel("QStore", QStore, config);
 
 	return new Promise(r => {
 		const createNextModel = async (l: string) => {

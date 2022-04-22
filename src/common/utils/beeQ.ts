@@ -17,11 +17,6 @@ class BeeQ implements BeeQueueType {
 		this.queue = new BeeQueue(queueName, options);
 
 		console.log(`Created ${this.kind} for ${queueName}.`);
-		// if (isWorker) {
-		// 	this.queue.on("succeeded", (job: Record, result: any) => {
-		// 		console.log(`Job ${job.id} succeeded with result: ${result}`);
-		// 	});
-		// }
 	}
 
 	addJob(jobSpec: Record, id: any = null) {

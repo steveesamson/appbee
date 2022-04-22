@@ -161,9 +161,9 @@ const configureIORoutes = (app: Express.Application) => {
 const configureRestServer = async (base: string) => {
 	//Load configs
 
-	const cfg = await loadConfig(base);
+	const config = await loadConfig(base);
 
-	Object.assign(configuration, cfg);
+	Object.assign(configuration, config);
 	await configureDataSources(configuration.store);
 	await loadModels(base, configuration);
 	//Load middlewares

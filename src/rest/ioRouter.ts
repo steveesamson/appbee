@@ -31,15 +31,10 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 
 	req.io = socket;
 	req.url = req.path;
-	req.cookies = socket.handshake.headers.cookie || socket.request.headers.cookie;
+	const token = socket.handshake.auth;
 
-	// console.log("IO.Cookies: ", req.cookies);
-	const sessionCookie = req.cookies && req.cookies["express:sess"] ? req.cookies["express:sess"] : null;
-	const sess = sessionCookie ? decode(sessionCookie) : null;
-	req.session = sess;
-
-	if (req.session?.jwt) {
-		const decoded = Token.verify(req.session.jwt);
+	if (token) {
+		const decoded = Token.verify(token);
 		if (decoded) {
 			req.currentUser = decoded;
 		}

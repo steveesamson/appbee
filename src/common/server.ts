@@ -1,17 +1,13 @@
-import { join, basename } from "path";
+import { join } from "path";
 import http from "http";
 import express, { Application, Router } from "express";
 import compression from "compression";
 import errorHandler from "errorhandler";
 import helmet from "helmet";
-import cookieSession from "cookie-session";
-import cookieParser from "cookie-parser";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { Server } from "socket.io";
 import cors from "cors";
-
 import methodOverride from "method-override";
-
 import beeMultiparts from "../rest/multiParts";
 import sessionUser from "../rest/middlewares/sessionUser";
 import {
@@ -24,10 +20,7 @@ import {
 import { initEventBus, initQueue, connectRedis } from "./utils/index";
 import { appState } from "./appState";
 
-const socketIOCookieParser: any = require("socket.io-cookie");
-
 const createAServer = async (base: string): Promise<Application> => {
-	const { NODE_ENV }: any = process.env;
 	await configureRestServer(base);
 
 	const { view, application, security, bus } = configuration;
@@ -96,13 +89,7 @@ const createAServer = async (base: string): Promise<Application> => {
 	app.use(
 		cors(),
 		helmet(),
-		cookieParser(),
 		beeMultiparts(),
-		cookieSession({
-			signed: false,
-			secure: false,
-			httpOnly: true,
-		}),
 		sessionUser(),
 		methodOverride(),
 		errorHandler(),
@@ -124,8 +111,6 @@ const createAServer = async (base: string): Promise<Application> => {
 
 	const httpServer = http.createServer(app),
 		io = new Server(httpServer, ioServerOptions);
-
-	io.use(socketIOCookieParser);
 
 	app.server = httpServer;
 	app.io = io;
