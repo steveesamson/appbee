@@ -8,6 +8,7 @@ import cookieSession from "cookie-session";
 import cookieParser from "cookie-parser";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { Server } from "socket.io";
+import cors from "cors";
 
 import methodOverride from "method-override";
 
@@ -25,7 +26,7 @@ import { appState } from "./appState";
 
 const socketIOCookieParser: any = require("socket.io-cookie");
 
-const createAServer = async (base: string, sapper?: any): Promise<Application> => {
+const createAServer = async (base: string): Promise<Application> => {
 	const { NODE_ENV }: any = process.env;
 	await configureRestServer(base);
 
@@ -92,21 +93,21 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 
 	const { PUBLIC_DIR, APP_PORT, APP_HOST = "127.0.0.1", MOUNT_PATH } = appState();
 
-	const session = cookieSession({
-		signed: false,
-		secure: false, //process.env.NODE_ENV === "production",
-		// httpOnly: true
-	});
 	app.use(
+		cors(),
 		helmet(),
 		cookieParser(),
 		beeMultiparts(),
-		session,
-		sessionUser,
+		cookieSession({
+			signed: false,
+			secure: false,
+			httpOnly: true,
+		}),
+		sessionUser(),
 		methodOverride(),
 		errorHandler(),
 		compression({ threshold: 0 }),
-		express.static(sapper ? basename(PUBLIC_DIR) : PUBLIC_DIR),
+		express.static(PUBLIC_DIR),
 	);
 	if (middlewares && middlewares.length) {
 		app.use(middlewares as any);
@@ -134,15 +135,6 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 
 	app.use(MOUNT_PATH, router);
 
-	sapper &&
-		app.use(
-			sapper.middleware({
-				session: (req: any, res: any) => {
-					// res.setHeader("cache-control", "no-cache, no-store");
-					return { currentUser: req.currentUser };
-				},
-			}),
-		);
 	httpServer.listen(APP_PORT, () => console.log(`Server running at http://${APP_HOST}:${APP_PORT}`));
 
 	return app;
