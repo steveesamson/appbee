@@ -25,7 +25,6 @@ import {
 	ViewConfig,
 	SendMailType,
 } from "../types";
-// import { AppConfig, LdapConfig, PolicyConfig, StoreConfig, ViewConfig,  } from "../../index";
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
@@ -132,18 +131,12 @@ const configureIORoutes = (app: Express.Application) => {
 			socket.disconnect();
 		});
 
-		// const cookies = cookie.serialize(socket.request.headers.cookie || ""),
-		// 	// const cookie = socket.request.headers.cookie || "",
-		// 	req = { connection: { encrypted: false }, headers: { cookie: cookies } },
-		// 	res = { getHeader: () => {}, setHeader: () => {} };
-		// //
-		// cookieSession(req, res, () => {
-		// 	console.log("Logging session: ", (req as any).session); // Do something with req.session
-		// });
-
 		["get", "post", "delete", "put", "patch", "head"].forEach((method: string) => {
 			socket.on(method, (req: any, cb: Function) => {
 				// console.log(req.url);
+				if (!req.headers) {
+					req.headers = {};
+				}
 				const request: ioRequest = {
 					req,
 					cb,

@@ -2,12 +2,6 @@ import _ from "lodash";
 import qs from "querystring";
 import { match as m } from "path-to-regexp";
 import { ioRequest } from "../common/types";
-import { Token } from "../common/utils/security";
-
-function decode(str: string) {
-	const body = Buffer.from(str, "base64").toString("utf8"); //new Buffer(str, "base64").toString("utf8");
-	return JSON.parse(body);
-}
 
 const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	const res = {
@@ -27,19 +21,9 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	} as any;
 
 	req = req || {};
-	// console.dir("REQ:", req);
-
 	req.io = socket;
 	req.url = req.path;
-	const token = socket.handshake.auth;
-
-	if (token) {
-		const decoded = Token.verify(token);
-		if (decoded) {
-			req.currentUser = decoded;
-		}
-	}
-	// console.log("IO.Session: ", sess);
+	req.headers["x-access-token"] = socket.handshake.auth["x-access-token"];
 
 	let { data, path } = req;
 

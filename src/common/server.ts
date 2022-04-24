@@ -9,7 +9,6 @@ import { Server } from "socket.io";
 import cors from "cors";
 import methodOverride from "method-override";
 import beeMultiparts from "../rest/multiParts";
-import sessionUser from "../rest/middlewares/sessionUser";
 import {
 	configureIORoutes,
 	configureRestRoutes,
@@ -90,7 +89,6 @@ const createAServer = async (base: string): Promise<Application> => {
 		cors(),
 		helmet(),
 		beeMultiparts(),
-		sessionUser(),
 		methodOverride(),
 		errorHandler(),
 		compression({ threshold: 0 }),
