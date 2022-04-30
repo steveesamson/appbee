@@ -102,5 +102,28 @@
 		"rollup-plugin-typescript2": "^0.31.1",
 		"ts-jest": "^24.1.0",
 		"typescript": "^3.7.2"
-	}
+	},
+	"keywords": [
+		"nodejs",
+		"express",
+		"rest",
+		"graphql",
+		"microservice",
+		"socket.io",
+		"typescript",
+		"javascript",
+		"mongodb",
+		"redis",
+		"mariadb",
+		"mysql",
+		"oracledb",
+		"postgres",
+		"smtp",
+		"api",
+		"backend",
+		"web",
+		"bee-queue",
+		"cors",
+		"compression"
+	]
 }

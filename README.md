@@ -2,7 +2,7 @@
 
 # appbee
 
-Application Back-End Engine, appbee is a REST, GraphQL and Realtime API Engine for NodeJS Backend Applications.
+Application Back-End Engine, appbee is a REST, GraphQL and Realtime API Engine for NodeJS Applications.
 
 ## Features
 
@@ -15,7 +15,7 @@ Application Back-End Engine, appbee is a REST, GraphQL and Realtime API Engine f
 - Policies
 - Template
 
-The features loosely form directories in `appbee` projects; they are explained in details below:
+The features loosely form directories in an `appbee` projects; they are explained in details below:
 
 **`Configuration:`** configuration is where the various behaviours of `appbee` projects are configured. The folder name is `config`. The `config` houses the following configuration files:
 
@@ -58,12 +58,13 @@ const view: ViewConfig = {
 	staticDir: 'public',
 	uploadDir: 'uploads',
 	indexFile: 'index',
+	templateDir: 'templates',
 };
 
 export default view;
 ```
 
-`staticDir` is the location for all static assets like `css` and `index.html`. Note that both `uploadDir` and `indexFile` are relative to the `staticDir`. For instance, if `staticDir` is, say `'public'`, `uploadDir` is `'uploads'` and `indexFile` is `'index'`, then `uploadDir` would be `public/uploads/` while `indexFile` would be `public/index.html`.
+`staticDir` is the location for all static assets like `css` and `index.html`. Note that both `uploadDir` and `indexFile` are relative to the `staticDir`. For instance, if `staticDir` is, say `'public'`, `uploadDir` is `'uploads'` and `indexFile` is `'index'`, then `uploadDir` would be `public/uploads/` while `indexFile` would be `public/index.html`. `templateDir` contains email templates for out-bound emails.
 
 ## store
 
@@ -143,7 +144,7 @@ export default policy;
 The `'*'` policy is either global to the whole `routes` or global the `routes` within `HTTP` methods. Routes could also be whitelisted by setting the value to `true`; it can also be barred completely by setting the value to `false` indicative of `not reachable`. Policy could be commas-separated like `'isAuthed,hasAccess'`, single string like `'isAuthed'` or an array like `['isAuthed','hasAccess']`.
 
 Also, multiple policies can be applied to the same route; the evaluation occurs from left-to-right when they are specified as an array of `policies` or string of policies separated by commas. Every `policy` set overrides the global one, therefore, if the intention is to still have the `global policy` in effect in addition to `another` policy, it must be specify in the `new policy`. This is important.
-For instance, is I still want policy `isAuthed` with another one `hasAcess` policy, I will do so:
+For instance, if I still want policy `isAuthed` with another one `hasAcess` policy, I will do so:
 
 ```javascript
 post:{
