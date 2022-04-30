@@ -8,7 +8,7 @@ Application Back-End Engine, appbee is a REST, GraphQL and Realtime API Engine f
 
 The features loosely form directories in an **`appbee`** projects; they are explained in details below:
 
-- [Configuration](docs/configuration)
+- [Configuration](docs/configuration.md)
 - Middleware
 - Modules
 - Plugins
