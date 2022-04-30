@@ -6,7 +6,6 @@ declare namespace NodeJS {
 		MOUNT_PATH: string;
 		BASE_DIR: string;
 		PUBLIC_DIR: string;
-		VIEW_DIR: string;
 		IO: any;
 	}
 }

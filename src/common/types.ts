@@ -1,6 +1,6 @@
-import { Response, NextFunction, Request } from "express";
-import http from "http";
-import { Socket, Server } from "socket.io";
+import { Response, NextFunction, Request } from 'express';
+import http from 'http';
+import { Socket, Server } from 'socket.io';
 
 declare global {
 	namespace Express {
@@ -53,7 +53,7 @@ export interface Model {
 	checkConcurrentUpdate?: string; //'lastupdated'
 	db?: any;
 	orderBy?: string;
-	orderDirection?: "ASC" | "DESC";
+	orderDirection?: 'ASC' | 'DESC';
 	insertKey?: string;
 	[key: string]: any;
 }
@@ -81,16 +81,16 @@ export interface ModelMap {
 	[key: string]: Model;
 }
 export type dbType =
-	| "pg"
-	| "mysql"
-	| "mysql2"
-	| "oracledb"
-	| "mssql"
-	| "sqlite3"
-	| "mongodb"
-	| "redis"
-	| "kafka"
-	| "rabbitmq";
+	| 'pg'
+	| 'mysql'
+	| 'mysql2'
+	| 'oracledb'
+	| 'mssql'
+	| 'sqlite3'
+	| 'mongodb'
+	| 'redis'
+	| 'kafka'
+	| 'rabbitmq';
 
 export type boolType = true | false;
 export interface RedisStoreConfig {
@@ -121,22 +121,19 @@ export interface StoreConfig {
 export interface StoreListConfig {
 	[key: string]: StoreConfig;
 }
-export type SocketType = ["polling"] | ["websocket"] | ["polling", "websocket"];
+export type SocketType = ['polling'] | ['websocket'] | ['polling', 'websocket'];
 export interface AppConfig {
 	port: number;
 	host?: string;
-	spa: boolType;
 	ioTransport?: SocketType;
-	useMultiTenant: boolType;
-	mountRestOn: string;
+	useMultiTenant?: boolType;
+	mountRestOn?: string;
 	[key: string]: any;
 }
 
 export interface ViewConfig {
-	engine?: string;
 	staticDir?: string;
 	uploadDir?: string;
-	viewDir?: string;
 	indexFile?: string;
 	templateDir?: string;
 }
@@ -148,7 +145,7 @@ export interface LdapConfig {
 }
 
 export interface PolicyConfig {
-	"*"?: string | boolean;
+	'*'?: string | boolean;
 	post?: Record;
 	get?: Record;
 	delete?: Record;
@@ -178,7 +175,7 @@ export interface CronConfig {
 export interface JobConfig {
 	id?: string;
 	name: string;
-	status: "stopped" | "running" | "disabled";
+	status: 'stopped' | 'running' | 'disabled';
 	start: () => void;
 	stop: () => void;
 }
@@ -232,7 +229,6 @@ export interface AppState {
 	MOUNT_PATH?: string;
 	BASE_DIR?: string;
 	PUBLIC_DIR?: string;
-	VIEW_DIR?: string;
 	SECRET?: string;
 	IO?: any;
 	eventBus: () => EventBusType;

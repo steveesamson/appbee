@@ -1,15 +1,15 @@
-import { join } from "path";
-import { existsSync as x } from "fs";
-import http from "http";
-import express, { Application, Router } from "express";
-import compression from "compression";
-import errorHandler from "errorhandler";
-import helmet from "helmet";
-import { createAdapter } from "@socket.io/redis-adapter";
-import { Server } from "socket.io";
-import cors from "cors";
-import methodOverride from "method-override";
-import beeMultiparts from "../rest/multiParts";
+import { join } from 'path';
+import { existsSync as x } from 'fs';
+import http from 'http';
+import express, { Application, Router } from 'express';
+import compression from 'compression';
+import errorHandler from 'errorhandler';
+import helmet from 'helmet';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { Server } from 'socket.io';
+import cors from 'cors';
+import methodOverride from 'method-override';
+import beeMultiparts from '../rest/multiParts';
 import {
 	initEventBus,
 	initQueue,
@@ -19,14 +19,14 @@ import {
 	configuration,
 	configureRestServer,
 	modules,
-} from "./utils";
-import { appState } from "./appState";
+} from './utils';
+import { appState } from './appState';
 
 export const startServer = async (base: string): Promise<Application> => {
 	base = base || process.cwd();
 	const ok = (p: string): boolean => x(join(base, p));
 
-	if (!ok("modules") || !ok("config")) {
+	if (!ok('modules') || !ok('config')) {
 		console.error("Sorry, am bailing; I cannot find 'modules' or 'config' folders in your application.");
 		return null;
 	}
@@ -34,10 +34,9 @@ export const startServer = async (base: string): Promise<Application> => {
 	await configureRestServer(base);
 
 	const { view, application, security, bus } = configuration;
-	const staticDir = view.staticDir || "";
-	const viewDir = view.viewDir || "";
-	const templateDir = view.templateDir || "";
-	const uploadDir = view.uploadDir || "";
+	const staticDir = view.staticDir || '';
+	const templateDir = view.templateDir || '';
+	const uploadDir = view.uploadDir || '';
 	const { useMultiTenant, port, host, mountRestOn, ioTransport, ...restapp } = application;
 	const { secret, ...restsecurity } = security;
 	const { policies, middlewares, controllers } = modules;
@@ -49,17 +48,16 @@ export const startServer = async (base: string): Promise<Application> => {
 			value: key.toLowerCase(),
 			id: index + 1,
 		}));
-	resources.push({ name: "Core", value: "core", id: resources.length + 1 });
+	resources.push({ name: 'Core', value: 'core', id: resources.length + 1 });
 
 	appState({
 		isMultitenant: useMultiTenant === true,
 		APP_PORT: port,
 		APP_HOST: host,
-		MOUNT_PATH: mountRestOn || "",
+		MOUNT_PATH: mountRestOn || '',
 		BASE_DIR: base,
 		PUBLIC_DIR: join(base, staticDir),
 		UPLOAD_DIR: join(base, staticDir, uploadDir),
-		VIEW_DIR: join(base, viewDir),
 		STATIC_DIR: staticDir,
 		TEMPLATE_DIR: join(base, templateDir),
 		SECRET: secret,
@@ -70,7 +68,7 @@ export const startServer = async (base: string): Promise<Application> => {
 
 	let redisClient: any = null;
 	if (bus) {
-		redisClient = await connectRedis(bus, "server");
+		redisClient = await connectRedis(bus, 'server');
 		if (!redisClient) {
 			return process.exit(1);
 		}
@@ -92,9 +90,9 @@ export const startServer = async (base: string): Promise<Application> => {
 
 	const router: Router = configureRestRoutes(policies);
 	const app: Application = express();
-	app.set("trust proxy", true);
+	app.set('trust proxy', true);
 
-	const { PUBLIC_DIR, APP_PORT, APP_HOST = "127.0.0.1", MOUNT_PATH } = appState();
+	const { PUBLIC_DIR, APP_PORT, APP_HOST = '127.0.0.1', MOUNT_PATH } = appState();
 
 	app.use(
 		cors(),
@@ -112,10 +110,10 @@ export const startServer = async (base: string): Promise<Application> => {
 	const ioServerOptions = redisClient
 		? {
 				adapter: createAdapter(redisClient, redisClient.duplicate()),
-				transports: ioTransport || ["polling", "websocket"],
+				transports: ioTransport || ['polling', 'websocket'],
 		  }
 		: {
-				transports: ioTransport || ["polling", "websocket"],
+				transports: ioTransport || ['polling', 'websocket'],
 		  };
 
 	const httpServer = http.createServer(app),
