@@ -1,8 +1,8 @@
-import { ControllerRequest, RouteConfig, RouteMap } from "../common/types";
-import { normalizePath } from "../common/utils/pathNormailizer";
+import { ControllerRequest, RouteConfig, RouteMap } from '../common/types';
+import { normalizePath } from '../common/utils/pathNormailizer';
 const routes: RouteMap = {};
 
-const Route = (name: string, mountPoint = "") => {
+const Route = (name: string, mountPoint = '') => {
 	const route: RouteConfig = {};
 
 	route.mountPoint = mountPoint;

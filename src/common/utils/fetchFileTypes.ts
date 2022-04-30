@@ -1,5 +1,5 @@
-import { readdirSync } from "fs";
-import { extname } from "path";
+import { readdirSync } from 'fs';
+import { extname } from 'path';
 
 const curry = (ext: string) => (dir: string) => {
 	const onlyTypeScriptFile = (file: string): boolean => extname(file).toLowerCase() === ext;

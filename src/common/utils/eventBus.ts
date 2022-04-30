@@ -1,11 +1,11 @@
-import { Record, EventBusType } from "../types";
-import { appState } from "../appState";
-import { BusMessenger } from "./busMessenger";
+import { Record, EventBusType } from '../types';
+import { appState } from '../appState';
+import { BusMessenger } from './busMessenger';
 
 class DevBus implements EventBusType {
 	listeners: { [key: string]: Function | any } = {};
-	shortId: any = require("shortid");
-	name = "DevBus";
+	shortId: any = require('shortid');
+	name = 'DevBus';
 	constructor() {
 		if (!(DevBus as any).instance) {
 			(DevBus as any).instance = this;
@@ -46,7 +46,7 @@ class DevBus implements EventBusType {
 
 	broadcast(load: Record) {
 		const { IO } = appState();
-		IO.emit("comets", load);
+		IO.emit('comets', load);
 		// const { verb, room, data } = load;
 		// this.emit(`${verb}::${room}`, data);
 	}
@@ -55,7 +55,7 @@ class ProdBus implements EventBusType {
 	bm: any = null;
 	subscriber: any = null;
 	publisher: any = null;
-	name = "BusMessenger";
+	name = 'BusMessenger';
 
 	constructor(redis: any) {
 		if ((ProdBus as any).instance) {
@@ -69,8 +69,8 @@ class ProdBus implements EventBusType {
 	}
 
 	on(eventName: string, fn: Function) {
-		this.subscriber.on("message", (channel: string, message: string) => {
-			console.log("Receiving on channel: ", channel);
+		this.subscriber.on('message', (channel: string, message: string) => {
+			console.log('Receiving on channel: ', channel);
 			if (channel !== eventName) return;
 			fn(this.bm.toObject(message));
 		});
@@ -85,7 +85,7 @@ class ProdBus implements EventBusType {
 			fn(this.bm.toObject(message));
 			this.subscriber.unsubscribe();
 		};
-		this.subscriber.on("message", onceWrapper);
+		this.subscriber.on('message', onceWrapper);
 		this.subscriber.subscribe(eventName);
 	}
 	emit(eventName: string, args: Record) {
@@ -94,7 +94,7 @@ class ProdBus implements EventBusType {
 
 	broadcast(load: Record) {
 		// console.log("prod event bus broadcast:", load);
-		this.bm.emit("comets", load);
+		this.bm.emit('comets', load);
 	}
 }
 const devBus: EventBusType = new DevBus();

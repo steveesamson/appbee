@@ -1,9 +1,9 @@
-import fs from "fs-extra";
-import path from "path";
-import { Request, Response } from "express";
-import { Params, WriteFileType, WriteStreamType } from "../types";
-import { appState } from "../appState";
-import raa from "../utils/handleAsyncAwait";
+import fs from 'fs-extra';
+import path from 'path';
+import { Request, Response } from 'express';
+import { Params, WriteFileType, WriteStreamType } from '../types';
+import { appState } from '../appState';
+import raa from '../utils/handleAsyncAwait';
 
 export const writeStreamTo: WriteStreamType = (req: Request, options: Params) => {
 	const { PUBLIC_DIR } = appState();
@@ -12,16 +12,16 @@ export const writeStreamTo: WriteStreamType = (req: Request, options: Params) =>
 
 	return new Promise(re => {
 		req
-			.on("data", (chunk: any) => {
+			.on('data', (chunk: any) => {
 				ws.write(chunk);
 			})
-			.on("end", () => {
+			.on('end', () => {
 				ws.destroy();
-				ws.on("close", () => {
-					const src = dest.replace(PUBLIC_DIR, "");
+				ws.on('close', () => {
+					const src = dest.replace(PUBLIC_DIR, '');
 					re({
 						data: {
-							text: "Web capture was successful.",
+							text: 'Web capture was successful.',
 							src,
 						},
 					});
@@ -43,10 +43,10 @@ export const writeFileTo: WriteFileType = (req: Request, options: Params, cb: an
 					error: "Error while uploading -'" + file.name + "' " + e.message,
 				});
 		} else {
-			const ndest = dest.replace(PUBLIC_DIR, "");
+			const ndest = dest.replace(PUBLIC_DIR, '');
 			cb &&
 				cb({
-					text: "Document uploaded successfully.",
+					text: 'Document uploaded successfully.',
 					src: ndest,
 				});
 		}
@@ -66,18 +66,18 @@ export const exportToExcel = (req: Request, res: Response) => {
 	const { APP_NAME } = appState();
 	const { storeName, load } = req.parameters;
 	const fileName = `${APP_NAME}_` + storeName;
-	res.setHeader("Content-Type", "application/vnd.ms-excel");
-	res.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xls");
-	res.setHeader("Pragma", "no-cache");
-	res.setHeader("Expires", "0");
-	res.end(load, "binary");
+	res.setHeader('Content-Type', 'application/vnd.ms-excel');
+	res.setHeader('Content-Disposition', 'attachment; filename=' + fileName + '.xls');
+	res.setHeader('Pragma', 'no-cache');
+	res.setHeader('Expires', '0');
+	res.end(load, 'binary');
 };
 
 export const streamToPicture = async (req: Request, res: Response) => {
 	const { UPLOAD_DIR } = appState();
 	const { storeName, saveAs } = req.parameters;
 
-	const saveName = saveAs || require("shortid").generate();
+	const saveName = saveAs || require('shortid').generate();
 
 	const { error, data } = await raa(writeStreamTo(req, { saveAs: `${UPLOAD_DIR}/${storeName}/${saveName}.jpg` }));
 	res.status(200).json({ error, data });
@@ -88,7 +88,7 @@ export const cropPicture = (req: Request, res: Response) => {
 	const { src, w, h, x, y } = req.parameters;
 
 	const imagePath = PUBLIC_DIR + src;
-	const gm = require("gm");
+	const gm = require('gm');
 	//        console.log(path);
 
 	gm(imagePath)
@@ -99,14 +99,14 @@ export const cropPicture = (req: Request, res: Response) => {
 					error: "Error while cropping -'" + src + "' " + e.message,
 				});
 			}
-			res.status(200).json({ text: "Picture cropped successfully.", src: src });
+			res.status(200).json({ text: 'Picture cropped successfully.', src: src });
 		});
 };
 
 export const getCaptcha = (req: Request, res: Response) => {
-	const svgCaptcha = require("svg-captcha");
+	const svgCaptcha = require('svg-captcha');
 	const capOpts = {
-			ignoreChars: "0o1il",
+			ignoreChars: '0o1il',
 			noise: 3,
 		},
 		captcha = svgCaptcha.create(capOpts);
@@ -119,7 +119,7 @@ export const unlinkFiles = (req: Request, res: Response) => {
 	const { UPLOAD_DIR } = appState();
 	const { attachments, storeName } = req.parameters;
 	if (attachments) {
-		const attachmentList = attachments.split(",") || [];
+		const attachmentList = attachments.split(',') || [];
 
 		if (attachmentList.length > 1) {
 			attachmentList.forEach((image: any) => {
@@ -131,7 +131,7 @@ export const unlinkFiles = (req: Request, res: Response) => {
 				}
 			});
 
-			res.status(200).json({ text: "Attachments successfully deletes" });
+			res.status(200).json({ text: 'Attachments successfully deletes' });
 		} else {
 			const _path = path.join(UPLOAD_DIR, storeName, attachmentList[0]);
 			fs.unlink(_path, (e: any) => {
@@ -139,11 +139,11 @@ export const unlinkFiles = (req: Request, res: Response) => {
 					res.status(200).json({ error: e.toString() });
 					return;
 				}
-				res.status(200).json({ text: path.basename(_path) + " successfully deleted!" });
+				res.status(200).json({ text: path.basename(_path) + ' successfully deleted!' });
 			});
 		}
 	} else {
-		res.status(200).json({ error: "There are no attachments" });
+		res.status(200).json({ error: 'There are no attachments' });
 	}
 };
 
@@ -151,13 +151,13 @@ export const resizeImage = (req: Request, res: Response) => {
 	const { PUBLIC_DIR } = appState();
 	const { src, w, h } = req.parameters;
 	if (!h || !w) {
-		return res.status(200).json({ error: "Provide height,h and width,w please." });
+		return res.status(200).json({ error: 'Provide height,h and width,w please.' });
 	}
 
 	if (!src) {
-		return res.status(200).json({ error: "No image source provided, src" });
+		return res.status(200).json({ error: 'No image source provided, src' });
 	}
-	const gm = require("gm");
+	const gm = require('gm');
 
 	const coords = {
 			w: Number(w),
@@ -183,7 +183,7 @@ export const resizeImage = (req: Request, res: Response) => {
 								error: "Error while resizing -'" + src + "' " + e.message,
 							});
 						} else {
-							res.status(200).json({ text: "Picture uploaded successfully.", src: src });
+							res.status(200).json({ text: 'Picture uploaded successfully.', src: src });
 						}
 					});
 			};
@@ -191,7 +191,7 @@ export const resizeImage = (req: Request, res: Response) => {
 		if (sw < coords.w || sh < coords.h) {
 			fs.unlink(imagePath, (e: any) => {});
 			res.status(200).json({
-				error: "Sorry, picture -'" + src + "' must be at least " + coords.w + "x" + coords.h + " in dimension.",
+				error: "Sorry, picture -'" + src + "' must be at least " + coords.w + 'x' + coords.h + ' in dimension.',
 			});
 		} else {
 			resizeImage(coords.w, coords.h);

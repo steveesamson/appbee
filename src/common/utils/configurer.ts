@@ -1,14 +1,14 @@
-import { Socket } from "socket.io";
-import _ from "lodash";
-import { Router, Response, Request } from "express";
-import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
-import { loadModels } from "./modelFactory";
-import { loadPlugins } from "./plugins";
-import { configure as configureDataSources, getSource, createSource } from "./sourceFactory";
-import restRouter from "../../rest/restRouter";
-import ioRouter from "../../rest/ioRouter";
-import { routes } from "../../rest/route";
-import Mailer from "./mailer";
+import { Socket } from 'socket.io';
+import _ from 'lodash';
+import { Router, Response, Request } from 'express';
+import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from './loaders';
+import { loadModels } from './modelFactory';
+import { loadPlugins } from './plugins';
+import { configure as configureDataSources, getSource, createSource } from './sourceFactory';
+import restRouter from '../../rest/restRouter';
+import ioRouter from '../../rest/ioRouter';
+import { routes } from '../../rest/route';
+import Mailer from './mailer';
 
 import {
 	RouteConfig,
@@ -24,7 +24,7 @@ import {
 	StoreConfig,
 	ViewConfig,
 	SendMailType,
-} from "../types";
+} from '../types';
 
 const configuration: Configuration = {} as any;
 const modules: Modules = {} as any;
@@ -41,38 +41,38 @@ let sender: SendMailType = null;
 const mailer = (): SendMailType => sender;
 
 const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
-	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };
+	policies = { ...policies, post: { ...(policies.post || {}), '/redo': true } };
 	const policiesMap: Record = {};
 
 	for (const k in policies) {
 		const policy = policies[k];
-		if (k === "*") {
+		if (k === '*') {
 			if (Array.isArray(policy)) {
-				policiesMap["global"] = await loadPolicy(base, policy);
-			} else if (typeof policy === "string") {
-				policiesMap["global"] = await loadPolicy(base, policy.split(","));
-			} else if (typeof policy === "boolean") {
-				policiesMap["global"] = policy ? [allowAll] : [denyAll];
+				policiesMap['global'] = await loadPolicy(base, policy);
+			} else if (typeof policy === 'string') {
+				policiesMap['global'] = await loadPolicy(base, policy.split(','));
+			} else if (typeof policy === 'boolean') {
+				policiesMap['global'] = policy ? [allowAll] : [denyAll];
 			}
-		} else if (typeof policy === "object") {
+		} else if (typeof policy === 'object') {
 			const childPoly: any = {};
 
 			for (const o in policy) {
 				const poly = policy[o];
-				if (o === "*") {
+				if (o === '*') {
 					if (Array.isArray(poly)) {
-						childPoly["global"] = await loadPolicy(base, poly);
-					} else if (typeof poly === "string") {
-						childPoly["global"] = await loadPolicy(base, poly.split(","));
-					} else if (typeof poly === "boolean") {
-						childPoly["global"] = !poly ? [denyAll] : [allowAll];
+						childPoly['global'] = await loadPolicy(base, poly);
+					} else if (typeof poly === 'string') {
+						childPoly['global'] = await loadPolicy(base, poly.split(','));
+					} else if (typeof poly === 'boolean') {
+						childPoly['global'] = !poly ? [denyAll] : [allowAll];
 					}
 				} else {
 					if (Array.isArray(poly)) {
 						childPoly[`${k} ${o}`] = await loadPolicy(base, poly);
-					} else if (typeof poly === "string") {
-						childPoly[`${k} ${o}`] = await loadPolicy(base, poly.split(","));
-					} else if (typeof poly === "boolean") {
+					} else if (typeof poly === 'string') {
+						childPoly[`${k} ${o}`] = await loadPolicy(base, poly.split(','));
+					} else if (typeof poly === 'boolean') {
 						childPoly[`${k} ${o}`] = !poly ? [denyAll] : [allowAll];
 					}
 				}
@@ -91,7 +91,7 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 	for (const rKey in routes) {
 		const route: RouteConfig = routes[rKey];
 		for (const key in route) {
-			if (key === "mountPoint") continue;
+			if (key === 'mountPoint') continue;
 			const handler: ControllerRequest = route[key] as ControllerRequest;
 			const [method, rpath] = key.split(/\s+/);
 			const nextPolicyRecord: Record = policies[method] || {},
@@ -123,12 +123,12 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 };
 
 const configureIORoutes = (app: Express.Application) => {
-	app.io.sockets.on("connection", (socket: Socket) => {
-		socket.once("disconnect", () => {
+	app.io.sockets.on('connection', (socket: Socket) => {
+		socket.once('disconnect', () => {
 			socket.disconnect();
 		});
 
-		["get", "post", "delete", "put", "patch", "head"].forEach((method: string) => {
+		['get', 'post', 'delete', 'put', 'patch', 'head'].forEach((method: string) => {
 			socket.on(method, (req: any, cb: Function) => {
 				if (!req.headers) {
 					req.headers = {};
@@ -157,7 +157,7 @@ const configureRestServer = async (base: string) => {
 	await loadModels(base, configuration);
 
 	//Load middlewares
-	const _middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
+	const _middlewares = (await loadModules(base, 'middlewares')) as MiddlewareConfig[];
 	modules.middlewares = _middlewares;
 
 	//Load controllers

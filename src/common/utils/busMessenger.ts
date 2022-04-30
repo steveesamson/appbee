@@ -1,14 +1,14 @@
-import { Record } from "../types";
-import { Emitter } from "@socket.io/redis-emitter";
+import { Record } from '../types';
+import { Emitter } from '@socket.io/redis-emitter';
 
 class BusMessenger {
 	emitter: any = null;
 	constructor(redisClient: any = null) {
 		if (!redisClient) {
-			throw new Error("Invalid BusMessenger options.");
+			throw new Error('Invalid BusMessenger options.');
 		}
 		this.emitter = new Emitter(redisClient);
-		console.log("Emitter created >> BusMessenger");
+		console.log('Emitter created >> BusMessenger');
 	}
 
 	toObject(str: string) {

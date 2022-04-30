@@ -3,9 +3,9 @@ import { ViewConfig } from "../../../src";
 
 const view: ViewConfig = {
         staticDir: 'public',
-        viewDir:'views',
         uploadDir:'uploads',
-        indexFile:'index'
+        indexFile:'index',
+        templateDir:'template'
 };
 
-export = view;
+export default view;

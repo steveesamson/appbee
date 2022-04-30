@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { Route } from "./rest/route";
-import { handleCreate, handleDelete, handleUpdate, handleGet } from "./rest/restful";
+import { Request, Response, NextFunction } from 'express';
+import { Route } from './rest/route';
+import { handleCreate, handleDelete, handleUpdate, handleGet } from './rest/restful';
 import {
 	BeeError,
 	SqlError,
@@ -23,7 +23,7 @@ import {
 	getSource,
 	getConfig,
 	Models,
-} from "./common/utils";
+} from './common/utils';
 
 import {
 	AppConfig,
@@ -46,8 +46,8 @@ import {
 	MailOptions,
 	BeeQConfig,
 	BeeQueueType,
-} from "./common/types";
-import { appState } from "./common/appState";
+} from './common/types';
+import { appState } from './common/appState';
 
 const utils: UtilsType = {
 	writeStreamTo,
@@ -70,8 +70,8 @@ const utils: UtilsType = {
 		getSource,
 	},
 };
-import { startServer } from "./common/server";
-import { startWorker as start } from "./common/worker";
+import { startServer } from './common/server';
+import { startWorker as start } from './common/worker';
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
 const serve = startServer;
 

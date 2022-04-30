@@ -1,27 +1,27 @@
-import path from "path";
-import fs from "fs";
-import _ from "lodash";
-import { listDir } from "./fetchFileTypes";
+import path from 'path';
+import fs from 'fs';
+import _ from 'lodash';
+import { listDir } from './fetchFileTypes';
 
-import { Model, Configuration, GetModels, ReqWithDB } from "../types";
-import { getSource } from "./sourceFactory";
-import { anyModel } from "./modelTypes/anyModel";
-import { sqlModel } from "./modelTypes/sqlModel";
-import { mongoDBModel } from "./modelTypes/mongoDbModel";
+import { Model, Configuration, GetModels, ReqWithDB } from '../types';
+import { getSource } from './sourceFactory';
+import { anyModel } from './modelTypes/anyModel';
+import { sqlModel } from './modelTypes/sqlModel';
+import { mongoDBModel } from './modelTypes/mongoDbModel';
 
 const Models: GetModels = {};
-const ext = process.env.TS_NODE_FILES ? ".ts" : ".js";
+const ext = process.env.TS_NODE_FILES ? '.ts' : '.js';
 
-const baseModel = function(modelKey: string, dbType = "", preferredCollection: string = null): Model {
+const baseModel = function(modelKey: string, dbType = '', preferredCollection: string = null): Model {
 	switch (dbType) {
-		case "mongodb":
+		case 'mongodb':
 			return mongoDBModel(modelKey, preferredCollection);
-		case "pg":
-		case "mysql":
-		case "mysql2":
-		case "oracledb":
-		case "mssql":
-		case "sqlite3":
+		case 'pg':
+		case 'mysql':
+		case 'mysql2':
+		case 'oracledb':
+		case 'mssql':
+		case 'sqlite3':
 			return sqlModel(modelKey, preferredCollection);
 		default:
 			return anyModel(modelKey, preferredCollection);
@@ -37,16 +37,16 @@ const makeModel = (storeName: string, defaultModel: Model, config: Configuration
 		? config.store[preferredStoreName].type
 		: useStore && config.store.core
 		? config.store.core.type
-		: "";
+		: '';
 
 	const parentModel = baseModel(storeName, dbType, preferredCollection),
-		baseKeys = parentModel["uniqueKeys"],
-		defaultKeys = defaultModel["uniqueKeys"] || [];
+		baseKeys = parentModel['uniqueKeys'],
+		defaultKeys = defaultModel['uniqueKeys'] || [];
 
 	const emblished = Object.assign({}, useStore ? parentModel : {}, defaultModel);
-	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
+	emblished['uniqueKeys'] = _.union(baseKeys, defaultKeys);
 
-	Models["get" + storeName] = ((mdl: Model) => {
+	Models['get' + storeName] = ((mdl: Model) => {
 		const lookup = (req: ReqWithDB): Model => {
 			const copy = _.clone(mdl);
 			if (mdl.store) {
@@ -57,10 +57,10 @@ const makeModel = (storeName: string, defaultModel: Model, config: Configuration
 			}
 
 			if (!req || !req.db) {
-				console.error("Null db object, check all your database connections. Looks like no db was configured...");
+				console.error('Null db object, check all your database connections. Looks like no db was configured...');
 			}
 			if (req.db) {
-				copy["db"] = req.db;
+				copy['db'] = req.db;
 				copy.storeType = req.db.storeType;
 			}
 
@@ -76,7 +76,7 @@ const makeModel = (storeName: string, defaultModel: Model, config: Configuration
 };
 
 const loadModels = (base: string, config: Configuration) => {
-	base = path.resolve(base, "modules");
+	base = path.resolve(base, 'modules');
 	const list = listDir(base);
 
 	return new Promise(r => {

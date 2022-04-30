@@ -1,4 +1,4 @@
-import { AppState, Record } from "./types";
+import { AppState, Record } from './types';
 
 const state: AppState = {} as any;
 

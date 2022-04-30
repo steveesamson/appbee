@@ -1,18 +1,18 @@
-import { BeeQConfig, Record, BeeQueueType } from "../types";
+import { BeeQConfig, Record, BeeQueueType } from '../types';
 
-const BeeQueue: any = require("bee-queue");
+const BeeQueue: any = require('bee-queue');
 
 class BeeQ implements BeeQueueType {
 	queue: any = null;
-	kind: "worker" | "queue";
+	kind: 'worker' | 'queue';
 
 	constructor(queueName: string, redis: any, isWorker: any = null) {
 		let options: BeeQConfig = { redis, getEvents: false, isWorker: false };
-		this.kind = "queue";
+		this.kind = 'queue';
 
 		if (isWorker) {
 			options = { redis, removeOnSuccess: true, getEvents: true, isWorker: true };
-			this.kind = "worker";
+			this.kind = 'worker';
 		}
 		this.queue = new BeeQueue(queueName, options);
 
@@ -20,7 +20,7 @@ class BeeQ implements BeeQueueType {
 	}
 
 	addJob(jobSpec: Record, id: any = null) {
-		if (this.kind === "worker") {
+		if (this.kind === 'worker') {
 			throw Error('You cannot add jobs to a worker, create a queue via "useQueue"');
 		}
 		return new Promise((r, j) => {
@@ -39,11 +39,11 @@ class BeeQ implements BeeQueueType {
 	}
 
 	processJob(processor: (job: Record, done: Function) => void, concurrency?: number) {
-		if (this.kind === "queue") {
+		if (this.kind === 'queue') {
 			throw Error('You cannot process jobs on a non-worker, create a worker via "useWorker"');
 		}
 		if (!processor) {
-			throw Error("No job processor was supplied to processJob");
+			throw Error('No job processor was supplied to processJob');
 		}
 		if (concurrency) {
 			this.queue.process(concurrency, processor);

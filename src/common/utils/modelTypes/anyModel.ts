@@ -1,17 +1,17 @@
-import _ from "lodash";
-import { Request } from "express";
-import { Record, Model, Params } from "../../types";
+import _ from 'lodash';
+import { Request } from 'express';
+import { Record, Model, Params } from '../../types';
 // import { eventBus } from "../eventBus";
-import { appState } from "../../appState";
+import { appState } from '../../appState';
 
 const cleanse = (str: string) =>
 	str
-		.replace(/<>/g, "")
-		.replace(/!=/g, "")
-		.replace(/>/g, "")
-		.replace(/=/g, "")
-		.replace(/</g, "")
-		.replace(/~/g, "")
+		.replace(/<>/g, '')
+		.replace(/!=/g, '')
+		.replace(/>/g, '')
+		.replace(/=/g, '')
+		.replace(/</g, '')
+		.replace(/~/g, '')
 		.trim();
 
 const anyModel = function(model: string, preferredCollection: string): Model {
@@ -27,20 +27,20 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 
 	const base: Model = {
 		db: {},
-		storeType: "",
+		storeType: '',
 		collection: _collection,
 		instanceName: model,
-		dbSchema: "",
+		dbSchema: '',
 		schema: {},
-		uniqueKeys: ["id"],
+		uniqueKeys: ['id'],
 		defaultDateValues: {}, //{'withdrawn_date':''yyyy-mm-dd'}
-		checkConcurrentUpdate: "", //'lastupdated'
+		checkConcurrentUpdate: '', //'lastupdated'
 		excludes: [],
 		verbatims: [], //['attachments'] excludes from mclean.
 		searchPath: [], //['attachments'] excludes from mclean.
 		ranges: [],
-		orderBy: "",
-		insertKey: "id",
+		orderBy: '',
+		insertKey: 'id',
 		setUp() {},
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
@@ -50,20 +50,20 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "create",
+							verb: 'create',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "create",
+								verb: 'create',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 
 				broadcast(pload);
-				console.log("PublishCreate to %s", _modelName);
+				console.log('PublishCreate to %s', _modelName);
 			}
 		},
 		publishUpdate(req: Request, load: Record) {
@@ -71,19 +71,19 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "update",
+							verb: 'update',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "update",
+								verb: 'update',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 				broadcast(pload);
-				console.log("PublishUpdate to %s", _modelName);
+				console.log('PublishUpdate to %s', _modelName);
 			}
 		},
 		publishDestroy(req: Request, load: Record) {
@@ -91,20 +91,20 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "destroy",
+							verb: 'destroy',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "destroy",
+								verb: 'destroy',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 
 				broadcast(pload);
-				console.log("PublishDestroy to %s", _modelName);
+				console.log('PublishDestroy to %s', _modelName);
 			}
 		},
 		removeExcludes(datas: Record[] | Record) {
@@ -125,13 +125,13 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 					const type = this.schema[tkey];
 
 					switch (type.trim()) {
-						case "number":
-						case "float":
+						case 'number':
+						case 'float':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => Number(i)) : Number(opts[key]);
 							break;
 
-						case "integer":
-						case "int":
+						case 'integer':
+						case 'int':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => parseInt(i, 10)) : parseInt(opts[key], 10);
 					}
 				}

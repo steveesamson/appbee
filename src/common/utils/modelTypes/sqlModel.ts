@@ -1,39 +1,39 @@
-import _ from "lodash";
-import { Request } from "express";
-import { Record, Model, Params } from "../../types";
-import { SqlError } from "../Error";
-import { appState } from "../../appState";
+import _ from 'lodash';
+import { Request } from 'express';
+import { Record, Model, Params } from '../../types';
+import { SqlError } from '../Error';
+import { appState } from '../../appState';
 
 const cleanse = (str: string) =>
 	str
-		.replace(/<>/g, "")
-		.replace(/!=/g, "")
-		.replace(/>/g, "")
-		.replace(/=/g, "")
-		.replace(/</g, "")
-		.replace(/~/g, "")
+		.replace(/<>/g, '')
+		.replace(/!=/g, '')
+		.replace(/>/g, '')
+		.replace(/=/g, '')
+		.replace(/</g, '')
+		.replace(/~/g, '')
 		.trim();
 
 const addWheres = (db: any, modelName: string, context: any) => (key: string, value: any) => {
 	let string = key.trim();
 	// console.log("key: ", string, value);
-	if (string.endsWith("<>") || string.endsWith("!=")) {
+	if (string.endsWith('<>') || string.endsWith('!=')) {
 		string = cleanse(string);
-		db.where(`${modelName}.${string}`, "!=", value);
-	} else if (string.endsWith(">")) {
+		db.where(`${modelName}.${string}`, '!=', value);
+	} else if (string.endsWith('>')) {
 		string = cleanse(string);
-		db.where(`${modelName}.${string}`, ">", value);
-	} else if (string.endsWith(">=")) {
+		db.where(`${modelName}.${string}`, '>', value);
+	} else if (string.endsWith('>=')) {
 		string = cleanse(string);
-		db.where(`${modelName}.${string}`, ">=", value);
-	} else if (string.endsWith("<")) {
+		db.where(`${modelName}.${string}`, '>=', value);
+	} else if (string.endsWith('<')) {
 		string = cleanse(string);
-		db.where(`${modelName}.${string}`, "<", value);
-	} else if (string.endsWith("<=")) {
+		db.where(`${modelName}.${string}`, '<', value);
+	} else if (string.endsWith('<=')) {
 		string = cleanse(string);
-		db.where(`${modelName}.${string}`, "<=", value);
+		db.where(`${modelName}.${string}`, '<=', value);
 	} else if (_.isArray(value)) {
-		if (string.startsWith("~")) {
+		if (string.startsWith('~')) {
 			string = cleanse(string);
 			db.whereNotIn(`${modelName}.${string}`, value);
 		} else {
@@ -70,9 +70,9 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 				for (let index = 0; index < searchPaths.length; ++index) {
 					const attr = searchPaths[index];
 					if (index === 0) {
-						db.where(attr.indexOf(".") === -1 ? `${modelName}.${attr}` : attr, "like", `%${sstr}%`);
+						db.where(attr.indexOf('.') === -1 ? `${modelName}.${attr}` : attr, 'like', `%${sstr}%`);
 					} else {
-						db.orWhere(attr.indexOf(".") === -1 ? `${modelName}.${attr}` : attr, "like", `%${sstr}%`);
+						db.orWhere(attr.indexOf('.') === -1 ? `${modelName}.${attr}` : attr, 'like', `%${sstr}%`);
 					}
 				}
 			}
@@ -81,21 +81,21 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 
 	const base: Model = {
 		db: {},
-		storeType: "",
-		canReturnDrivers: ["oracledb", "mssql", "pg"],
+		storeType: '',
+		canReturnDrivers: ['oracledb', 'mssql', 'pg'],
 		collection: _collection,
 		instanceName: model,
-		dbSchema: "",
+		dbSchema: '',
 		schema: {},
-		uniqueKeys: ["id"],
+		uniqueKeys: ['id'],
 		defaultDateValues: {}, //{'withdrawn_date':''yyyy-mm-dd'}
-		checkConcurrentUpdate: "", //'lastupdated'
+		checkConcurrentUpdate: '', //'lastupdated'
 		excludes: [],
 		verbatims: [], //['attachments'] excludes from mclean.
 		searchPath: [], //['attachments'] excludes from mclean.
 		ranges: [],
-		orderBy: "",
-		insertKey: "id",
+		orderBy: '',
+		insertKey: 'id',
 		setUp() {},
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
@@ -105,20 +105,20 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "create",
+							verb: 'create',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "create",
+								verb: 'create',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 
 				broadcast(pload);
-				console.log("PublishCreate to %s", _modelName);
+				console.log('PublishCreate to %s', _modelName);
 			}
 		},
 		publishUpdate(req: Request, load: Record) {
@@ -126,19 +126,19 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "update",
+							verb: 'update',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "update",
+								verb: 'update',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 				broadcast(pload);
-				console.log("PublishUpdate to %s", _modelName);
+				console.log('PublishUpdate to %s', _modelName);
 			}
 		},
 		publishDestroy(req: Request, load: Record) {
@@ -146,20 +146,20 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "destroy",
+							verb: 'destroy',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "destroy",
+								verb: 'destroy',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 
 				broadcast(pload);
-				console.log("PublishDestroy to %s", _modelName);
+				console.log('PublishDestroy to %s', _modelName);
 			}
 		},
 		removeExcludes(datas: Record[] | Record) {
@@ -180,13 +180,13 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 					const type = this.schema[tkey];
 
 					switch (type.trim()) {
-						case "number":
-						case "float":
+						case 'number':
+						case 'float':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => Number(i)) : Number(opts[key]);
 							break;
 
-						case "integer":
-						case "int":
+						case 'integer':
+						case 'int':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => parseInt(i, 10)) : parseInt(opts[key], 10);
 					}
 				}
@@ -217,18 +217,18 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 
 			const { orderby, direction, offset, limit } = options;
 
-			db.offset(parseInt(offset || "0", 10));
+			db.offset(parseInt(offset || '0', 10));
 
 			if (limit) {
 				db.limit(parseInt(limit, 10));
 			}
 			if (orderby) {
-				const dir = (direction || "ASC").toUpperCase();
+				const dir = (direction || 'ASC').toUpperCase();
 				db.orderBy(orderby, dir);
 			} else if (this.orderBy) {
-				const dir = (direction || this.orderDirection || "ASC").toUpperCase();
+				const dir = (direction || this.orderDirection || 'ASC').toUpperCase();
 				db.orderBy(`${modelName}.${this.orderBy}`, dir);
-			} else db.orderBy(`${modelName}.id`, "ASC");
+			} else db.orderBy(`${modelName}.id`, 'ASC');
 
 			return db;
 		},
@@ -237,8 +237,8 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 		},
 		rowCount(db: any) {
 			return this.db
-				.count(`sub.${this.insertKey || "*"} as recordCount`)
-				.from(db.as("sub"))
+				.count(`sub.${this.insertKey || '*'} as recordCount`)
+				.from(db.as('sub'))
 				.first();
 		},
 		async finalize(options: Params, db: any) {
@@ -296,12 +296,12 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 			delete options.where;
 
 			if (!id && !where) {
-				throw new SqlError("You need an id/where object to update any model");
+				throw new SqlError('You need an id/where object to update any model');
 			}
 			const query = id ? { id } : where;
 			const { db } = this.getCollection(query);
 			const validOptions = this.validOptions(options);
-			await db.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
+			await db.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ['id'] : null);
 
 			return this.find(query);
 		},
@@ -311,7 +311,7 @@ const sqlModel = function(model: string, preferredCollection: string): Model {
 			delete options.where;
 
 			if (!id && !where) {
-				throw new SqlError("You need an id/where object to delete any model");
+				throw new SqlError('You need an id/where object to delete any model');
 			}
 			const query = id ? { id } : where;
 			const { db } = this.getCollection(query);

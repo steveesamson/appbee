@@ -1,6 +1,6 @@
-import { NextFunction, Response, Request } from "express";
-import { getSource } from "../common/utils/sourceFactory";
-import { appState } from "../common/appState";
+import { NextFunction, Response, Request } from 'express';
+import { getSource } from '../common/utils/sourceFactory';
+import { appState } from '../common/appState';
 
 const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {
 	// console.log('Tenancy: ', isMultitenant);
@@ -17,7 +17,7 @@ const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {
 			next && next();
 		}
 	} else {
-		req.db = getSource("core");
+		req.db = getSource('core');
 		next && next();
 	}
 };

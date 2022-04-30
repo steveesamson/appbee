@@ -1,6 +1,6 @@
-import http from "http";
-import https from "https";
-import { Record } from "../types";
+import http from 'http';
+import https from 'https';
+import { Record } from '../types';
 
 interface IRequest {
 	status: number;
@@ -11,7 +11,7 @@ const options: Record = {
 	//   port: port,
 	headers: {
 		// "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-		"Content-Type": "application/json",
+		'Content-Type': 'application/json',
 		// 'Content-Length': data.length
 	},
 };
@@ -30,11 +30,11 @@ const createRequest = (type: string) => (url: string, method: string, data?: any
 
 		return new Promise<IRequest>((resolve, reject) => {
 			const req: any = (transports as any)[type].request(copy, (res: any) => {
-				if (method === "HEAD") {
+				if (method === 'HEAD') {
 					return resolve({ status: res.statusCode, body: {} });
 				}
-				res.setEncoding("utf8");
-				res.on("data", (body: any) => {
+				res.setEncoding('utf8');
+				res.on('data', (body: any) => {
 					try {
 						resolve({ status: res.statusCode, body: JSON.parse(body) });
 					} catch (x) {
@@ -48,7 +48,7 @@ const createRequest = (type: string) => (url: string, method: string, data?: any
 					}
 				});
 			});
-			req.on("error", (e: any) => {
+			req.on('error', (e: any) => {
 				reject(e);
 			});
 			// write data to request body
@@ -61,22 +61,22 @@ const createRequest = (type: string) => (url: string, method: string, data?: any
 
 		const instance = {
 			async post(url: string, data: Record) {
-				return await request(url, "POST", data);
+				return await request(url, 'POST', data);
 			},
 			async put(url: string, data: Record) {
-				return await request(url, "PUT", data);
+				return await request(url, 'PUT', data);
 			},
 			async patch(url: string, data: Record) {
-				return await request(url, "PATCH", data);
+				return await request(url, 'PATCH', data);
 			},
 			async delete(url: string, data?: Record) {
-				return await request(url, "DELETE", data);
+				return await request(url, 'DELETE', data);
 			},
 			async get(url: string) {
-				return await request(url, "GET");
+				return await request(url, 'GET');
 			},
 			async head(url: string) {
-				return await request(url, "HEAD");
+				return await request(url, 'HEAD');
 			},
 			set(key: string, value: any) {
 				options[key] = value;
@@ -94,8 +94,8 @@ const Request = (props: Record = {}) => {
 	Object.assign(options, props);
 
 	return {
-		http: protocol("http"),
-		https: protocol("https"),
+		http: protocol('http'),
+		https: protocol('https'),
 	};
 };
 

@@ -1,10 +1,10 @@
 class BeeError {
-	type = "BeeError";
+	type = 'BeeError';
 	constructor(public message: string) {}
 }
 
 class SqlError {
-	type = "sqlError";
+	type = 'sqlError';
 	constructor(public sqlMessage: string) {}
 }
 

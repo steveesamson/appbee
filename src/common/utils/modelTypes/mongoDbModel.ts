@@ -1,9 +1,9 @@
-import _ from "lodash";
-import { ObjectID } from "mongodb";
-import { Request } from "express";
-import { Record, Model, Params } from "../../types";
-import { SqlError } from "../Error";
-import { appState } from "../../appState";
+import _ from 'lodash';
+import { ObjectID } from 'mongodb';
+import { Request } from 'express';
+import { Record, Model, Params } from '../../types';
+import { SqlError } from '../Error';
+import { appState } from '../../appState';
 
 const replaceId = (datas: Record[] | Record) => {
 		const eject = (data: any) => {
@@ -25,12 +25,12 @@ const replaceId = (datas: Record[] | Record) => {
 	},
 	cleanse = (str: string) =>
 		str
-			.replace(/<>/g, "")
-			.replace(/!=/g, "")
-			.replace(/>/g, "")
-			.replace(/=/g, "")
-			.replace(/</g, "")
-			.replace(/~/g, "")
+			.replace(/<>/g, '')
+			.replace(/!=/g, '')
+			.replace(/>/g, '')
+			.replace(/=/g, '')
+			.replace(/</g, '')
+			.replace(/~/g, '')
 			.trim();
 
 const mongoDBModel = function(model: string, preferredCollection: string): Model {
@@ -46,17 +46,17 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 
 	const base: Model = {
 		db: {},
-		storeType: "",
+		storeType: '',
 		collection: _collection,
 		instanceName: model,
 		schema: {},
-		uniqueKeys: ["id", "_id"],
+		uniqueKeys: ['id', '_id'],
 		defaultDateValues: {}, //{'withdrawn_date':''yyyy-mm-dd'}
 		excludes: [],
 		verbatims: [], //['attachments'] excludes from mclean.
 		ranges: [],
-		orderBy: "",
-		insertKey: "id",
+		orderBy: '',
+		insertKey: 'id',
 		setUp() {},
 		postCreate(req: Request, data: Record) {},
 		postUpdate(req: Request, data: Record) {},
@@ -69,20 +69,20 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "create",
+							verb: 'create',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "create",
+								verb: 'create',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 
 				broadcast(pload);
-				console.log("PublishCreate to %s", _modelName);
+				console.log('PublishCreate to %s', _modelName);
 			}
 		},
 		publishUpdate(req: Request, load: Record) {
@@ -90,19 +90,19 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "update",
+							verb: 'update',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "update",
+								verb: 'update',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 				broadcast(pload);
-				console.log("PublishUpdate to %s", _modelName);
+				console.log('PublishUpdate to %s', _modelName);
 			}
 		},
 		publishDestroy(req: Request, load: Record) {
@@ -110,20 +110,20 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			if (req.io) {
 				const pload = Array.isArray(load)
 					? load.map(data => ({
-							verb: "destroy",
+							verb: 'destroy',
 							data,
 							room: _modelName,
 					  }))
 					: [
 							{
-								verb: "destroy",
+								verb: 'destroy',
 								data: load,
 								room: _modelName,
 							},
 					  ];
 
 				broadcast(pload);
-				console.log("PublishDestroy to %s", _modelName);
+				console.log('PublishDestroy to %s', _modelName);
 			}
 		},
 		validOptions(opts: Params) {
@@ -136,32 +136,32 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 				} else {
 					const type = this.schema[tkey];
 					switch (type.trim()) {
-						case "boolean":
+						case 'boolean':
 							copy[key] = _.isArray(opts[key])
-								? opts[key].map((i: any) => !!i && `${i}`.toLowerCase() === "true")
-								: !!opts[key] && `${opts[key]}`.toLowerCase() === "true";
+								? opts[key].map((i: any) => !!i && `${i}`.toLowerCase() === 'true')
+								: !!opts[key] && `${opts[key]}`.toLowerCase() === 'true';
 							break;
-						case "number":
-						case "float":
+						case 'number':
+						case 'float':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => Number(i)) : Number(opts[key]);
 							break;
-						case "objectId":
+						case 'objectId':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => new ObjectID(i)) : new ObjectID(opts[key]);
 							break;
-						case "date":
-						case "timestamp":
+						case 'date':
+						case 'timestamp':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => new Date(i)) : new Date(opts[key]);
 							break;
-						case "array":
+						case 'array':
 							copy[key] = _.isArray(opts[key]) ? opts[key] : [opts[key]];
 							break;
-						case "int":
-						case "integer":
+						case 'int':
+						case 'integer':
 							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => parseInt(i, 10)) : parseInt(opts[key], 10);
 					}
 
-					if (tkey === "id") {
-						const newKey = key.replace("id", "_id");
+					if (tkey === 'id') {
+						const newKey = key.replace('id', '_id');
 						copy[newKey] = copy[key];
 						delete copy[key];
 					}
@@ -176,38 +176,38 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 				let ostring = key.trim();
 				// console.log(`key:${key}, value:${value}`);
 
-				if (ostring.endsWith("<>") || ostring.endsWith("!=")) {
+				if (ostring.endsWith('<>') || ostring.endsWith('!=')) {
 					ostring = cleanse(ostring);
 					// ostring = ostring === "id" ? "_id" : ostring;
 					wheres[ostring] = {
 						$ne: value,
 					};
-				} else if (ostring.endsWith(">")) {
+				} else if (ostring.endsWith('>')) {
 					ostring = cleanse(ostring);
 					// ostring = ostring === "id" ? "_id" : ostring;
 					wheres[ostring] = {
 						$gt: value,
 					};
-				} else if (ostring.endsWith(">=")) {
+				} else if (ostring.endsWith('>=')) {
 					ostring = cleanse(ostring);
 					// ostring = ostring === "id" ? "_id" : ostring;
 					wheres[ostring] = {
 						$gte: value,
 					};
-				} else if (ostring.endsWith("<")) {
+				} else if (ostring.endsWith('<')) {
 					ostring = cleanse(ostring);
 					// ostring = ostring === "id" ? "_id" : ostring;
 					wheres[ostring] = {
 						$lt: value,
 					};
-				} else if (ostring.endsWith("<=")) {
+				} else if (ostring.endsWith('<=')) {
 					ostring = cleanse(ostring);
 					// ostring = ostring === "id" ? "_id" : ostring;
 					wheres[ostring] = {
 						$lte: value,
 					};
 				} else if (_.isArray(value)) {
-					if (ostring.startsWith("~")) {
+					if (ostring.startsWith('~')) {
 						ostring = cleanse(ostring);
 						// ostring = ostring === "id" ? "_id" : ostring;
 						wheres[ostring] = {
@@ -243,26 +243,26 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			const facetArgs = [];
 
 			if (search) {
-				const cleaned = search.split(" ").filter((a: string) => !!a.trim());
+				const cleaned = search.split(' ').filter((a: string) => !!a.trim());
 				let searches: any[] = [];
 				for (const fd of this.searchPath) {
-					searches = [...searches, { [fd]: { $in: cleaned.map((s: string) => new RegExp(`.*${s}.*`, "i")) } }];
+					searches = [...searches, { [fd]: { $in: cleaned.map((s: string) => new RegExp(`.*${s}.*`, 'i')) } }];
 				}
 				query = { ...query, $or: searches };
 			}
 
 			if (orderby) {
-				const ob = orderby.trim() === "id" ? "_id" : orderby.trim();
-				const dir = (direction || "ASC").toUpperCase();
-				facetArgs.push({ $sort: { [ob]: dir === "ASC" ? 1 : -1 } });
+				const ob = orderby.trim() === 'id' ? '_id' : orderby.trim();
+				const dir = (direction || 'ASC').toUpperCase();
+				facetArgs.push({ $sort: { [ob]: dir === 'ASC' ? 1 : -1 } });
 			} else if (this.orderBy) {
-				const orderby = this.orderBy.trim() === "id" ? "_id" : this.orderBy.trim();
-				const direction = (this.orderDirection || "ASC").toUpperCase();
-				facetArgs.push({ $sort: { [orderby]: direction === "ASC" ? 1 : -1 } });
+				const orderby = this.orderBy.trim() === 'id' ? '_id' : this.orderBy.trim();
+				const direction = (this.orderDirection || 'ASC').toUpperCase();
+				facetArgs.push({ $sort: { [orderby]: direction === 'ASC' ? 1 : -1 } });
 			} else {
 				facetArgs.push({ $sort: { _id: 1 } });
 			}
-			facetArgs.push({ $skip: parseInt(offset || "0", 10) });
+			facetArgs.push({ $skip: parseInt(offset || '0', 10) });
 			if (limit) {
 				facetArgs.push({ $limit: parseInt(limit, 10) });
 			}
@@ -272,7 +272,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 				...pipe,
 				{
 					$facet: {
-						metadata: [{ $count: "recordCount" }],
+						metadata: [{ $count: 'recordCount' }],
 						data: [...facetArgs],
 					},
 				},
@@ -280,7 +280,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 					$project: {
 						data: 1,
 						// Get total from the first element of the metadata array
-						recordCount: { $arrayElemAt: ["$metadata.recordCount", 0] },
+						recordCount: { $arrayElemAt: ['$metadata.recordCount', 0] },
 					},
 				},
 			]);
@@ -337,15 +337,15 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 
 			const collection = this.db.collection(this.collection);
 
-			const insertOperation = isMultiple ? "insertMany" : "insertOne";
+			const insertOperation = isMultiple ? 'insertMany' : 'insertOne';
 
 			const { insertedCount, ops } = await collection[insertOperation](validOptions);
 
 			const idKey = this.insertKey;
 			if (insertedCount) {
 				return isMultiple
-					? this.find({ [idKey]: ops.map((a: Params) => a["_id"].toString()) })
-					: this.find({ [idKey]: ops[0]["_id"].toString() });
+					? this.find({ [idKey]: ops.map((a: Params) => a['_id'].toString()) })
+					: this.find({ [idKey]: ops[0]['_id'].toString() });
 
 				// if (isMultiple) {
 				// 	return this.find({ id: ops.id.toString() });
@@ -361,14 +361,14 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			return null;
 		},
 		// async update(params: Params, operationKey = "$set") {
-		async update(params: Params, options: Params = { opType: "$set", upsert: false }) {
+		async update(params: Params, options: Params = { opType: '$set', upsert: false }) {
 			const { id, where, $unset: _toRemove = [] } = params;
 			delete params.id;
 			delete params.where;
 			delete params.$unset;
 			const { opType, upsert } = options;
 			if (!id && !where) {
-				throw new SqlError("You need an id/where object to update any model");
+				throw new SqlError('You need an id/where object to update any model');
 			}
 			const arg = id ? { id } : where;
 			const query = this.validOptions(arg);
@@ -377,10 +377,10 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 
 			const collection = this.db.collection(this.collection);
 			const isSingle = this.hasKey(arg);
-			const updateOperation = isSingle ? "updateOne" : "updateMany";
+			const updateOperation = isSingle ? 'updateOne' : 'updateMany';
 
 			const $unset = _toRemove.reduce((acc: Record, field: string) => {
-				return { ...acc, [field]: "" };
+				return { ...acc, [field]: '' };
 			}, {});
 			const removal = _toRemove.length ? { $unset } : {};
 
@@ -397,7 +397,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			delete options.where;
 
 			if (!id && !where) {
-				throw new SqlError("You need an id/where object to delete any model");
+				throw new SqlError('You need an id/where object to delete any model');
 			}
 
 			const arg = id ? { id } : where;
@@ -406,7 +406,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 			const collection = this.db.collection(this.collection);
 			const isSingle = this.hasKey(arg);
 
-			const deleteOperation = isSingle ? "deleteOne" : "deleteMany";
+			const deleteOperation = isSingle ? 'deleteOne' : 'deleteMany';
 			const { deletedCount } = await collection[deleteOperation](query);
 			return deletedCount ? arg : null;
 		},

@@ -1,7 +1,7 @@
-import _ from "lodash";
-import qs from "querystring";
-import { match as m } from "path-to-regexp";
-import { ioRequest } from "../common/types";
+import _ from 'lodash';
+import qs from 'querystring';
+import { match as m } from 'path-to-regexp';
+import { ioRequest } from '../common/types';
 
 const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	const res = {
@@ -23,7 +23,7 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	req = req || {};
 	req.io = socket;
 	req.url = req.path;
-	req.headers["x-access-token"] = socket.handshake.auth["x-access-token"];
+	req.headers['x-access-token'] = socket.handshake.auth['x-access-token'];
 
 	let { data, path } = req;
 
@@ -49,7 +49,7 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 
 	// console.log(req.path, url, req.query, parts);
 	if (!url || !url.trim()) {
-		return res.status(404).error("Route not found.");
+		return res.status(404).error('Route not found.');
 	}
 	ioRoutes[method][url](req, res);
 };

@@ -1,4 +1,4 @@
-import { HandleAsyncAwait } from "../types";
+import { HandleAsyncAwait } from '../types';
 
 const handle: HandleAsyncAwait = (promise: Promise<any>) =>
 	promise

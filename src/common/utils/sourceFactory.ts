@@ -1,7 +1,7 @@
-import { StoreConfig, StoreListConfig } from "../types";
+import { StoreConfig, StoreListConfig } from '../types';
 
 const DataSources: any = {};
-const SQLs = ["pg", "mysql", "mysql2", "oracledb", "mssql", "sqlite3"];
+const SQLs = ['pg', 'mysql', 'mysql2', 'oracledb', 'mssql', 'sqlite3'];
 const createSource = ({
 	type,
 	host,
@@ -34,7 +34,7 @@ const createSource = ({
 
 	return new Promise(async (re, je) => {
 		if (SQLs.includes(type)) {
-			const knex = require("knex");
+			const knex = require('knex');
 			const db = knex({
 				debug,
 				client: type,
@@ -46,10 +46,10 @@ const createSource = ({
 			});
 		}
 
-		if (type === "mongodb") {
+		if (type === 'mongodb') {
 			const { MongoClient } = await import(type);
 
-			const credential = user ? `${user}:${password}@` : "";
+			const credential = user ? `${user}:${password}@` : '';
 			// Connection URL
 			const url = connectionString ? connectionString : `mongodb://${credential}${host}:${port}`;
 			// console.log(`pool size: ${poolSize}`);
@@ -73,7 +73,7 @@ const createSource = ({
 			});
 		}
 
-		if (type === "redis") {
+		if (type === 'redis') {
 			const redis = require(type);
 
 			const db = redis.createClient({
