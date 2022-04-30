@@ -1,4 +1,4 @@
-# Configuration
+# appbee configuration
 
 **`Configuration:`** configuration is where the various behaviours of `appbee` projects are configured. The folder name is `config`. The `config` houses the following configuration files:
 
