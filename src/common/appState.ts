@@ -1,8 +1,8 @@
-import { AppState } from "./types";
+import { AppState, Record } from "./types";
 
 const state: AppState = {} as any;
 
-const appState = (_state?: any): AppState => {
+const appState = (_state?: Record): AppState => {
 	if (_state) {
 		Object.assign(state, _state);
 	}

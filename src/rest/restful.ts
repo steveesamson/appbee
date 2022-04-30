@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import raa from "../common/utils/handleAsyncAwait";
-import { Models } from "../common/utils/storeModels";
+import { Models } from "../common/utils/modelFactory";
 import { Params } from "../index";
 
 const handleGet = (modelName: string) => async (req: Request, res: Response) => {

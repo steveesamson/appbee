@@ -1,4 +1,4 @@
-import {baseModel} from "../src/common/utils/storeModels";
+import {baseModel} from "../src/common/utils/modelFactory";
 
 const UsersModel = baseModel("Users");
 

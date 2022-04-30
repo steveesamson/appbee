@@ -1,4 +1,5 @@
 import { join } from "path";
+import { existsSync as x } from "fs";
 import http from "http";
 import express, { Application, Router } from "express";
 import compression from "compression";
@@ -10,16 +11,26 @@ import cors from "cors";
 import methodOverride from "method-override";
 import beeMultiparts from "../rest/multiParts";
 import {
+	initEventBus,
+	initQueue,
+	connectRedis,
 	configureIORoutes,
 	configureRestRoutes,
 	configuration,
 	configureRestServer,
 	modules,
-} from "./utils/configurer";
-import { initEventBus, initQueue, connectRedis } from "./utils/index";
+} from "./utils";
 import { appState } from "./appState";
 
-const createAServer = async (base: string): Promise<Application> => {
+export const startServer = async (base: string): Promise<Application> => {
+	base = base || process.cwd();
+	const ok = (p: string): boolean => x(join(base, p));
+
+	if (!ok("modules") || !ok("config")) {
+		console.error("Sorry, am bailing; I cannot find 'modules' or 'config' folders in your application.");
+		return null;
+	}
+
 	await configureRestServer(base);
 
 	const { view, application, security, bus } = configuration;
@@ -122,5 +133,3 @@ const createAServer = async (base: string): Promise<Application> => {
 
 	return app;
 };
-
-export default createAServer;

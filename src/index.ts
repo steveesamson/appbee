@@ -18,9 +18,12 @@ import {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
-	initEventBus,
-	initQueue,
-} from "./common/utils/index";
+	mailer,
+	createSource,
+	getSource,
+	getConfig,
+	Models,
+} from "./common/utils";
 
 import {
 	AppConfig,
@@ -44,8 +47,6 @@ import {
 	BeeQConfig,
 	BeeQueueType,
 } from "./common/types";
-import { mailer, createSource, getSource, getConfig } from "./common/utils/configurer";
-import { Models } from "./common/utils/storeModels";
 import { appState } from "./common/appState";
 
 const utils: UtilsType = {
@@ -69,13 +70,10 @@ const utils: UtilsType = {
 		getSource,
 	},
 };
-import { startDevServer } from "./common/restDev";
-// import { startProdServer as serveProd } from "./common/restProd";
+import { startServer } from "./common/server";
 import { startWorker as start } from "./common/worker";
-
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
-// const serve = (dev: boolean = process.env.NODE_ENV === "development") => (dev ? startDevServer : serveProd);
-const serve = startDevServer;
+const serve = startServer;
 
 export {
 	Models,

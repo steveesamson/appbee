@@ -2,9 +2,9 @@ import { Socket } from "socket.io";
 import _ from "lodash";
 import { Router, Response, Request } from "express";
 import { loadPolicy, denyAll, allowAll, loadConfig, loadControllers, loadModules } from "./loaders";
-import { loadModels } from "./storeModels";
+import { loadModels } from "./modelFactory";
 import { loadPlugins } from "./plugins";
-import { configure as configureDataSources, getSource, createSource } from "./dataSource";
+import { configure as configureDataSources, getSource, createSource } from "./sourceFactory";
 import restRouter from "../../rest/restRouter";
 import ioRouter from "../../rest/ioRouter";
 import { routes } from "../../rest/route";
@@ -124,16 +124,12 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 
 const configureIORoutes = (app: Express.Application) => {
 	app.io.sockets.on("connection", (socket: Socket) => {
-		// console.log("Connected: ", socket.id);
-
 		socket.once("disconnect", () => {
-			// console.log("disconnecting...");
 			socket.disconnect();
 		});
 
 		["get", "post", "delete", "put", "patch", "head"].forEach((method: string) => {
 			socket.on(method, (req: any, cb: Function) => {
-				// console.log(req.url);
 				if (!req.headers) {
 					req.headers = {};
 				}
@@ -159,6 +155,7 @@ const configureRestServer = async (base: string) => {
 	Object.assign(configuration, config);
 	await configureDataSources(configuration.store);
 	await loadModels(base, configuration);
+
 	//Load middlewares
 	const _middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
 	modules.middlewares = _middlewares;

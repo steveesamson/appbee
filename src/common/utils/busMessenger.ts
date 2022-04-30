@@ -20,8 +20,5 @@ class BusMessenger {
 	emit(eventName: string, args: Record) {
 		this.emitter.emit(eventName, args);
 	}
-	// useTransport() {
-	// 	return this.redisClient;
-	// }
 }
 export { BusMessenger };

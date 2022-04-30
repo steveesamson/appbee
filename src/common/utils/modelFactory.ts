@@ -4,8 +4,7 @@ import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
 
 import { Model, Configuration, GetModels, ReqWithDB } from "../types";
-import { getSource } from "./dataSource";
-// import { QStore } from "../../rest/utils/QStore";
+import { getSource } from "./sourceFactory";
 import { anyModel } from "./modelTypes/anyModel";
 import { sqlModel } from "./modelTypes/sqlModel";
 import { mongoDBModel } from "./modelTypes/mongoDbModel";
@@ -68,9 +67,6 @@ const makeModel = (storeName: string, defaultModel: Model, config: Configuration
 			return copy;
 		};
 
-		// if (mdl.collection) {
-		// 	Models[mdl.collection] = lookup;
-		// }
 		if (mdl.setUp) {
 			mdl.setUp();
 		}

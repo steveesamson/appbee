@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { getSource } from "../common/utils/dataSource";
+import { getSource } from "../common/utils/sourceFactory";
 import { appState } from "../common/appState";
 
 const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {

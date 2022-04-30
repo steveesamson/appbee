@@ -1,6 +1,5 @@
-import express, { Response, NextFunction, Request } from "express";
+import { Response, NextFunction, Request } from "express";
 import http from "http";
-import { RedisClient } from "redis";
 import { Socket, Server } from "socket.io";
 
 declare global {
@@ -23,7 +22,6 @@ export type Record = {
 	[key: string]: any;
 };
 export type Params = Record;
-// rowCount, searchPath, checkConcurrentUpdate;
 export interface Model {
 	setUp?(): void;
 	hasKey?(options: Params): boolean;

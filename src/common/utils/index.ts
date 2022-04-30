@@ -1,7 +1,7 @@
 import raa from "./handleAsyncAwait";
 import request from "./request";
 import { getPlugin } from "./plugins";
-import { loadModels, baseModel, Models } from "./storeModels";
+import { loadModels, baseModel, Models } from "./modelFactory";
 import { BeeError, SqlError } from "./Error";
 import {
 	writeFileTo,
@@ -18,6 +18,21 @@ export { Encrypt, Token } from "./security";
 export { initEventBus } from "./eventBus";
 export { initQueue } from "./beeQ";
 export { connectRedis } from "./redis";
+export {
+	configureIORoutes,
+	configurePolicies,
+	configureDataSources,
+	configureRestRoutes,
+	configureRestServer,
+	configureWorker,
+	getSource,
+	createSource,
+	ioRoutes,
+	configuration,
+	mailer,
+	modules,
+	getConfig,
+} from "./configurer";
 export {
 	writeFileTo,
 	writeStreamTo,
