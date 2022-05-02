@@ -22,6 +22,7 @@ export type Record = {
 	[key: string]: any;
 };
 export type Params = Record;
+
 export interface Model {
 	setUp?(): void;
 	hasKey?(options: Params): boolean;
