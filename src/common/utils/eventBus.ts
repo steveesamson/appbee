@@ -1,10 +1,10 @@
 import { Record, EventBusType } from '../types';
 import { appState } from '../appState';
 import { BusMessenger } from './busMessenger';
+import shortId from 'shortid';
 
 class DevBus implements EventBusType {
 	listeners: { [key: string]: Function | any } = {};
-	shortId: any = require('shortid');
 	name = 'DevBus';
 	constructor() {
 		if (!(DevBus as any).instance) {
@@ -24,7 +24,7 @@ class DevBus implements EventBusType {
 	}
 
 	once(eventName: string, fn: Function) {
-		const fnId = this.shortId.generate();
+		const fnId = shortId.generate();
 		const onceWrapper = () => {
 			fn();
 			this.removeListener(eventName, fnId);
@@ -32,7 +32,7 @@ class DevBus implements EventBusType {
 		this.addListener(eventName, onceWrapper, fnId);
 	}
 	on(eventName: string, fn: Function) {
-		const fnId = this.shortId.generate();
+		const fnId = shortId.generate();
 		this.addListener(eventName, fn, fnId);
 		return () => this.removeListener(eventName, fnId);
 	}
@@ -47,8 +47,6 @@ class DevBus implements EventBusType {
 	broadcast(load: Record) {
 		const { IO } = appState();
 		IO.emit('comets', load);
-		// const { verb, room, data } = load;
-		// this.emit(`${verb}::${room}`, data);
 	}
 }
 class ProdBus implements EventBusType {
@@ -62,7 +60,7 @@ class ProdBus implements EventBusType {
 			return (ProdBus as any).instance;
 		}
 		this.bm = new BusMessenger(redis);
-		this.publisher = redis.duplicate(); //this.bm.useTransport();
+		this.publisher = redis.duplicate();
 		this.subscriber = redis.duplicate();
 		(ProdBus as any).instance = this;
 		console.log(`Redis connected >> eventBus profile`);

@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import shortId from 'shortid';
 import { Request, Response } from 'express';
 import { Params, WriteFileType, WriteStreamType } from '../types';
 import { appState } from '../appState';
@@ -77,7 +78,7 @@ export const streamToPicture = async (req: Request, res: Response) => {
 	const { UPLOAD_DIR } = appState();
 	const { storeName, saveAs } = req.parameters;
 
-	const saveName = saveAs || require('shortid').generate();
+	const saveName = saveAs || shortId.generate();
 
 	const { error, data } = await raa(writeStreamTo(req, { saveAs: `${UPLOAD_DIR}/${storeName}/${saveName}.jpg` }));
 	res.status(200).json({ error, data });
