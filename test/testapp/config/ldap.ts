@@ -7,4 +7,4 @@ const ldap: LdapConfig = {
   password: 'ldappassword'
 };
 
-export = ldap;
+export default ldap;

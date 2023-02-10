@@ -31,8 +31,6 @@ export const startWorker = async (base: string, app: WorkerApp): Promise<void> =
 	});
 
 	if (bus) {
-		// console.log(`Configuring event bus to use host:${bus.host}, port:${bus.port}`);
-
 		const redisClient: any = await connectRedis(bus, "worker");
 		if (!redisClient) {
 			return process.exit(1);

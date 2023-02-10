@@ -72,15 +72,12 @@ const multipart = () => {
 					return new Promise(re => {
 						fs.ensureDir(dir)
 							.then(() => {
-								// console.log("dir: ", dir);
 								const dest = `${dir}/${fileName}`;
-								// console.log("dest: ", dest);
 
 								fs.rename(saveTo, dest, function(e: any) {
 									if (e) {
 										return re({ error: "Error while uploading -'" + filename + "' " + e.message });
 									}
-									// const src = dest.replace(PUBLIC_DIR, "");
 									re({
 										data: {
 											text: "Document uploaded successfully.",

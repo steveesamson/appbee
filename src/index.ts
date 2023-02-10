@@ -18,8 +18,8 @@ import {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
-	initEventBus,
-	initQueue,
+	dataLoader,
+	dataPager,
 } from "./common/utils/index";
 
 import {
@@ -29,7 +29,6 @@ import {
 	PolicyConfig,
 	MiddlewareConfig,
 	Params,
-	Record,
 	ViewConfig,
 	Model,
 	CronConfig,
@@ -43,6 +42,10 @@ import {
 	MailOptions,
 	BeeQConfig,
 	BeeQueueType,
+	DataLoaderOptions,
+	IJob,
+	Pipeline,
+	DataPagerOptions,
 } from "./common/types";
 import { mailer, createSource, getSource, getConfig } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
@@ -64,6 +67,8 @@ const utils: UtilsType = {
 	Token,
 	mailer,
 	getConfig,
+	dataLoader,
+	dataPager,
 	dataSource: {
 		createSource,
 		getSource,
@@ -100,8 +105,11 @@ export {
 	MailOptions,
 	BeeQConfig,
 	BeeQueueType,
+	DataLoaderOptions,
+	IJob,
+	Pipeline,
+	DataPagerOptions,
 	Params,
-	Record,
 	ViewConfig,
 	StoreConfig,
 	RedisStoreConfig,

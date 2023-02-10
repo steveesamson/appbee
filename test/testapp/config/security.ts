@@ -1,10 +1,10 @@
 
-import { Record } from "../../../src";
+import { Params } from "../../../src";
 
-const security: Record = {
+const security: Params = {
  secret: 'my53cr3t',
  ANY:'ANY',
  PEP:'PEP'
 };
 
-export = security;
+export default security;

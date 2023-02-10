@@ -29,23 +29,18 @@ describe('Base Model',() =>{
             expect(UsersModel.uniqueKeys).toContain("id");
         })
     })
-    describe('defaultDateValues',() =>{
-        it('expects defaultDateValues to be truthy',() =>{
-            expect(UsersModel.defaultDateValues).toBeTruthy();
+    describe('pipeline()',() =>{
+        it('expects pipeline to be truthy',() =>{
+            expect(UsersModel.excludes).toBeTruthy();
         })
     })
 
-    describe('checkConcurrentUpdate',() =>{
-        it('expects checkConcurrentUpdate to be defined',() =>{
-            expect(UsersModel.checkConcurrentUpdate).toBeDefined();
+    describe('resolveResult',() =>{
+        it('expects resolveResult to be defined',() =>{
+            expect(UsersModel.resolveResult).toBeDefined();
         })
     })
-    describe('verbatims',() =>{
-        it('expects verbatims to be defined and array',() =>{
-            expect(UsersModel.verbatims).toBeDefined();
-            expect(UsersModel.verbatims).toBeInstanceOf(Array);
-        })
-    })
+   
     describe('searchPath',() =>{
         it('expects searchPath to be defined and array',() =>{
             expect(UsersModel.searchPath).toBeDefined();

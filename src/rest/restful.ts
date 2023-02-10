@@ -1,14 +1,13 @@
 import { Response, Request } from "express";
-import raa from "../common/utils/handleAsyncAwait";
 import { Models } from "../common/utils/storeModels";
 import { Params } from "../index";
 
 const handleGet = (modelName: string) => async (req: Request, res: Response) => {
 		const model = Models[`get${modelName}`](req);
-		const { error, ...rest } = await raa(model.find(req.parameters));
+		const { error, ...rest } = await model.find(req.parameters);
 		if (error) {
 			console.error(error);
-			return res.status(500).json({ error: error.sqlMessage });
+			return res.status(500).json({ error });
 		}
 		res.status(200).json({ ...rest });
 	},
@@ -16,29 +15,24 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 		req: Request,
 		res: Response,
 	) => {
-		let load = req.parameters;
+		const { data: _data, includes, relaxExclude, ...rest } = req.parameters;
 		const model = Models[`get${modelName}`](req);
+		let injection = {};
+
 		if (paramsInjector) {
 			if (typeof paramsInjector !== "function") {
 				throw Error("Params Injector must be a funcion that returns a string, a number or an object");
 			}
 			const injected = paramsInjector(req);
-			const patch = typeof injected === "string" || typeof injected === "number" ? { id: injected } : injected;
-			if (load.body && Array.isArray(load.body)) {
-				const { body } = load;
-				load.body = body.map((ld: Params) => ({ ...ld, ...patch }));
-			} else {
-				load = { ...load, ...patch };
-			}
+			injection = typeof injected === "string" || typeof injected === "number" ? { id: injected } : injected;
 		}
 
-		const { error, data } = await raa(model.create(load));
+		const payload = _data ? { ..._data, ...injection } : { ...rest, ...injection };
+		const { error, data } = await model.create({ includes, relaxExclude, data: payload });
 
-		// console.log("saved with: ", error, result);
 		if (error) {
-			return res.status(500).json({ error: error.sqlMessage });
+			return res.status(500).json({ error });
 		}
-		// const row = await model.find(data);
 		model.publishCreate(req, data);
 		res.status(201).json({ data: data });
 	},
@@ -48,9 +42,9 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 	) => {
 		const arg = req.parameters;
 		const model = Models[`get${modelName}`](req);
-		const { error, data } = await raa(model.update({ ...arg }, options));
+		const { error, data } = await model.update({ ...arg }, options);
 		if (error) {
-			return res.status(500).json({ error: error.sqlMessage });
+			return res.status(500).json({ error });
 		}
 
 		if (data) {
@@ -58,7 +52,7 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 			res.status(200).json({ data });
 		} else {
 			res.status(304).json({
-				error: "Update was not successful, probably this record has been updated since your last fetch.",
+				error: "Update was not successful, probably this Params has been updated since your last fetch.",
 			});
 		}
 	},
@@ -67,10 +61,10 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 
 		const model = Models[`get${modelName}`](req);
 
-		const { data } = await raa(model.find({ ...arg }));
-		const { error } = await raa(model.destroy({ ...arg }));
+		const { data } = await model.find({ ...arg });
+		const { error } = await model.destroy({ ...arg });
 		if (error) {
-			return res.status(500).json({ error: error.sqlMessage });
+			return res.status(500).json({ error });
 		}
 
 		if (data) {
@@ -79,7 +73,7 @@ const handleGet = (modelName: string) => async (req: Request, res: Response) => 
 			res.status(200).json({ data });
 		} else {
 			res.status(304).json({
-				error: "Delete was not successful, probably this record has been updated since your last fetch",
+				error: "Delete was not successful, probably this Params has been updated since your last fetch",
 			});
 		}
 	};

@@ -1,8 +1,7 @@
 import path from "path";
 import fs from "fs";
-import _ from "lodash";
 import filesWithExtension, { listDir } from "./fetchFileTypes";
-import { Record, RouteMap, CronConfig, MiddlewareConfig, MiddlewareRoutine, Configuration, JobConfig } from "../types";
+import { Params, RouteMap, MiddlewareConfig, MiddlewareRoutine, Configuration } from "../types";
 import { routes } from "../../rest/route";
 import { NextFunction, Response } from "express";
 import { StoreConfig } from "../types";
@@ -46,7 +45,7 @@ const loadPolicy = async (base: string, policies: string[]): Promise<MiddlewareR
 	}
 
 	policies
-		.filter((p: string) => p !== "allowAll" && p !== "denyAll")
+		.filter((p: string) => !["allowAll", "denyAll"].includes(p))
 		.forEach(async (l: string) => {
 			const policyPath = path.resolve(base, "policies", l);
 			if (fileExists(policyPath + ext)) {
@@ -60,7 +59,7 @@ const loadPolicy = async (base: string, policies: string[]): Promise<MiddlewareR
 	return policiesMap;
 };
 
-const loadModules = async (base: string, type: string): Promise<Record | MiddlewareConfig[]> => {
+const loadModules = async (base: string, type: string): Promise<Params | MiddlewareConfig[]> => {
 	base = path.resolve(base, type);
 	if (!fs.existsSync(base)) return [];
 

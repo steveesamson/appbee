@@ -10,11 +10,11 @@ describe("models", () => {
     await configureRestServer(path.resolve(__dirname,"testapp"));
 
     
-    expect(Object.keys(models).length).toBe(3);
+    expect(Object.keys(models).length).toBe(2);
     expect(Object.keys(models)).toContain("getUsers");
     expect(Object.keys(models)).toContain("getAccounts");
-    expect(Object.keys(models)).toContain("getQStore");
-    // console.log(models);
+    expect(Object.keys(models)).not.toContain("getQStore");
+    console.log(models);
 
   });
 });

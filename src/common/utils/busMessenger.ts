@@ -1,4 +1,4 @@
-import { Record } from "../types";
+import { Params } from "../types";
 import { Emitter } from "@socket.io/redis-emitter";
 
 class BusMessenger {
@@ -14,10 +14,10 @@ class BusMessenger {
 	toObject(str: string) {
 		return JSON.parse(str);
 	}
-	toString(obj: Record) {
+	toString(obj: Params) {
 		return JSON.stringify(obj);
 	}
-	emit(eventName: string, args: Record) {
+	emit(eventName: string, args: Params) {
 		this.emitter.emit(eventName, args);
 	}
 	// useTransport() {

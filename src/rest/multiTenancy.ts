@@ -3,7 +3,6 @@ import { getSource } from "../common/utils/dataSource";
 import { appState } from "../common/appState";
 
 const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {
-	// console.log('Tenancy: ', isMultitenant);
 	req = req as Request;
 	const { parameters } = req;
 	const { isMultitenant } = appState();
@@ -13,7 +12,6 @@ const multiTenancy = (req: any, res?: Response, next?: NextFunction) => {
 			req.db = getSource(tenant);
 			next && next();
 		} else {
-			//req.db = DataSources["core"];
 			next && next();
 		}
 	} else {

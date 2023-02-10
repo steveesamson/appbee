@@ -1,6 +1,6 @@
-import { Record } from "../../../src";
+import { Params } from "../../../src";
 
-const smtp: Record = {
+const smtp: Params = {
     sender: 'Domain Supports <support@domain.net>',
     templateFile:'mail.html',
     host: 'smtp.domain.com',
@@ -14,4 +14,4 @@ const smtp: Record = {
     maxMessages: 10
 };
 
-export = smtp;
+export default smtp;

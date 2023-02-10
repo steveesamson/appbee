@@ -95,7 +95,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 	const session = cookieSession({
 		signed: false,
 		secure: false, //process.env.NODE_ENV === "production",
-		// httpOnly: true
+		httpOnly: true,
 	});
 	app.use(
 		helmet(),

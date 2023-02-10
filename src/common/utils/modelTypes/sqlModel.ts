@@ -1,322 +1,140 @@
 import _ from "lodash";
+import raa from "../handleAsyncAwait";
 import { Request } from "express";
-import { Record, Model, Params } from "../../types";
-import { SqlError } from "../Error";
-import { appState } from "../../appState";
-
-const cleanse = (str: string) =>
-	str
-		.replace(/<>/g, "")
-		.replace(/!=/g, "")
-		.replace(/>/g, "")
-		.replace(/=/g, "")
-		.replace(/</g, "")
-		.replace(/~/g, "")
-		.trim();
-
-const addWheres = (db: any, modelName: string, context: any) => (key: string, value: any) => {
-	let string = key.trim();
-	// console.log("key: ", string, value);
-	if (string.endsWith("<>") || string.endsWith("!=")) {
-		string = cleanse(string);
-		db.where(`${modelName}.${string}`, "!=", value);
-	} else if (string.endsWith(">")) {
-		string = cleanse(string);
-		db.where(`${modelName}.${string}`, ">", value);
-	} else if (string.endsWith(">=")) {
-		string = cleanse(string);
-		db.where(`${modelName}.${string}`, ">=", value);
-	} else if (string.endsWith("<")) {
-		string = cleanse(string);
-		db.where(`${modelName}.${string}`, "<", value);
-	} else if (string.endsWith("<=")) {
-		string = cleanse(string);
-		db.where(`${modelName}.${string}`, "<=", value);
-	} else if (_.isArray(value)) {
-		if (string.startsWith("~")) {
-			string = cleanse(string);
-			db.whereNotIn(`${modelName}.${string}`, value);
-		} else {
-			string = cleanse(string);
-			if (context.ranges.includes(string)) {
-				db.whereBetween(`${modelName}.${string}`, value);
-			} else {
-				db.whereIn(`${modelName}.${string}`, value);
-			}
-		}
-	} else {
-		string = cleanse(string);
-		db.where(`${modelName}.${string}`, value);
-	}
-};
+import { Params, Model, FindOptions, DeleteParams } from "../../types";
+import {
+	collectionInstance,
+	getSQLFinalizer,
+	getValidOptionsExtractor,
+	normalizeIncludes,
+	prepWhere,
+} from "./sqlCommon";
+import { getBroadcastPayload, broadcast } from ".";
 
 const sqlModel = function(model: string, preferredCollection: string): Model {
 	const _modelName = model.toLowerCase(),
-		_collection = preferredCollection ? preferredCollection : _modelName,
-		broadcast = (load: Record[]) => {
-			const { eventBus } = appState();
-			const bus = eventBus();
-			for (const data of load) {
-				bus.broadcast(data);
-			}
-		};
+		_collection = preferredCollection ? preferredCollection : _modelName;
 
-	const prepSearch = (searchStrings: string, _searchPaths: string[], db: any, modelName: string) => {
-		if (searchStrings.length) {
-			const searchParams = searchStrings.split(/\s/),
-				searchPaths: string[] = [..._searchPaths];
-
-			for (const sstr of searchParams) {
-				for (let index = 0; index < searchPaths.length; ++index) {
-					const attr = searchPaths[index];
-					if (index === 0) {
-						db.where(attr.indexOf(".") === -1 ? `${modelName}.${attr}` : attr, "like", `%${sstr}%`);
-					} else {
-						db.orWhere(attr.indexOf(".") === -1 ? `${modelName}.${attr}` : attr, "like", `%${sstr}%`);
-					}
-				}
-			}
-		}
-	};
+	const canReturnDrivers = ["oracledb", "mssql", "pg"];
 
 	const base: Model = {
 		db: {},
 		storeType: "",
-		canReturnDrivers: ["oracledb", "mssql", "pg"],
 		collection: _collection,
 		instanceName: model,
 		dbSchema: "",
 		schema: {},
 		uniqueKeys: ["id"],
-		defaultDateValues: {}, //{'withdrawn_date':''yyyy-mm-dd'}
-		checkConcurrentUpdate: "", //'lastupdated'
+		joinKeys: [],
+		// checkConcurrentUpdate: "", //'lastupdated'
 		excludes: [],
-		verbatims: [], //['attachments'] excludes from mclean.
 		searchPath: [], //['attachments'] excludes from mclean.
-		ranges: [],
 		orderBy: "",
 		insertKey: "id",
-		setUp() {},
-		postCreate(req: Request, data: Record) {},
-		postUpdate(req: Request, data: Record) {},
-		postDestroy(req: Request, data: Record) {},
-		publishCreate(req: Request, load: Record) {
-			this.postCreate(req, load);
+		async postCreate(req: Request, data: Params[]) {},
+		async postUpdate(req: Request, data: Params[]) {},
+		async postDestroy(req: Request, data: Params[]) {},
+		async publishCreate(req: Request, data: Params | Params[]) {
+			await this.postCreate(req, data);
 			if (req.io) {
-				const pload = Array.isArray(load)
-					? load.map(data => ({
-							verb: "create",
-							data,
-							room: _modelName,
-					  }))
-					: [
-							{
-								verb: "create",
-								data: load,
-								room: _modelName,
-							},
-					  ];
-
-				broadcast(pload);
+				const payload = getBroadcastPayload({ data, verb: "create", room: _modelName });
+				broadcast(payload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
-		publishUpdate(req: Request, load: Record) {
-			this.postUpdate(req, load);
+		async publishUpdate(req: Request, data: Params | Params[]) {
+			await this.postUpdate(req, data);
 			if (req.io) {
-				const pload = Array.isArray(load)
-					? load.map(data => ({
-							verb: "update",
-							data,
-							room: _modelName,
-					  }))
-					: [
-							{
-								verb: "update",
-								data: load,
-								room: _modelName,
-							},
-					  ];
-				broadcast(pload);
+				const payload = getBroadcastPayload({ data, verb: "update", room: _modelName });
+				broadcast(payload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
-		publishDestroy(req: Request, load: Record) {
-			this.postDestroy(req, load);
+		async publishDestroy(req: Request, data: Params | Params[]) {
+			await this.postDestroy(req, data);
 			if (req.io) {
-				const pload = Array.isArray(load)
-					? load.map(data => ({
-							verb: "destroy",
-							data,
-							room: _modelName,
-					  }))
-					: [
-							{
-								verb: "destroy",
-								data: load,
-								room: _modelName,
-							},
-					  ];
-
-				broadcast(pload);
+				const payload = getBroadcastPayload({ data, verb: "destroy", room: _modelName });
+				broadcast(payload);
 				console.log("PublishDestroy to %s", _modelName);
 			}
 		},
-		removeExcludes(datas: Record[] | Record) {
-			const refactor = (data: Record) => {
-				this.excludes.forEach((x: string) => delete data[x]);
-				return data;
-			};
-			return _.isArray(datas) ? datas.map((next: Record) => refactor(next)) : refactor(datas);
-		},
-		validOptions(opts: Params) {
-			const copy: Record = _.clone(opts);
-
-			for (const key in copy) {
-				const tkey = cleanse(key);
-				if (!(tkey in this.schema)) {
-					delete copy[key];
-				} else {
-					const type = this.schema[tkey];
-
-					switch (type.trim()) {
-						case "number":
-						case "float":
-							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => Number(i)) : Number(opts[key]);
-							break;
-
-						case "integer":
-						case "int":
-							copy[key] = _.isArray(opts[key]) ? opts[key].map((i: any) => parseInt(i, 10)) : parseInt(opts[key], 10);
-					}
-				}
-			}
-			return copy;
-		},
-		getCollection(options: Params) {
-			const modelName = this.dbSchema ? `${this.dbSchema}.${this.collection}` : this.collection,
-				db = this.db(modelName),
-				addWhere = addWheres(db, modelName, this);
-
-			// addWhere = addWheres(db, modelName, this);
-			const { search } = options;
-
-			if (search) {
-				prepSearch(search, this.searchPath, db, modelName);
-			}
-
-			const validOpts = this.validOptions(options);
-
-			for (const attr in validOpts) {
-				addWhere(attr, validOpts[attr]);
-			}
-			return { db, modelName };
-		},
-		prepWhere(options: Params) {
-			const { db, modelName } = this.getCollection(options);
-
-			const { orderby, direction, offset, limit } = options;
-
-			db.offset(parseInt(offset || "0", 10));
-
-			if (limit) {
-				db.limit(parseInt(limit, 10));
-			}
-			if (orderby) {
-				const dir = (direction || "ASC").toUpperCase();
-				db.orderBy(orderby, dir);
-			} else if (this.orderBy) {
-				const dir = (direction || this.orderDirection || "ASC").toUpperCase();
-				db.orderBy(`${modelName}.${this.orderBy}`, dir);
-			} else db.orderBy(`${modelName}.id`, "ASC");
-
-			return db;
-		},
-		hasKey(options: Params) {
-			return this.uniqueKeys.some((r: string) => Object.keys(options).includes(r) && !_.isArray(options[r]));
-		},
-		rowCount(db: any) {
-			return this.db
-				.count(`sub.${this.insertKey || "*"} as recordCount`)
-				.from(db.as("sub"))
-				.first();
-		},
-		async finalize(options: Params, db: any) {
-			const { relax_exclude } = options;
-			if (this.hasKey(options)) {
-				const data = await db.first();
-				if (!relax_exclude && this.excludes.length) {
-					return this.removeExcludes(data);
-				}
-				return data;
-			} else {
-				const { db: counter } = this.getCollection(options);
-				const { recordCount } = await this.rowCount(counter);
-				// console.log("recordCount: ", recordCount);
-				let data = await db;
-				if (!relax_exclude && this.excludes.length) {
-					data = this.removeExcludes(data);
-				}
-
-				return { data, recordCount };
-			}
+		async resolveResult(data: Params[], includeMap: Params<1 | string>): Promise<Params[]> {
+			return data;
 		},
 		async find(options: Params) {
-			const db: any = this.prepWhere(options);
-			return this.finalize(options, db);
+			const {
+				includes: includeString,
+				offset,
+				limit,
+				orderBy,
+				orderDirection,
+				relaxExclude = false,
+				search,
+				...rest
+			} = options;
+			const includeMap = normalizeIncludes(includeString, this);
+			const includes = includeMap[_modelName] ?? "";
+			const expectedOptions: FindOptions = {
+				includes,
+				offset,
+				limit,
+				orderBy,
+				orderDirection,
+				search,
+				relaxExclude,
+				query: rest,
+			};
+			const finalize = getSQLFinalizer(this);
+			const db = prepWhere(this, expectedOptions);
+			return raa(finalize({ query: rest, search, includeMap }, db));
 		},
 		async create(options: Params) {
-			const { body } = options;
-			delete options.relax_exclude;
-
+			const { relaxExclude, ...body } = options;
+			const getValidOptions = getValidOptionsExtractor(this);
 			const isMultiple = body && _.isArray(body);
 
 			options = body ? body : options;
 
-			// const validOptions = this.validOptions(options);
-			const validOptions = isMultiple
-				? options.map((next: Params) => this.validOptions(next))
-				: this.validOptions(options);
+			const validOptions = isMultiple ? options.map((next: Params) => getValidOptions(next)) : getValidOptions(options);
 
 			const idKey = this.insertKey;
 			const result = await this.db(this.collection).insert(
 				validOptions,
-				this.canReturnDrivers.includes(this.storeType) ? [idKey] : null,
+				canReturnDrivers.includes(this.storeType) ? [idKey] : null,
 			);
 			if (result?.length) {
 				return isMultiple
-					? this.find({ [idKey]: options.map((a: Params) => a[idKey]) })
-					: this.find({ [idKey]: result[0] });
+					? this.find({ [idKey]: options.map((a: Params) => a[idKey]), relaxExclude })
+					: this.find({ [idKey]: result[0], relaxExclude });
 			}
-			return null;
+			return { error: "No Params was inserted." };
 		},
 		async update(options: Params) {
-			const { id, where } = options;
-			delete options.id;
-			delete options.where;
+			const { id, where, relaxExclude, ...data } = options;
+			const getCollection = collectionInstance(this);
+			const getValidOptions = getValidOptionsExtractor(this);
 
 			if (!id && !where) {
-				throw new SqlError("You need an id/where object to update any model");
+				return { error: "You need an id/where object to update any model" };
 			}
 			const query = id ? { id } : where;
-			const { db } = this.getCollection(query);
-			const validOptions = this.validOptions(options);
-			await db.update(validOptions, this.canReturnDrivers.includes(this.storeType) ? ["id"] : null);
+			const { db } = getCollection({ query });
+			const validOptions = getValidOptions(data);
+			await db.update(validOptions, canReturnDrivers.includes(this.storeType) ? ["id"] : null);
 
-			return this.find(query);
+			return this.find({ ...query, relaxExclude });
 		},
-		async destroy(options: Params) {
+		async destroy(options: DeleteParams) {
 			const { id, where } = options;
-			delete options.id;
-			delete options.where;
 
 			if (!id && !where) {
-				throw new SqlError("You need an id/where object to delete any model");
+				return { error: "You need an id/where object to delete any model" };
 			}
+			const getCollection = collectionInstance(this);
 			const query = id ? { id } : where;
-			const { db } = this.getCollection(query);
+			const { db } = getCollection({ query });
 
-			return db.del();
+			return raa(db.del());
 		},
 	};
 	return base;

@@ -18,6 +18,8 @@ export { Encrypt, Token } from "./security";
 export { initEventBus } from "./eventBus";
 export { initQueue } from "./beeQ";
 export { connectRedis } from "./redis";
+export { dataLoader } from "./dataLoader";
+export { dataPager } from "./dataPager";
 export {
 	writeFileTo,
 	writeStreamTo,

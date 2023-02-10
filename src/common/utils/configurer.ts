@@ -12,7 +12,7 @@ import Mailer from "./mailer";
 
 import {
 	RouteConfig,
-	Record,
+	Params,
 	ControllerRequest,
 	MiddlewareConfig,
 	ioRequest,
@@ -41,9 +41,9 @@ let sender: SendMailType = null;
 
 const mailer = (): SendMailType => sender;
 
-const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
+const configurePolicies = async (base: string, policies: Params): Promise<Params> => {
 	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };
-	const policiesMap: Record = {};
+	const policiesMap: Params = {};
 
 	for (const k in policies) {
 		const policy = policies[k];
@@ -95,9 +95,9 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 			if (key === "mountPoint") continue;
 			const handler: ControllerRequest = route[key] as ControllerRequest;
 			const [method, rpath] = key.split(/\s+/);
-			const nextPolicyRecord: Record = policies[method] || {},
-				nextGlobalPolicy = nextPolicyRecord.global,
-				nextPolicy = nextPolicyRecord[key];
+			const nextPolicyParams: Params = policies[method] || {},
+				nextGlobalPolicy = nextPolicyParams.global,
+				nextPolicy = nextPolicyParams[key];
 
 			let policy = nextPolicy ? nextPolicy : nextGlobalPolicy ? nextGlobalPolicy : globalPolicy ? globalPolicy : [];
 			policy = [restRouter, ...policy];
@@ -113,8 +113,6 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 
 					_policies.push(_handler);
 
-					// console.log("Polices: ", _policies.toString());
-
 					next();
 				};
 			})(policy, handler);
@@ -125,25 +123,12 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 
 const configureIORoutes = (app: Express.Application) => {
 	app.io.sockets.on("connection", (socket: Socket) => {
-		// console.log("Connected: ", socket.id);
-
 		socket.once("disconnect", () => {
-			// console.log("disconnecting...");
 			socket.disconnect();
 		});
 
-		// const cookies = cookie.serialize(socket.request.headers.cookie || ""),
-		// 	// const cookie = socket.request.headers.cookie || "",
-		// 	req = { connection: { encrypted: false }, headers: { cookie: cookies } },
-		// 	res = { getHeader: () => {}, setHeader: () => {} };
-		// //
-		// cookieSession(req, res, () => {
-		// 	console.log("Logging session: ", (req as any).session); // Do something with req.session
-		// });
-
 		["get", "post", "delete", "put", "patch", "head"].forEach((method: string) => {
 			socket.on(method, (req: any, cb: Function) => {
-				// console.log(req.url);
 				const request: ioRequest = {
 					req,
 					cb,
@@ -198,7 +183,7 @@ const configureWorker = async (base: string) => {
 	modules.plugins = await loadPlugins(base);
 };
 
-const getConfig = (type: string): AppConfig | LdapConfig | PolicyConfig | StoreConfig | ViewConfig | Record =>
+const getConfig = (type: string): AppConfig | LdapConfig | PolicyConfig | StoreConfig | ViewConfig | Params =>
 	(configuration as any)[type];
 
 export {

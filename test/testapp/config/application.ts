@@ -10,4 +10,4 @@ const app: AppConfig = {
  ioTransport:["websocket"]
 };
 
-export = app;
+export default app;

@@ -24,4 +24,4 @@ const store: StoreConfig = {
   // }
 }; 
 
-export = store;
+export default store;

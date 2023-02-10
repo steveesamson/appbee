@@ -9,4 +9,4 @@ const view: ViewConfig = {
         indexFile:'index'
 };
 
-export = view;
+export default view;

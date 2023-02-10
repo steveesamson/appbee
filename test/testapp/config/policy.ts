@@ -23,4 +23,4 @@ const policies: PolicyConfig = {
     // }
 };
 
-export = policies;
+export default policies;

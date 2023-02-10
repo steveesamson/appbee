@@ -1,4 +1,4 @@
-import { BeeQConfig, Record, BeeQueueType } from "../types";
+import { BeeQConfig, Params, BeeQueueType } from "../types";
 
 const BeeQueue: any = require("bee-queue");
 
@@ -17,14 +17,9 @@ class BeeQ implements BeeQueueType {
 		this.queue = new BeeQueue(queueName, options);
 
 		console.log(`Created ${this.kind} for ${queueName}.`);
-		// if (isWorker) {
-		// 	this.queue.on("succeeded", (job: Record, result: any) => {
-		// 		console.log(`Job ${job.id} succeeded with result: ${result}`);
-		// 	});
-		// }
 	}
 
-	addJob(jobSpec: Record, id: any = null) {
+	addJob(jobSpec: Params, id: any = null) {
 		if (this.kind === "worker") {
 			throw Error('You cannot add jobs to a worker, create a queue via "useQueue"');
 		}
@@ -43,7 +38,7 @@ class BeeQ implements BeeQueueType {
 		});
 	}
 
-	processJob(processor: (job: Record, done: Function) => void, concurrency?: number) {
+	processJob(processor: (job: Params, done: Function) => void, concurrency?: number) {
 		if (this.kind === "queue") {
 			throw Error('You cannot process jobs on a non-worker, create a worker via "useWorker"');
 		}
@@ -61,7 +56,7 @@ class BeeQ implements BeeQueueType {
 		this.queue.on(event, handler);
 	}
 }
-const map: Record = {};
+const map: Params = {};
 
 const _useWorker = (redis: any) => (queueName: string): BeeQueueType => {
 	const mapName = `${queueName}-worker`;

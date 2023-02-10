@@ -3,12 +3,12 @@ import { join } from "path";
 import nodemailer from "nodemailer";
 import smtpPool from "nodemailer-smtp-pool";
 import { appState } from "../appState";
-import { Record, MailerType, SendMailType, MailOptions } from "../types";
+import { Params, SendMailType, MailOptions } from "../types";
 
 let mailConfig = {};
 
 const stud: any = require("stud"),
-	mail = (mailLoad: Record, cb: Function) => {
+	mail = (mailLoad: Params, cb: Function) => {
 		const transporter = nodemailer.createTransport(smtpPool(mailConfig)),
 			mailOptions: any = {
 				from: mailLoad.from, // // sender address
@@ -31,13 +31,12 @@ const stud: any = require("stud"),
 	};
 const htmlToText = (html: string) => html.replace(/<[^>]+>/gi, "");
 
-const Mailer = (smtpConfig: Record): SendMailType => {
+const Mailer = (smtpConfig: Params): SendMailType => {
 	const { sender } = smtpConfig;
 	delete smtpConfig.sender;
 	delete smtpConfig.template;
 	delete smtpConfig.templateFile;
 	mailConfig = smtpConfig;
-	// console.log(smtpConfig, tpl)
 	return {
 		sendMail(options: MailOptions, cb: Function) {
 			const { message, html, template } = options;
@@ -54,7 +53,6 @@ const Mailer = (smtpConfig: Record): SendMailType => {
 					if (!options.message) {
 						options.message = htmlToText(options.html);
 					}
-					// console.log('going out: ', options)
 					mail(options, cb);
 				});
 			} else if (message) {

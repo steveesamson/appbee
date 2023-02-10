@@ -1,6 +1,3 @@
-// import path from "path";
-
-// import { configureRestServer } from "../src/common/utils/configurer";
 import { EventBusType } from "../src/common/types";
 import {initEventBus } from "../src/common/utils/eventBus";
 

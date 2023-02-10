@@ -6,7 +6,7 @@ const otp = function () {
     return Math.floor(Math.random() * 89999 + 10000);
 };
 
-export = (req:Request, res:Response, next:NextFunction) =>{
+export default (req:Request, res:Response, next:NextFunction) =>{
 
     // req = <Request>req;
 

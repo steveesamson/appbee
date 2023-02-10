@@ -12,12 +12,5 @@ describe("stores config", () => {
      expect(Object.keys(store).length).toBe(0);
      
 
-    //  expect(Object.keys(store).length).toBe(2);
-    //  const { core, people } = store;
-    //  expect(core).toBeDefined();
-    //  expect(people).toBeDefined();
-    //  expect(core.type).toBe("mysql");
-    //  expect(people.type).toBe("pg");
-
   });
 });
