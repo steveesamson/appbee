@@ -18,6 +18,14 @@ declare global {
 		}
 	}
 }
+export interface DBAware {
+	db?: any;
+}
+export interface RequestAware {
+	db?: any;
+	io?: any;
+	parameters?: any;
+}
 
 export type Params<T = any> = {
 	[key: string]: T;
@@ -56,12 +64,12 @@ export interface Model {
 	create?(param: Params): Promise<Params>;
 	update?(param: Params, options?: Params): Promise<Params>;
 	destroy?(param: Params): Promise<Params>;
-	postCreate?(req: Request, data: Params[]): Promise<void>;
-	postUpdate?(req: Request, data: Params[]): Promise<void>;
-	postDestroy?(req: Request, data: Params[]): Promise<void>;
-	publishCreate?(req: Request, data: Params | Params[]): void;
-	publishUpdate?(req: Request, data: Params | Params[]): void;
-	publishDestroy?(req: Request, data: Params | Params[]): void;
+	postCreate?(req: RequestAware, data: Params[]): Promise<void>;
+	postUpdate?(req: RequestAware, data: Params[]): Promise<void>;
+	postDestroy?(req: RequestAware, data: Params[]): Promise<void>;
+	publishCreate?(req: RequestAware, data: Params | Params[]): void;
+	publishUpdate?(req: RequestAware, data: Params | Params[]): void;
+	publishDestroy?(req: RequestAware, data: Params | Params[]): void;
 	storeType?: string;
 	dbSchema?: string;
 	schema: Params<
@@ -213,15 +221,12 @@ export interface getByCollectionType {
 	[key: string]: (collection: string, req: Request) => Model | null;
 }
 
-export interface ReqWithDB {
-	db?: any;
-}
 export interface getByInstance {
 	[key: string]: (req: Request) => Model;
 }
 
 export interface GetModels {
-	[key: string]: (req: ReqWithDB) => Model;
+	[key: string]: (req: DBAware) => Model;
 }
 export interface Modules {
 	controllers: RouteMap;

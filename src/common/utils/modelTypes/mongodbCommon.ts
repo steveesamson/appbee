@@ -69,6 +69,9 @@ const createConverter = (options: Params) => {
 	const toInteger = (key: string, val: any) => {
 		options[key] = isArray(val) ? val.map(i => parseInt(i, 10)) : parseInt(val, 10);
 	};
+	const toString = (key: string, val: any) => {
+		options[key] = isArray(val) ? val.map(i => `${i}`) : `${val}`;
+	};
 	const toDateTime = (key: string, val: any) => {
 		options[key] = isArray(val) ? val.map(i => new Date(i)) : new Date(val);
 	};
@@ -85,7 +88,7 @@ const createConverter = (options: Params) => {
 				: !!val && `${val}`.toLowerCase().trim() === "true";
 		},
 		objectId(key: string, val: any) {
-			options[key] = isArray(val) ? val.map(i => new ObjectID(i)) : new ObjectID(val);
+			options[key] = isArray(val) ? val.map(i => new ObjectID(`${i}`)) : new ObjectID(`${val}`);
 		},
 		timestamp(key: string, val: any) {
 			toDateTime(key, val);
@@ -95,6 +98,9 @@ const createConverter = (options: Params) => {
 		},
 		array(key: string, val: any) {
 			options[key] = isArray(val) ? val : [val];
+		},
+		string(key: string, val: any) {
+			toString(key, val);
 		},
 		int(key: string, val: any) {
 			toInteger(key, val);

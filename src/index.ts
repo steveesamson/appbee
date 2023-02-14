@@ -46,6 +46,8 @@ import {
 	IJob,
 	Pipeline,
 	DataPagerOptions,
+	DBAware,
+	RequestAware,
 } from "./common/types";
 import { mailer, createSource, getSource, getConfig } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
@@ -107,6 +109,8 @@ export {
 	BeeQueueType,
 	DataLoaderOptions,
 	IJob,
+	DBAware,
+	RequestAware,
 	Pipeline,
 	DataPagerOptions,
 	Params,

@@ -1,6 +1,5 @@
 import isArray from "lodash/isArray";
 import clone from "lodash/clone";
-import { ObjectID } from "mongodb";
 
 import { FindOptions, Model, Params } from "../../types";
 
@@ -124,6 +123,9 @@ const createConverter = (options: Params) => {
 	const toDateTime = (key: string, val: any) => {
 		options[key] = isArray(val) ? val.map(i => new Date(i)) : new Date(val);
 	};
+	const toString = (key: string, val: any) => {
+		options[key] = isArray(val) ? val.map(i => `'${i}'`) : `'${val}'`;
+	};
 	const converters: Params<(key: string, val: any) => void> = {
 		number(key: string, val: any) {
 			options[key] = isArray(val) ? val.map(i => Number(i)) : Number(val);
@@ -136,9 +138,7 @@ const createConverter = (options: Params) => {
 				? val.map((i: any) => !!i && `${i}`.toLowerCase().trim() === "true")
 				: !!val && `${val}`.toLowerCase().trim() === "true";
 		},
-		objectId(key: string, val: any) {
-			options[key] = isArray(val) ? val.map(i => new ObjectID(i)) : new ObjectID(val);
-		},
+
 		timestamp(key: string, val: any) {
 			toDateTime(key, val);
 		},
@@ -153,6 +153,9 @@ const createConverter = (options: Params) => {
 		},
 		integer(key: string, val: any) {
 			toInteger(key, val);
+		},
+		string(key: string, val: any) {
+			toString(key, val);
 		},
 	};
 	return (converter: string, key: string, val: any) => {

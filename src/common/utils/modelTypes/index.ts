@@ -2,24 +2,16 @@ import { appState } from "../../appState";
 import { Params } from "../../types";
 
 export type BroadcastPayloadOptions = {
-	data: Params | Params[];
+	data: Params[];
 	verb: "create" | "update" | "destroy";
 	room: string;
 };
 export const getBroadcastPayload = ({ data: dataIn, room, verb }: BroadcastPayloadOptions) => {
-	return Array.isArray(dataIn)
-		? dataIn.map(data => ({
-				verb,
-				data,
-				room,
-		  }))
-		: [
-				{
-					verb,
-					data: dataIn,
-					room,
-				},
-		  ];
+	return dataIn.map(data => ({
+		verb,
+		data,
+		room,
+	}));
 };
 
 export const broadcast = (load: Params[]) => {

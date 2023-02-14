@@ -3,7 +3,7 @@ import fs from "fs";
 import _ from "lodash";
 import { listDir } from "./fetchFileTypes";
 
-import { Model, Configuration, GetModels, ReqWithDB } from "../types";
+import { Model, Configuration, GetModels, DBAware } from "../types";
 import { getSource } from "./dataSource";
 import { anyModel } from "./modelTypes/anyModel";
 import { sqlModel } from "./modelTypes/sqlModel";
@@ -47,7 +47,7 @@ const makeModel = (storeName: string, defaultModel: Model, config: Configuration
 	emblished["uniqueKeys"] = _.union(baseKeys, defaultKeys);
 
 	Models["get" + storeName] = ((mdl: Model) => {
-		const lookup = (req: ReqWithDB): Model => {
+		const lookup = (req: DBAware): Model => {
 			const copy = _.clone(mdl);
 			if (mdl.store) {
 				req.db = getSource(mdl.store);

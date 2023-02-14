@@ -1,5 +1,5 @@
-import { Request } from "express";
-import { Params, Model } from "../../types";
+import { Params, Model, RequestAware } from "../../types";
+import isArray from "lodash/isArray";
 import { getBroadcastPayload, broadcast } from ".";
 
 const anyModel = function(model: string, preferredCollection: string): Model {
@@ -19,29 +19,36 @@ const anyModel = function(model: string, preferredCollection: string): Model {
 		searchPath: [], //['attachments'] excludes from mclean.
 		orderBy: "",
 		insertKey: "id",
-		async postCreate(req: Request, data: Params[]) {},
-		async postUpdate(req: Request, data: Params[]) {},
-		async postDestroy(req: Request, data: Params[]) {},
-		async publishCreate(req: Request, data: Params | Params[]) {
-			await this.postCreate(req, data);
-			if (req.io) {
-				const payload = getBroadcastPayload({ data, verb: "create", room: _modelName });
+		async postCreate(req: RequestAware, data: Params[]) {},
+		async postUpdate(req: RequestAware, data: Params[]) {},
+		async postDestroy(req: RequestAware, data: Params[]) {},
+		async publishCreate(req: RequestAware, data: Params | Params[]) {
+			const { db, io, parameters } = req;
+			const dat = isArray(data) ? data : [data];
+			await this.postCreate({ db, io, parameters }, dat);
+			if (io) {
+				const payload = getBroadcastPayload({ data: dat, verb: "create", room: _modelName });
 				broadcast(payload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
-		async publishUpdate(req: Request, data: Params | Params[]) {
-			await this.postUpdate(req, data);
-			if (req.io) {
-				const payload = getBroadcastPayload({ data, verb: "update", room: _modelName });
+		async publishUpdate(req: RequestAware, data: Params | Params[]) {
+			const { db, io, parameters } = req;
+			const dat = isArray(data) ? data : [data];
+			await this.postUpdate({ db, io, parameters }, dat);
+			if (io) {
+				const payload = getBroadcastPayload({ data: dat, verb: "update", room: _modelName });
 				broadcast(payload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
-		async publishDestroy(req: Request, data: Params | Params[]) {
-			await this.postDestroy(req, data);
-			if (req.io) {
-				const payload = getBroadcastPayload({ data, verb: "destroy", room: _modelName });
+		async publishDestroy(req: RequestAware, data: Params | Params[]) {
+			const { db, io, parameters } = req;
+			const dat = isArray(data) ? data : [data];
+
+			await this.postDestroy({ db, io, parameters }, dat);
+			if (io) {
+				const payload = getBroadcastPayload({ data: dat, verb: "destroy", room: _modelName });
 				broadcast(payload);
 				console.log("PublishDestroy to %s", _modelName);
 			}

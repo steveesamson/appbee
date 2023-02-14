@@ -1,6 +1,5 @@
 import isArray from "lodash/isArray";
-import { Request } from "express";
-import { Params, Model, FindOptions, UpdateOptions, DeleteParams } from "../../types";
+import { Params, Model, FindOptions, UpdateOptions, DeleteParams, RequestAware } from "../../types";
 import raa from "../handleAsyncAwait";
 
 import {
@@ -30,35 +29,39 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		joinKeys: [],
 		orderBy: "",
 		insertKey: "id",
-		async postCreate(req: Request, data: Params[]) {},
-		async postUpdate(req: Request, data: Params[]) {},
-		async postDestroy(req: Request, data: Params[]) {},
+		async postCreate(req: RequestAware, data: Params[]) {},
+		async postUpdate(req: RequestAware, data: Params[]) {},
+		async postDestroy(req: RequestAware, data: Params[]) {},
 		pipeline() {
 			return [];
 		},
-		async publishCreate(req: Request, data: Params | Params[]) {
+		async publishCreate(req: RequestAware, data: Params | Params[]) {
+			const { db, io, parameters } = req;
 			const dat = isArray(data) ? data : [data];
-			await this.postCreate(req, dat);
-			if (req.io) {
-				const payload = getBroadcastPayload({ data, verb: "create", room: _modelName });
+			await this.postCreate({ db, io, parameters }, dat);
+			if (io) {
+				const payload = getBroadcastPayload({ data: dat, verb: "create", room: _modelName });
 				broadcast(payload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
-		async publishUpdate(req: Request, data: Params | Params[]) {
+		async publishUpdate(req: RequestAware, data: Params | Params[]) {
+			const { db, io, parameters } = req;
 			const dat = isArray(data) ? data : [data];
-			await this.postUpdate(req, dat);
-			if (req.io) {
-				const payload = getBroadcastPayload({ data, verb: "update", room: _modelName });
+			await this.postUpdate({ db, io, parameters }, dat);
+			if (io) {
+				const payload = getBroadcastPayload({ data: dat, verb: "update", room: _modelName });
 				broadcast(payload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
-		async publishDestroy(req: Request, data: Params | Params[]) {
+		async publishDestroy(req: RequestAware, data: Params | Params[]) {
+			const { db, io, parameters } = req;
 			const dat = isArray(data) ? data : [data];
-			await this.postDestroy(req, dat);
-			if (req.io) {
-				const payload = getBroadcastPayload({ data, verb: "destroy", room: _modelName });
+
+			await this.postDestroy({ db, io, parameters }, dat);
+			if (io) {
+				const payload = getBroadcastPayload({ data: dat, verb: "destroy", room: _modelName });
 				broadcast(payload);
 				console.log("PublishDestroy to %s", _modelName);
 			}
@@ -96,11 +99,12 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 		},
 		async create(options: Params) {
 			const extractOptions = getValidOptionsExtractor(this);
-			const { relaxExclude = false, includes = 1, data } = options;
+			const { relaxExclude = false, includes = 1, data, ...rest } = options;
 
-			const isMultiple = data && isArray(data);
+			const payload = data ?? rest;
+			const isMultiple = payload && isArray(payload);
 
-			const validOptions = isMultiple ? data.map((next: Params) => extractOptions(next)) : extractOptions(data);
+			const validOptions = isMultiple ? payload.map((next: Params) => extractOptions(next)) : extractOptions(payload);
 
 			const collection = this.db.collection(this.collection);
 
@@ -115,10 +119,10 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 					: { [idKey]: ops[0]["_id"].toString(), relaxExclude, includes };
 				return this.find(query);
 			}
-			return { error: "No Params was inserted." };
+			return { error: "No record was inserted." };
 		},
 		async update(params: Params, options: UpdateOptions = { opType: "$set", upsert: false }) {
-			const { id, where, $unset: _toRemove = [], relaxExclude = false, includes = 1, ...data } = params;
+			const { id, where, $unset: _toRemove = [], relaxExclude = false, includes = 1, data, ...rest } = params;
 			const { opType, upsert = false } = options;
 
 			if (!id && !where) {
@@ -129,7 +133,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 
 			const arg = id ? { id } : where;
 			const query = extractOptions(arg);
-			const validOptions = extractOptions(data);
+			const validOptions = extractOptions(data ?? rest);
 			const conditions = getMongoParams(query);
 
 			const collection = this.db.collection(this.collection);
@@ -144,7 +148,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 				{ [opType]: validOptions, ...removal },
 				{ upsert },
 			);
-			return modifiedCount ? this.find({ ...arg, relaxExclude, includes }) : { error: "No, Params was updated." };
+			return modifiedCount ? this.find({ ...arg, relaxExclude, includes }) : { error: "No, record was updated." };
 		},
 		async destroy(params: DeleteParams) {
 			const { id, where } = params;
@@ -163,7 +167,7 @@ const mongoDBModel = function(model: string, preferredCollection: string): Model
 
 			const deleteOperation = isSingle ? "deleteOne" : "deleteMany";
 			const { deletedCount } = await collection[deleteOperation](query);
-			return deletedCount ? { data: arg } : { error: "No, Params was deleted" };
+			return deletedCount ? { data: arg } : { error: "No, record was deleted" };
 		},
 	};
 
