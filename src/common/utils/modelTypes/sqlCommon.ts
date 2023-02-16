@@ -115,7 +115,9 @@ export const collectionInstance = (context: Model) => (options: Params) => {
 
 	return { db, modelName };
 };
-
+const isNotOk = (val: any): boolean => {
+	return !val || (isArray(val) && !val.length);
+};
 const createConverter = (options: Params) => {
 	const toInteger = (key: string, val: any) => {
 		options[key] = isArray(val) ? val.map(i => parseInt(i, 10)) : parseInt(val, 10);
@@ -128,30 +130,38 @@ const createConverter = (options: Params) => {
 	};
 	const converters: Params<(key: string, val: any) => void> = {
 		number(key: string, val: any) {
+			if (isNotOk(val)) return;
 			options[key] = isArray(val) ? val.map(i => Number(i)) : Number(val);
 		},
 		float(key: string, val: any) {
+			if (isNotOk(val)) return;
 			options[key] = isArray(val) ? val.map(i => Number(i)) : Number(val);
 		},
 		boolean(key: string, val: any) {
+			if (isNotOk(val)) return;
 			options[key] = isArray(val)
 				? val.map((i: any) => !!i && `${i}`.toLowerCase().trim() === "true")
 				: !!val && `${val}`.toLowerCase().trim() === "true";
 		},
 
 		timestamp(key: string, val: any) {
+			if (isNotOk(val)) return;
 			toDateTime(key, val);
 		},
 		date(key: string, val: any) {
+			if (isNotOk(val)) return;
 			toDateTime(key, val);
 		},
 		array(key: string, val: any) {
+			if (isNotOk(val)) return;
 			options[key] = isArray(val) ? val : [val];
 		},
 		int(key: string, val: any) {
+			if (isNotOk(val)) return;
 			toInteger(key, val);
 		},
 		integer(key: string, val: any) {
+			if (isNotOk(val)) return;
 			toInteger(key, val);
 		},
 		string(key: string, val: any) {
