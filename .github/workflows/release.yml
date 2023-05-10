@@ -1,1 +1,58 @@
-# First line
+name: Release package
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "Release type (one of): patch, minor, major"
+        # , prepatch, preminor, premajor, prerelease
+        required: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout project repository
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          registry-url: https://registry.npmjs.org/
+          node-version: "16"
+
+      # Install dependencies (required by Run tests step)
+      #- name: Install dependencies
+      #  run: yarn install
+
+      # Tests
+      #- name: Run tests
+      #  run: yarn test
+
+      # Configure Git
+      - name: Git configuration
+        run: |
+          git config --global user.email "kevwe.samson@gmail.com"
+          git config --global user.name "steveesamson-bot"
+
+      # Bump package version
+      # Use tag latest
+      - name: Bump release version
+        # if; startsWith(github.event.inputs.release-type, 'pre') != true
+        run: |
+          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+        env:
+          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+
+      # Push repository changes
+      - name: Push changes to repository
+        run: |
+          git add .
+          git commit -m "bumped version to ${{ env.NEW_VERSION}}"
+          git push origin && git push --tags
+        # env:
+        # GITHUB_TOKEN {{ secrets.TOKEN_GITHUB }}
