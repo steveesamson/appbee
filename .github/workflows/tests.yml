@@ -9,6 +9,7 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+
     steps:
       # Checkout project repository
       - name: Checkout
