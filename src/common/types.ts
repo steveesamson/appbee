@@ -207,6 +207,7 @@ export interface JobConfig {
 }
 export type MiddlewareConfig = Params<MiddlewareRoutine>;
 export interface Configuration {
+	dataSources: { [key: string]: any };
 	store: StoreConfig;
 	ldap: LdapConfig;
 	security: Params;

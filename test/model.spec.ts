@@ -1,20 +1,21 @@
 import path from "path";
-
-import { configureRestServer} from "../src/common/utils/configurer";
-import {Models as models} from "../src/common/utils/storeModels";
+import { configureRestServer } from "../src/common/utils/configurer";
+import { Models } from "../src/common/utils/storeModels";
 
 describe("models", () => {
 
-  it("expects loadModels to return configured models", async () => {
-
+  beforeAll(async(done) =>{
     await configureRestServer(path.resolve(__dirname,"testapp"));
+    done();
+  })
 
-    
-    expect(Object.keys(models).length).toBe(2);
-    expect(Object.keys(models)).toContain("getUsers");
-    expect(Object.keys(models)).toContain("getAccounts");
-    expect(Object.keys(models)).not.toContain("getQStore");
-    console.log(models);
+  it("expects loadModels to return configured models", () => {
+    const keyz = Object.keys(Models);
+    expect(keyz.length).toBe(2);
+    expect(keyz).toContain("getUsers");
+    expect(keyz).toContain("getAccounts");
+    expect(keyz).not.toContain("getQStore");
 
   });
+
 });

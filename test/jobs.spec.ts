@@ -1,18 +1,16 @@
 import path from "path";
-
-import { configureRestServer } from "../src/common/utils/configurer";
 import { loadModules} from "../src/common/utils/loaders";
 
 import { JobConfig } from "../src/common/types";
+let jobs:JobConfig[] = [];
 
 describe("plugins", () => {
-    beforeAll(async () =>{
-        await configureRestServer(path.resolve(__dirname,"testapp"));
-    });
-  it("expects jobs to be empty", async () => {
-    const jobs = (await loadModules(path.resolve(__dirname, "testapp"), "jobs")) as JobConfig[];
-    // console.log(jobs);
-    // jobMaster.init(jobs);
+  beforeAll(async (done) =>{
+      jobs = (await loadModules(path.resolve(__dirname, "testapp"), "jobs")) as JobConfig[];
+      done();
+  });
+
+  it("expects jobs to be empty", () => {
     expect(jobs.length).toBe(1);
   });
 

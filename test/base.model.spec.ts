@@ -69,8 +69,6 @@ describe('Base Model',() =>{
         it('expects find to be defined and function',async () =>{
             expect(UsersModel.find).toBeDefined();
             expect(UsersModel.find).toBeInstanceOf(Function);
-            // const res = await UsersModel.find({});
-            // expect(res).toMatchObject({});
 
         })
     })
@@ -78,24 +76,18 @@ describe('Base Model',() =>{
         it('expects create to be defined and function',async () =>{
             expect(UsersModel.create).toBeDefined();
             expect(UsersModel.create).toBeInstanceOf(Function);
-            // const res = await UsersModel.create({});
-            // expect(res).toMatchObject({});
         })
     })
       describe('update',() =>{
         it('expects update to be defined and function',async () =>{
             expect(UsersModel.update).toBeDefined();
             expect(UsersModel.update).toBeInstanceOf(Function);
-            // const res = await UsersModel.update({});
-            // expect(res).toMatchObject({});
         })
     })
     describe('destroy',() =>{
         it('expects destroy to be defined and function',async () =>{
             expect(UsersModel.destroy).toBeDefined();
             expect(UsersModel.destroy).toBeInstanceOf(Function);
-            // const res = await UsersModel.destroy({});
-            // expect(res).toMatchObject({});
         })
     })
     
