@@ -28,6 +28,7 @@ import {
 // import { AppConfig, LdapConfig, PolicyConfig, StoreConfig, ViewConfig,  } from "../../index";
 
 const configuration: Configuration = {} as any;
+
 const modules: Modules = {} as any;
 const ioRoutes: any = {
 	get: {},
@@ -40,9 +41,11 @@ const ioRoutes: any = {
 let sender: SendMailType = null;
 
 const mailer = (): SendMailType => sender;
-
+const initConfigurations = async (base: string): Promise<Configuration> => {
+	return await loadConfig(base);
+};
 const configurePolicies = async (base: string, policies: Params): Promise<Params> => {
-	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };
+	// policies = { ..._policies };
 	const policiesMap: Params = {};
 
 	for (const k in policies) {
@@ -146,18 +149,17 @@ const configureIORoutes = (app: Express.Application) => {
 const configureRestServer = async (base: string) => {
 	//Load configs
 
-	const cfg = await loadConfig(base);
+	const cfg: Configuration = await initConfigurations(base);
 
 	Object.assign(configuration, cfg);
-	await configureDataSources(configuration.store);
+
+	await configureDataSources(configuration.store); // datasources via getSources()
 	await loadModels(base, configuration);
 	//Load middlewares
-	const _middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
-	modules.middlewares = _middlewares;
+	modules.middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
 
 	//Load controllers
-	const _controllers = await loadControllers(base, configuration.store);
-	modules.controllers = _controllers;
+	modules.controllers = await loadControllers(base, configuration.store);
 
 	if (configuration.smtp) {
 		sender = Mailer({ ...(configuration.smtp || {}) });

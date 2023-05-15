@@ -102,7 +102,7 @@ const configure = (store: StoreListConfig) => {
 				if (keys.length) {
 					createNextSource(keys.shift());
 				} else {
-					r(null);
+					r(DataSources);
 				}
 			} catch (e) {
 				console.error(e);

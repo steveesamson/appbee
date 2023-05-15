@@ -4,8 +4,13 @@ import { configureRestServer, modules } from "../src/common/utils/configurer";
 import { MiddlewareConfig } from "../src/common/types";
 
 describe("mwares configs", () => {
-  it("expects loadModules to return valid mware config", async () => {
-       await configureRestServer(path.resolve(__dirname,"testapp"));
+
+  beforeAll(async(done) =>{
+     await configureRestServer(path.resolve(__dirname,"testapp"));
+     done();
+  });
+  
+  it("expects loadModules to return valid mware config", () => {
         const { middlewares } = modules;
         expect(middlewares).toBeInstanceOf(Array);
         const first:MiddlewareConfig = middlewares[0];

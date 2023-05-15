@@ -1,6 +1,7 @@
 import path from "path";
 
 import { configureRestServer, configuration } from "../src/common/utils/configurer";
+
 const expected = {
     sender: 'Domain Supports <support@domain.net>',
     templateFile:'mail.html',
@@ -15,9 +16,13 @@ const expected = {
     maxMessages: 10
 };
 describe("smtp configs", () => {
-  it("expects loadConfig to return valid smtp config", async () => {
-     await configureRestServer(path.resolve(__dirname,"testapp"));
-      const { smtp } = configuration;
+  beforeAll(async( done ) =>{
+      await configureRestServer(path.resolve(__dirname,"testapp"));
+      done();
+  })
+
+  it("expects loadConfig to return valid smtp config", () => {
+    const { smtp } = configuration;
     expect(smtp).toMatchObject(expected);
   });
 });

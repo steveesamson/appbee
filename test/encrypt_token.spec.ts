@@ -27,23 +27,15 @@ describe("Encrypt", () => {
      expect(enc).toBeDefined();
         testEncryptedString = enc;
         done();
-   //   , (e:any,enc:string) =>{
-   //      expect(e).toBeNull();
-   //      expect(enc).toBeDefined();
-   //      testEncryptedString = enc;
-   //      done();
-   //   })
   });
 
    it("expects verify to assure that testPlainString  equals testEncryptedString.", async (done) => {
 
      const verdit = await Encrypt.verify(testPlainString,testEncryptedString);//, (e:any,verdit:boolean) =>{
         
-      //   expect(e).toBeNull();
         expect(verdit).toBeDefined();
         expect(verdit).toBe(true);
         done();
-   //   })
   });
 
 });
@@ -66,16 +58,11 @@ describe("Token", () => {
   });
 
    it("expects verify to assure that testPlainString  equals testPlainObject.", () => {
-     const verdit = Token.verify(testEncryptedString);//, (e:any,verdit:any) =>{
+         const verdit = Token.verify(testEncryptedString);
         
-      //   expect(e).toBeNull();
         expect(verdit).toBeDefined();
         expect(verdit).toMatchObject(testPlainObject);
-      //   done();
-   //   })
   });
-
-
 
 });
 

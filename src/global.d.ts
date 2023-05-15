@@ -10,3 +10,5 @@ declare namespace NodeJS {
 		IO: any;
 	}
 }
+
+// declare module "fakeredis";

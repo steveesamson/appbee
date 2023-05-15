@@ -8,8 +8,12 @@ const expected = {
   password: 'ldappassword'
 };
 describe("ldap configs", () => {
-  it("expects loadConfig to return valid ldap config", async () => {
-    await configureRestServer(path.resolve(__dirname,"testapp"));
+   beforeAll(async (done) =>{
+        await configureRestServer(path.resolve(__dirname,"testapp"));
+        done();
+    });
+  it("expects loadConfig to return valid ldap config", () => {
+   
     const { ldap } = configuration;
     expect(ldap).toMatchObject(expected);
   });

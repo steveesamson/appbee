@@ -25,8 +25,8 @@ import { appState } from "./appState";
 
 const socketIOCookieParser: any = require("socket.io-cookie");
 
-const createAServer = async (base: string, sapper?: any): Promise<Application> => {
-	const { NODE_ENV }: any = process.env;
+const createServer = async (base: string, sapper?: any): Promise<Application> => {
+	// const { NODE_ENV }: any = process.env;
 	await configureRestServer(base);
 
 	const { view, application, security, bus } = configuration;
@@ -144,8 +144,7 @@ const createAServer = async (base: string, sapper?: any): Promise<Application> =
 			}),
 		);
 	httpServer.listen(APP_PORT, () => console.log(`Server running at http://${APP_HOST}:${APP_PORT}`));
-
 	return app;
 };
 
-export default createAServer;
+export default createServer;

@@ -2,13 +2,17 @@ import { EventBusType } from "../src/common/types";
 import {initEventBus } from "../src/common/utils/eventBus";
 
 let eventBus:() => EventBusType;
+
 describe("eventBus", () => {
-    beforeAll(async () =>{
+    beforeAll(async (done) =>{
         eventBus = initEventBus();
+        done();
     });
-  it("expects jobs to be empty", (done:Function) => {
+
+  it("expects jobs to be empty", (done) => {
+
       const bus = eventBus();
-      // console.log('Which eventBus: ', bus.name)
+      
       bus.once('start',() => {
         expect(true).toBe(true);
         done();

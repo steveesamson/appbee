@@ -88,15 +88,15 @@ const loadModels = (base: string, config: Configuration) => {
 				if (list.length) {
 					createNextModel(list.shift());
 				} else {
-					r(null);
+					r(Models);
 				}
 			} catch (e) {
 				console.error(e);
-				r(null);
+				r(Models);
 			}
 		};
 		if (!list.length) {
-			r(null);
+			r(Models);
 		} else {
 			createNextModel(list.shift());
 		}
