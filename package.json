@@ -14,10 +14,6 @@
 		"predev": "rimraf dist",
 		"lint": "prettier-eslint 'src/**/*.ts' --write",
 		"build": "NODE_ENV=production rollup -c",
-		"prepublishOnly": "npm run build",
-		"preversion": "npm test && npm run lint",
-		"version": "git add -A .",
-		"postversion": "git push && git push --tags && npm publish",
 		"dev": "rollup -c --watch"
 	},
 	"husky": {

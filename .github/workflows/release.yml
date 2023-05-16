@@ -47,10 +47,11 @@ jobs:
 
       # Publish version to public repository
       - name: Publish
-        run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+        # run: npm publish --verbose --access public --tag {{ env.RELEASE_TAG }}
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM }}
-          
+
       # Configure Git
       - name: Git configuration
         run: |
