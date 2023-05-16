@@ -1,13 +1,20 @@
 import path from "path"
+import fakeredis from 'redis-mock'; 
 import {io} from "socket.io-client";
-import { serve as createServer, utils} from "../src";
-import { configuration} from "../src/common/utils/configurer"
+import {  serve as createServer, utils} from "../src";
+import { configuration} from "../src/common/utils/configurer";
+
+jest.mock('bee-queue')
+jest.mock('redis', () => fakeredis);
 
 const { http } = utils.request({});
 http.set("hostname","localhost").set("port",8000);
 let inserteID:any =null;
 let socket:any = null,
 Transport:any = {};
+
+
+
 const startIO =  (done:any) => {
   const { application } = configuration;
 	const { ioTransport,} = application;
@@ -24,12 +31,14 @@ const startIO =  (done:any) => {
 				})
 			});
         };
-        console.log('Connected to io-socket server...');
+        // console.log('Connected to io-socket server...');
       done();
 	});
 
 	socket.on('comets', (load:any) => console.log(load));
 }
+
+
 
 describe("Rest Controller and IO Controller", () => {
   let core:any = null;
@@ -39,12 +48,13 @@ describe("Rest Controller and IO Controller", () => {
   })
 
   afterAll(async () =>{
-    console.log('shutting down...')
+    // console.log('shutting down...')
     core.close();
   })
 
   describe("Accounts Rest Controller", () =>{
-      it("expects get '/accounts' to return 'find' response ", async () => {
+    
+    it("expects get '/accounts' to return 'find' response ", async () => {
       const res = await http.get("/accounts");
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(2);

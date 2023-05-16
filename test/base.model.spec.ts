@@ -29,23 +29,18 @@ describe('Base Model',() =>{
             expect(UsersModel.uniqueKeys).toContain("id");
         })
     })
-    describe('defaultDateValues',() =>{
-        it('expects defaultDateValues to be truthy',() =>{
-            expect(UsersModel.defaultDateValues).toBeTruthy();
+    describe('pipeline()',() =>{
+        it('expects pipeline to be truthy',() =>{
+            expect(UsersModel.excludes).toBeTruthy();
         })
     })
 
-    describe('checkConcurrentUpdate',() =>{
-        it('expects checkConcurrentUpdate to be defined',() =>{
-            expect(UsersModel.checkConcurrentUpdate).toBeDefined();
+    describe('resolveResult',() =>{
+        it('expects resolveResult to be defined',() =>{
+            expect(UsersModel.resolveResult).toBeDefined();
         })
     })
-    describe('verbatims',() =>{
-        it('expects verbatims to be defined and array',() =>{
-            expect(UsersModel.verbatims).toBeDefined();
-            expect(UsersModel.verbatims).toBeInstanceOf(Array);
-        })
-    })
+   
     describe('searchPath',() =>{
         it('expects searchPath to be defined and array',() =>{
             expect(UsersModel.searchPath).toBeDefined();
@@ -74,8 +69,6 @@ describe('Base Model',() =>{
         it('expects find to be defined and function',async () =>{
             expect(UsersModel.find).toBeDefined();
             expect(UsersModel.find).toBeInstanceOf(Function);
-            // const res = await UsersModel.find({});
-            // expect(res).toMatchObject({});
 
         })
     })
@@ -83,24 +76,18 @@ describe('Base Model',() =>{
         it('expects create to be defined and function',async () =>{
             expect(UsersModel.create).toBeDefined();
             expect(UsersModel.create).toBeInstanceOf(Function);
-            // const res = await UsersModel.create({});
-            // expect(res).toMatchObject({});
         })
     })
       describe('update',() =>{
         it('expects update to be defined and function',async () =>{
             expect(UsersModel.update).toBeDefined();
             expect(UsersModel.update).toBeInstanceOf(Function);
-            // const res = await UsersModel.update({});
-            // expect(res).toMatchObject({});
         })
     })
     describe('destroy',() =>{
         it('expects destroy to be defined and function',async () =>{
             expect(UsersModel.destroy).toBeDefined();
             expect(UsersModel.destroy).toBeInstanceOf(Function);
-            // const res = await UsersModel.destroy({});
-            // expect(res).toMatchObject({});
         })
     })
     

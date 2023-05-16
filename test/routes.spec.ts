@@ -1,16 +1,21 @@
+import { RouteConfig } from "../src/common/types";
 import { routes, Route } from "../src/rest/route";
 
-const {get, post, put, del, patch } = Route("Tests",'/tests');
-get('/:id?',() =>{})
-post('/',() =>{})
-// head('/',() =>{})
-del('/:id',() =>{})
-put('/:id',() =>{})
-patch('/:id',() =>{})
 
-const testRoutes = routes.Tests;
+let testRoutes:RouteConfig;
 
-describe("REST routes", () => {
+describe("rest routes", () => {
+  beforeAll(async( done ) =>{
+    const r = Route("Tests",'/tests');
+    r.get('/:id?',() =>{})
+    r.post('/',() =>{})
+    r.del('/:id',() =>{})
+    r.put('/:id',() =>{})
+    r.patch('/:id',() =>{})
+    testRoutes = routes.Tests;
+    done();
+  });
+
   it("expects routes to have key 'Tests'", async () => {
     expect(Object.keys(routes).length).toBe(1);
     expect(testRoutes).toBeTruthy();

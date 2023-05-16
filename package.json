@@ -1,6 +1,6 @@
 {
 	"name": "appbee",
-	"version": "1.1.41",
+	"version": "1.2.2",
 	"description": "appbee(Application Back-End Engine) is a REST, GraphQL and Socket.io API Backend Engine",
 	"files": [
 		"dist"
@@ -89,6 +89,7 @@
 		"@types/nodemailer": "^6.4.0",
 		"@types/nodemailer-smtp-pool": "^1.0.31",
 		"@types/redis": "^2.8.32",
+		"@types/redis-mock": "^0.17.1",
 		"@types/shortid": "^0.0.29",
 		"@typescript-eslint/eslint-plugin": "^2.6.1",
 		"@typescript-eslint/parser": "^2.6.1",
@@ -103,6 +104,7 @@
 		"lint-staged": "^9.4.2",
 		"prettier": "^1.19.1",
 		"prettier-eslint-cli": "^5.0.0",
+		"redis-mock": "^0.56.3",
 		"rimraf": "^3.0.0",
 		"rollup": "^1.26.5",
 		"rollup-plugin-terser": "^5.3.1",

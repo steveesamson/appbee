@@ -1,12 +1,12 @@
 import http from "http";
 import https from "https";
-import { Record } from "../types";
+import { Params } from "../types";
 
 interface IRequest {
 	status: number;
 	body: any;
 }
-const options: Record = {
+const options: Params = {
 	//   hostname: "localhost",
 	//   port: port,
 	headers: {
@@ -60,16 +60,16 @@ const createRequest = (type: string) => (url: string, method: string, data?: any
 		const request = createRequest(type);
 
 		const instance = {
-			async post(url: string, data: Record) {
+			async post(url: string, data: Params) {
 				return await request(url, "POST", data);
 			},
-			async put(url: string, data: Record) {
+			async put(url: string, data: Params) {
 				return await request(url, "PUT", data);
 			},
-			async patch(url: string, data: Record) {
+			async patch(url: string, data: Params) {
 				return await request(url, "PATCH", data);
 			},
-			async delete(url: string, data?: Record) {
+			async delete(url: string, data?: Params) {
 				return await request(url, "DELETE", data);
 			},
 			async get(url: string) {
@@ -90,7 +90,7 @@ const createRequest = (type: string) => (url: string, method: string, data?: any
 		return instance;
 	};
 
-const Request = (props: Record = {}) => {
+const Request = (props: Params = {}) => {
 	Object.assign(options, props);
 
 	return {

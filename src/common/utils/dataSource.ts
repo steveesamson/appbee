@@ -52,7 +52,6 @@ const createSource = ({
 			const credential = user ? `${user}:${password}@` : "";
 			// Connection URL
 			const url = connectionString ? connectionString : `mongodb://${credential}${host}:${port}`;
-			// console.log(`pool size: ${poolSize}`);
 			// Create a new MongoClient
 			const client = new MongoClient(url, { useUnifiedTopology: true, useNewUrlParser: true, poolSize });
 
@@ -65,9 +64,6 @@ const createSource = ({
 				const db = client.db(database);
 				console.log(`Connected successfully to ${database} db on ${type}`);
 				db.storeType = type;
-				// db.close = async () => {
-				// 	await client.close();
-				// };
 
 				re({ db });
 			});
@@ -106,7 +102,7 @@ const configure = (store: StoreListConfig) => {
 				if (keys.length) {
 					createNextSource(keys.shift());
 				} else {
-					r(null);
+					r(DataSources);
 				}
 			} catch (e) {
 				console.error(e);

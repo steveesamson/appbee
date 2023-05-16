@@ -12,7 +12,7 @@ import Mailer from "./mailer";
 
 import {
 	RouteConfig,
-	Record,
+	Params,
 	ControllerRequest,
 	MiddlewareConfig,
 	ioRequest,
@@ -28,6 +28,7 @@ import {
 // import { AppConfig, LdapConfig, PolicyConfig, StoreConfig, ViewConfig,  } from "../../index";
 
 const configuration: Configuration = {} as any;
+
 const modules: Modules = {} as any;
 const ioRoutes: any = {
 	get: {},
@@ -40,10 +41,12 @@ const ioRoutes: any = {
 let sender: SendMailType = null;
 
 const mailer = (): SendMailType => sender;
-
-const configurePolicies = async (base: string, policies: Record): Promise<Record> => {
-	policies = { ...policies, post: { ...(policies.post || {}), "/redo": true } };
-	const policiesMap: Record = {};
+const initConfigurations = async (base: string): Promise<Configuration> => {
+	return await loadConfig(base);
+};
+const configurePolicies = async (base: string, policies: Params): Promise<Params> => {
+	// policies = { ..._policies };
+	const policiesMap: Params = {};
 
 	for (const k in policies) {
 		const policy = policies[k];
@@ -95,9 +98,9 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 			if (key === "mountPoint") continue;
 			const handler: ControllerRequest = route[key] as ControllerRequest;
 			const [method, rpath] = key.split(/\s+/);
-			const nextPolicyRecord: Record = policies[method] || {},
-				nextGlobalPolicy = nextPolicyRecord.global,
-				nextPolicy = nextPolicyRecord[key];
+			const nextPolicyParams: Params = policies[method] || {},
+				nextGlobalPolicy = nextPolicyParams.global,
+				nextPolicy = nextPolicyParams[key];
 
 			let policy = nextPolicy ? nextPolicy : nextGlobalPolicy ? nextGlobalPolicy : globalPolicy ? globalPolicy : [];
 			policy = [restRouter, ...policy];
@@ -113,8 +116,6 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 
 					_policies.push(_handler);
 
-					// console.log("Polices: ", _policies.toString());
-
 					next();
 				};
 			})(policy, handler);
@@ -125,25 +126,12 @@ const configureRestRoutes = (policies: MiddlewareConfig) => {
 
 const configureIORoutes = (app: Express.Application) => {
 	app.io.sockets.on("connection", (socket: Socket) => {
-		// console.log("Connected: ", socket.id);
-
 		socket.once("disconnect", () => {
-			// console.log("disconnecting...");
 			socket.disconnect();
 		});
 
-		// const cookies = cookie.serialize(socket.request.headers.cookie || ""),
-		// 	// const cookie = socket.request.headers.cookie || "",
-		// 	req = { connection: { encrypted: false }, headers: { cookie: cookies } },
-		// 	res = { getHeader: () => {}, setHeader: () => {} };
-		// //
-		// cookieSession(req, res, () => {
-		// 	console.log("Logging session: ", (req as any).session); // Do something with req.session
-		// });
-
 		["get", "post", "delete", "put", "patch", "head"].forEach((method: string) => {
 			socket.on(method, (req: any, cb: Function) => {
-				// console.log(req.url);
 				const request: ioRequest = {
 					req,
 					cb,
@@ -161,18 +149,17 @@ const configureIORoutes = (app: Express.Application) => {
 const configureRestServer = async (base: string) => {
 	//Load configs
 
-	const cfg = await loadConfig(base);
+	const cfg: Configuration = await initConfigurations(base);
 
 	Object.assign(configuration, cfg);
-	await configureDataSources(configuration.store);
+
+	await configureDataSources(configuration.store); // datasources via getSources()
 	await loadModels(base, configuration);
 	//Load middlewares
-	const _middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
-	modules.middlewares = _middlewares;
+	modules.middlewares = (await loadModules(base, "middlewares")) as MiddlewareConfig[];
 
 	//Load controllers
-	const _controllers = await loadControllers(base, configuration.store);
-	modules.controllers = _controllers;
+	modules.controllers = await loadControllers(base, configuration.store);
 
 	if (configuration.smtp) {
 		sender = Mailer({ ...(configuration.smtp || {}) });
@@ -198,7 +185,7 @@ const configureWorker = async (base: string) => {
 	modules.plugins = await loadPlugins(base);
 };
 
-const getConfig = (type: string): AppConfig | LdapConfig | PolicyConfig | StoreConfig | ViewConfig | Record =>
+const getConfig = (type: string): AppConfig | LdapConfig | PolicyConfig | StoreConfig | ViewConfig | Params =>
 	(configuration as any)[type];
 
 export {

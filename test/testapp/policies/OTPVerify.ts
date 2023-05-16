@@ -4,7 +4,7 @@
 import { Request, Response, NextFunction,  Models } from "../../../src";
 
 
-export = async (req:Request, res:Response, next:NextFunction) =>{
+export default async (req:Request, res:Response, next:NextFunction) =>{
 
     // req = <Request>req;
     

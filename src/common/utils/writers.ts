@@ -31,7 +31,6 @@ export const writeStreamTo: WriteStreamType = (req: Request, options: Params) =>
 };
 
 export const writeFileTo: WriteFileType = (req: Request, options: Params, cb: any) => {
-	//console.log(req.files);
 	const { PUBLIC_DIR } = appState();
 	const { saveAs, uploadName, dir } = options;
 	const file = req.files[uploadName],
@@ -89,7 +88,6 @@ export const cropPicture = (req: Request, res: Response) => {
 
 	const imagePath = PUBLIC_DIR + src;
 	const gm = require("gm");
-	//        console.log(path);
 
 	gm(imagePath)
 		.crop(Number(w), Number(h), Number(x), Number(y))
@@ -111,7 +109,6 @@ export const getCaptcha = (req: Request, res: Response) => {
 		},
 		captcha = svgCaptcha.create(capOpts);
 	captcha.data = encodeURIComponent(captcha.data);
-	//console.log(captcha);
 	res.status(200).json(captcha);
 };
 

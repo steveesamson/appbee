@@ -18,8 +18,8 @@ import {
 	streamToPicture,
 	unlinkFiles,
 	uploadFile,
-	initEventBus,
-	initQueue,
+	dataLoader,
+	dataPager,
 } from "./common/utils/index";
 
 import {
@@ -29,7 +29,6 @@ import {
 	PolicyConfig,
 	MiddlewareConfig,
 	Params,
-	Record,
 	ViewConfig,
 	Model,
 	CronConfig,
@@ -43,6 +42,12 @@ import {
 	MailOptions,
 	BeeQConfig,
 	BeeQueueType,
+	DataLoaderOptions,
+	IJob,
+	Pipeline,
+	DataPagerOptions,
+	DBAware,
+	RequestAware,
 } from "./common/types";
 import { mailer, createSource, getSource, getConfig } from "./common/utils/configurer";
 import { Models } from "./common/utils/storeModels";
@@ -64,18 +69,18 @@ const utils: UtilsType = {
 	Token,
 	mailer,
 	getConfig,
+	dataLoader,
+	dataPager,
 	dataSource: {
 		createSource,
 		getSource,
 	},
 };
-import { startDevServer } from "./common/restDev";
-// import { startProdServer as serveProd } from "./common/restProd";
+import { startServer } from "./common/restServer";
 import { startWorker as start } from "./common/worker";
 
 const Restful: RestfulType = { handleGet, handleCreate, handleUpdate, handleDelete };
-// const serve = (dev: boolean = process.env.NODE_ENV === "development") => (dev ? startDevServer : serveProd);
-const serve = startDevServer;
+const serve = startServer;
 
 export {
 	Models,
@@ -100,8 +105,13 @@ export {
 	MailOptions,
 	BeeQConfig,
 	BeeQueueType,
+	DataLoaderOptions,
+	IJob,
+	DBAware,
+	RequestAware,
+	Pipeline,
+	DataPagerOptions,
 	Params,
-	Record,
 	ViewConfig,
 	StoreConfig,
 	RedisStoreConfig,

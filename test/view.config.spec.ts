@@ -8,9 +8,14 @@ const expected = {
         indexFile:'index'
 };
 describe("view configs", () => {
-  it("expects loadConfig to return valid view config", async () => {
+  beforeAll(async(done) =>{
     await configureRestServer(path.resolve(__dirname,"testapp"));
-     const {view} = configuration;
+    done();
+  })
+  
+  it("expects loadConfig to return valid view config",  () => {
+    
+     const { view } = configuration;
     expect(view).toMatchObject(expected);
   });
 });

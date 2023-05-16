@@ -1,4 +1,4 @@
-import { Record, EventBusType } from "../types";
+import { Params, EventBusType } from "../types";
 import { appState } from "../appState";
 import { BusMessenger } from "./busMessenger";
 
@@ -37,14 +37,14 @@ class DevBus implements EventBusType {
 		return () => this.removeListener(eventName, fnId);
 	}
 
-	emit(eventName: string, data: Record) {
+	emit(eventName: string, data: Params) {
 		const fns = Object.values(this.listeners[eventName] || {});
 		fns.forEach((f: Function) => {
 			f(data);
 		});
 	}
 
-	broadcast(load: Record) {
+	broadcast(load: Params) {
 		const { IO } = appState();
 		IO.emit("comets", load);
 		// const { verb, room, data } = load;
@@ -88,12 +88,11 @@ class ProdBus implements EventBusType {
 		this.subscriber.on("message", onceWrapper);
 		this.subscriber.subscribe(eventName);
 	}
-	emit(eventName: string, args: Record) {
+	emit(eventName: string, args: Params) {
 		this.publisher.publish(eventName, this.bm.toString(args));
 	}
 
-	broadcast(load: Record) {
-		// console.log("prod event bus broadcast:", load);
+	broadcast(load: Params) {
 		this.bm.emit("comets", load);
 	}
 }

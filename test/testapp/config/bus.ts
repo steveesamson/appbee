@@ -5,4 +5,4 @@ const bus:RedisStoreConfig = {
     port: 6379,
     password:'foobar'
 }
-export = bus;
+export default bus;

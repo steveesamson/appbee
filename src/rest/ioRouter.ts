@@ -27,13 +27,11 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 	} as any;
 
 	req = req || {};
-	// console.dir("REQ:", req);
 
 	req.io = socket;
 	req.url = req.path;
 	req.cookies = socket.handshake.headers.cookie || socket.request.headers.cookie;
 
-	// console.log("IO.Cookies: ", req.cookies);
 	const sessionCookie = req.cookies && req.cookies["express:sess"] ? req.cookies["express:sess"] : null;
 	const sess = sessionCookie ? decode(sessionCookie) : null;
 	req.session = sess;
@@ -44,7 +42,6 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 			req.currentUser = decoded;
 		}
 	}
-	// console.log("IO.Session: ", sess);
 
 	let { data, path } = req;
 
@@ -68,7 +65,6 @@ const ioRouter = ({ req: req, method, cb, socket, ioRoutes }: ioRequest) => {
 		return !!detail;
 	});
 
-	// console.log(req.path, url, req.query, parts);
 	if (!url || !url.trim()) {
 		return res.status(404).error("Route not found.");
 	}

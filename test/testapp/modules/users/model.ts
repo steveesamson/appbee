@@ -2,7 +2,7 @@ import {Model} from "../../../../src/common/types";
 
  export const Users:Model = {
   schema:{
-    id: 'int',
+    id: "int",
     upline: 'int',
     backlog: 'int',
     username: 'string',

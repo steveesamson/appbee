@@ -1,6 +1,5 @@
-import express, { Response, NextFunction, Request } from "express";
+import { Response, NextFunction, Request } from "express";
 import http from "http";
-import { RedisClient } from "redis";
 import { Socket, Server } from "socket.io";
 
 declare global {
@@ -19,45 +18,74 @@ declare global {
 		}
 	}
 }
-export type Record = {
-	[key: string]: any;
+export interface DBAware {
+	db?: any;
+}
+export interface RequestAware {
+	db?: any;
+	io?: any;
+	parameters?: any;
+}
+
+export type Params<T = any> = {
+	[key: string]: T;
 };
-export type Params = Record;
-// rowCount, searchPath, checkConcurrentUpdate;
+interface WithSideEffects {
+	id?: number | string;
+	where?: Params;
+}
+
+export interface UpdateOptions {
+	opType?: "$set" | "$inc";
+	upsert?: true | false;
+}
+
+export interface UpdateParams extends WithSideEffects {
+	$unset?: string | string[];
+	data?: Params;
+}
+export type DeleteParams = WithSideEffects;
+
+export interface FindOptions {
+	includes?: string | string[];
+	offset?: string;
+	limit?: string;
+	orderBy?: string;
+	orderDirection?: "ASC" | "DESC" | "asc" | "desc";
+	search?: string;
+	query: Params;
+	relaxExclude?: boolean;
+}
+
 export interface Model {
-	setUp?(): void;
-	hasKey?(options: Params): boolean;
-	pipeline?(): Record;
-	prepWhere?(options: Params): void;
-	rowCount?(db: any): Promise<Record>;
-	find?(param: Params): Promise<Record>;
-	create?(param: Params): Promise<Record | null>;
-	update?(param: Params, options?: Params): Promise<Record | null>;
-	destroy?(param: Params): Promise<Record>;
-	postCreate?(req: Request, data: Params): void;
-	postUpdate?(req: Request, data: Params): void;
-	postDestroy?(req: Request, data: Params): void;
-	publishCreate?(req: Request, load: Record): void;
-	publishUpdate?(req: Request, load: Record): void;
-	publishDestroy?(req: Request, load: Record): void;
-	validOptions?(param: Params): Params;
-	collectArgs?(options: Record): Params;
+	pipeline?(): Params[];
+	resolveResult?(data: Params[], includeMap: Params<1 | string>): Promise<Params[]>;
+	find?(param: Params): Promise<Params>;
+	create?(param: Params): Promise<Params>;
+	update?(param: Params, options?: Params): Promise<Params>;
+	destroy?(param: Params): Promise<Params>;
+	postCreate?(req: RequestAware, data: Params[]): Promise<void>;
+	postUpdate?(req: RequestAware, data: Params[]): Promise<void>;
+	postDestroy?(req: RequestAware, data: Params[]): Promise<void>;
+	publishCreate?(req: RequestAware, data: Params | Params[]): void;
+	publishUpdate?(req: RequestAware, data: Params | Params[]): void;
+	publishDestroy?(req: RequestAware, data: Params | Params[]): void;
 	storeType?: string;
 	dbSchema?: string;
-	schema: Record;
-	defaultDateValues?: Record; //{'withdrawn_date':''yyyy-mm-dd'}
+	schema: Params<
+		"objectId" | "int" | "integer" | "object" | "string" | "number" | "timestamp" | "date" | "boolean" | "array"
+	>;
 	uniqueKeys?: string[];
+	joinKeys?: string[];
 	searchPath?: string[];
-	verbatims?: string[]; //['attachments'] excludes from mclean.
 	excludes?: string[];
 	instanceName?: string;
 	collection?: string;
-	checkConcurrentUpdate?: string; //'lastupdated'
 	db?: any;
+	store?: any;
 	orderBy?: string;
 	orderDirection?: "ASC" | "DESC";
 	insertKey?: string;
-	[key: string]: any;
 }
 
 export interface ControllerRequest {
@@ -69,20 +97,14 @@ export interface MiddlewareRoutine {
 }
 
 //method path is the key, ControllerRequest, the handler is the value
-export interface RouteConfig {
-	[key: string]: ControllerRequest | string;
-}
+export type RouteConfig = Params<ControllerRequest | string>;
 
 //controller name is the key, its Routes is the value
-export interface RouteMap {
-	[key: string]: RouteConfig;
-}
+export type RouteMap = Params<RouteConfig>;
 
 //models name is the key, its Model is the value
-export interface ModelMap {
-	[key: string]: Model;
-}
-export type dbType =
+export type ModelMap = Params<Model>;
+export type DBType =
 	| "pg"
 	| "mysql"
 	| "mysql2"
@@ -94,7 +116,8 @@ export type dbType =
 	| "kafka"
 	| "rabbitmq";
 
-export type boolType = true | false;
+export type BoolType = true | false;
+
 export interface RedisStoreConfig {
 	host?: string;
 	port?: number;
@@ -104,34 +127,32 @@ export interface RedisStoreConfig {
 	flushOnStart?: boolean;
 }
 
-export interface StoreConfig {
-	type?: dbType;
+export interface StoreConfig extends Params {
+	type?: DBType;
 	host?: string;
 	port?: string | number;
 	user?: string;
 	database?: string;
 	password?: string;
 	connectionString?: string;
-	debug?: boolType;
-	cdc?: boolType;
+	debug?: BoolType;
+	cdc?: BoolType;
 	poolSize?: number;
-	multipleStatements?: boolType;
-	maillog?: boolType;
-	[key: string]: any;
+	multipleStatements?: BoolType;
+	maillog?: BoolType;
 }
 
-export interface StoreListConfig {
-	[key: string]: StoreConfig;
-}
+export type StoreListConfig = Params<StoreConfig>;
+
 export type SocketType = ["polling"] | ["websocket"] | ["polling", "websocket"];
-export interface AppConfig {
+
+export interface AppConfig extends Params {
 	port: number;
 	host?: string;
-	spa: boolType;
+	spa: BoolType;
 	ioTransport?: SocketType;
-	useMultiTenant: boolType;
+	useMultiTenant: BoolType;
 	mountRestOn: string;
-	[key: string]: any;
 }
 
 export interface ViewConfig {
@@ -151,10 +172,10 @@ export interface LdapConfig {
 
 export interface PolicyConfig {
 	"*"?: string | boolean;
-	post?: Record;
-	get?: Record;
-	delete?: Record;
-	put?: Record;
+	post?: Params;
+	get?: Params;
+	delete?: Params;
+	put?: Params;
 }
 export interface IEncrypt {
 	verify(plain: string, hash: string): Promise<boolean>;
@@ -173,8 +194,8 @@ export interface CronConfig {
 	key: string;
 	name: string;
 	schedule: string;
-	enabled: boolType;
-	immediate: boolType;
+	enabled: BoolType;
+	immediate: BoolType;
 	task: () => void;
 }
 export interface JobConfig {
@@ -184,16 +205,15 @@ export interface JobConfig {
 	start: () => void;
 	stop: () => void;
 }
-export interface MiddlewareConfig {
-	[key: string]: MiddlewareRoutine;
-}
+export type MiddlewareConfig = Params<MiddlewareRoutine>;
 export interface Configuration {
+	dataSources: { [key: string]: any };
 	store: StoreConfig;
 	ldap: LdapConfig;
-	security: Record;
+	security: Params;
 	view: ViewConfig;
 	application: AppConfig;
-	smtp: Record;
+	smtp: Params;
 	policy: PolicyConfig;
 	bus: RedisStoreConfig;
 }
@@ -202,20 +222,17 @@ export interface getByCollectionType {
 	[key: string]: (collection: string, req: Request) => Model | null;
 }
 
-export interface ReqWithDB {
-	db?: any;
-}
 export interface getByInstance {
 	[key: string]: (req: Request) => Model;
 }
 
 export interface GetModels {
-	[key: string]: (req: ReqWithDB) => Model;
+	[key: string]: (req: DBAware) => Model;
 }
 export interface Modules {
 	controllers: RouteMap;
 	policies: MiddlewareConfig;
-	plugins: Record;
+	plugins: Params;
 	middlewares: MiddlewareConfig[];
 }
 export interface ioRequest {
@@ -225,7 +242,7 @@ export interface ioRequest {
 	socket: Socket;
 	ioRoutes: any;
 }
-export interface AppState {
+export interface AppState extends Params {
 	isMultitenant?: boolean;
 	TEMPLATE_DIR?: string;
 	SERVER_TYPE?: string;
@@ -241,7 +258,6 @@ export interface AppState {
 	useWorker?: (queueName: string) => BeeQueueType;
 	useQueue?: (queueName: string) => BeeQueueType;
 	redis?: any;
-	[key: string]: any;
 }
 
 export interface CallBackFunction {
@@ -249,7 +265,7 @@ export interface CallBackFunction {
 }
 
 export interface CronMasterType {
-	init(crons: CronConfig[], notifier: (msg: Record) => void): void;
+	init(crons: CronConfig[], notifier: (msg: Params) => void): void;
 	start(cronKey: string): void;
 	stop(cronKey: string): void;
 	add(cron: CronConfig): void;
@@ -257,7 +273,7 @@ export interface CronMasterType {
 }
 
 export interface JobMasterType {
-	init(jobs: JobConfig[], notifier: (msg: Record) => void): void;
+	init(jobs: JobConfig[], notifier: (msg: Params) => void): void;
 	start(jobName: string): void;
 	stop(jobName: string): void;
 	listAll(): void;
@@ -281,7 +297,7 @@ export interface WriteStreamType {
 }
 
 export interface MailerType {
-	(smtpConfig: Record): SendMailType;
+	(smtpConfig: Params): SendMailType;
 }
 export interface MailOptions {
 	message?: string;
@@ -300,24 +316,23 @@ export interface HandleAsyncAwait {
 }
 
 interface IWithDataRequest {
-	(url: string, data: Record): Promise<Record>;
+	(url: string, data: Params): Promise<Params>;
 }
 interface IWithNoDataRequest {
-	(url: string): Promise<Record>;
+	(url: string): Promise<Params>;
 }
 interface IKeyValueRequest {
 	(key: string, value: any): any;
 }
 interface IWithOptionalDataRequest {
-	(url: string, data?: Record): Promise<Record>;
+	(url: string, data?: Params): Promise<Params>;
 }
-export interface AsyncResolve {
+export interface AsyncResolve extends Params {
 	data?: any;
 	error?: any;
-	[key: string]: any;
 }
 export interface HttpRequestType {
-	(props: Record): {
+	(props: Params): {
 		http: {
 			post: IWithDataRequest;
 			put: IWithDataRequest;
@@ -340,20 +355,19 @@ export interface HttpRequestType {
 		};
 	};
 }
-export interface PluginTypes {
-	[key: string]: Function;
-}
+// export type PluginTypes = Params<Function>;
+
 export interface EventBusType {
 	name: string;
 	on: (eventName: string, fn: Function) => Function;
 	once: (eventName: string, fn: Function) => void;
-	emit: (eventName: string, data?: Record) => void;
-	broadcast: (record: Record) => void;
+	emit: (eventName: string, data?: Params) => void;
+	broadcast: (Params: Params) => void;
 }
 
 export interface RestfulType {
 	handleGet: (modelName: string) => ControllerRequest;
-	handleCreate: (modelName: string, paramsInjector?: (req: Request) => Record | string | number) => ControllerRequest;
+	handleCreate: (modelName: string, paramsInjector?: (req: Request) => Params | string | number) => ControllerRequest;
 	handleUpdate: (modelName: string, options?: Params) => ControllerRequest;
 	handleDelete: (modelName: string) => ControllerRequest;
 }
@@ -362,18 +376,40 @@ export interface WorkerApp {
 	(): void;
 }
 
-export interface BeeQConfig {
+export interface BeeQConfig extends Params {
 	redis: any;
 	isWorker?: false | true;
-	[key: string]: any;
 }
 
 export interface BeeQueueType {
-	addJob: (jobSpec: Record, id?: any, restoring?: boolean) => Promise<any>;
-	processJob: (processor: (job: Record, done?: Function) => void, concurrency?: number) => void;
+	addJob: (jobSpec: Params, id?: any, restoring?: boolean) => Promise<any>;
+	processJob: (processor: (job: Params, done?: Function) => void, concurrency?: number) => void;
 	on: (event: string, handler: Function) => void;
 }
+export type DataPagerOptions = {
+	model: Model;
+	params?: Params;
+	includes?: string | string[] | 1;
+	LIMIT?: number;
+	debug?: boolean;
+	onPage: (data?: Params[], next?: () => void) => void;
+};
 
+export interface IJob {
+	model: string;
+	from: string;
+	to: string;
+	includes?: string | number;
+	map?: string;
+}
+export type Pipeline = Array<IJob>;
+
+export type DataLoaderOptions = {
+	name: string;
+	input: Params[];
+	pipeline: Pipeline;
+	debug?: true | false;
+};
 export interface UtilsType {
 	writeFileTo: WriteFileType;
 	writeStreamTo: WriteStreamType;
@@ -384,20 +420,20 @@ export interface UtilsType {
 	streamToPicture: ControllerRequest;
 	unlinkFiles: ControllerRequest;
 	uploadFile: ControllerRequest;
+	dataLoader: (sourceName?: string) => (dataLoaderOptions: DataLoaderOptions) => Promise<Params[]>;
+	dataPager: (
+		pagerOptions: DataPagerOptions,
+	) => {
+		start: () => Promise<void>;
+	};
 	mailer: () => SendMailType;
 	request: HttpRequestType;
 	raa: HandleAsyncAwait;
 	Encrypt: IEncrypt;
 	Token: IToken;
-	// eventBus: () => EventBusType;
-	// beeQueue: {
-	// 	initRedis: (options: RedisStoreConfig) => void;
-	// 	useWorker?: (queueName: string, options?: BeeQConfig) => Promise<BeeQueueType>;
-	// 	useQueue: (queueName: string, options?: StoreConfig) => Promise<BeeQueueType>;
-	// };
 	dataSource: {
 		createSource: (options: StoreConfig) => any;
 		getSource: (name: string) => any;
 	};
-	getConfig: (type: string) => AppConfig | ViewConfig | LdapConfig | StoreConfig | PolicyConfig | Record;
+	getConfig: (type: string) => AppConfig | ViewConfig | LdapConfig | StoreConfig | PolicyConfig | Params;
 }
