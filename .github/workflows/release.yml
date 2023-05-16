@@ -57,9 +57,14 @@ jobs:
         run: |
           git config --global user.email "kevwe.samson@gmail.com"
           git config --global user.name "steveesamson-bot"
+
       # Push repository changes
-      - name: Push changes to repository
+      - name: Commit changes to repository
         run: |
           git add .
           git commit -m "bumped version to ${{ env.NEW_VERSION}}"
+          git tag ${{ env.NEW_VERSION }}
+
+      - name: Push changes to repository
+        run: |
           git push origin && git push --tags
