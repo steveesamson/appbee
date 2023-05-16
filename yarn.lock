@@ -4328,8 +4328,8 @@ nodemailer-wellknown@0.1.10:
   integrity "sha1-WG24EB2zDLRDjrVGc3pBqtDPE9U= sha512-/VV4mjAEjfm2fn0loUvrpjvugw5rgurNjPO4WU24CuVSoeumsyLOTgaEWG8WoGdPxh1biOAp5JxDoy1hlA2zsw=="
 
 nodemailer@^6.4.2:
-  version "6.4.6"
-  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.4.6.tgz"
+  version "6.6.1"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.6.1.tgz#2a05fbf205b897d71bf43884167b5d4d3bd01b99"
 
 normalize-package-data@^2.3.2, normalize-package-data@^2.5.0:
   version "2.5.0"
