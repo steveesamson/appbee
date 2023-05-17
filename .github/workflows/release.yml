@@ -9,6 +9,9 @@ on:
 jobs:
   release_npm_package:
     runs-on: ubuntu-latest
+    environment:
+      name: prod
+      url: https://production_url
     steps:
       # Checkout project repository
       - name: Checkout
