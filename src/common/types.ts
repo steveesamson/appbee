@@ -196,6 +196,7 @@ export interface CronConfig {
 	schedule: string;
 	enabled: BoolType;
 	immediate: BoolType;
+	timeZone: string;
 	task: () => void;
 }
 export interface JobConfig {
