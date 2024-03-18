@@ -14,10 +14,10 @@ type TResponse = {
 	error?: any;
 };
 
-const dedupeArray = (array: string[]) => {
+const dedupeArray = (array: string[]): string[] => {
 	return Array.from(new Set([...array]));
 };
-const toArray = (str = "") => {
+const toArray = (str = ""): string[] => {
 	if (!!str.trim()) {
 		const arr = str
 			.split(",")
