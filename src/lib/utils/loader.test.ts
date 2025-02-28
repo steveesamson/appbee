@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import path from "path";
 import loader from './loader.js';
-import { base, clearMocks, mockModules } from "@src/testapp/index.js";
+import { base, clearMocks, mockModules } from "@testapp/index.js";
 import { allowAll, denyAll } from '../rest/policies/index.js';
 import { useSource } from './configurer.js';
 import { configureSources } from '../tools/data-source.js';

@@ -2,7 +2,7 @@ import { expect, it, describe, vi, beforeAll, afterAll } from "vitest";
 import { initEventBus } from "./event-bus.js";
 import { appState } from "$lib/tools/app-state.js"
 import type { AppState, Configuration, StoreConfigMap } from "../common/types.js";
-import { clearMocks, base, mockModules } from "@src/testapp/index.js";
+import { clearMocks, base, mockModules } from "@testapp/index.js";
 import { useRedis } from "./redis.js";
 import loader from "../utils/loader.js";
 

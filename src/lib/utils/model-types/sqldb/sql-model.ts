@@ -9,6 +9,7 @@ import {
 	normalizeIncludes,
 	prepWhere,
 } from "./sql-common.js";
+// import _ from "lodash";
 
 
 export const sqlModel = function (base: Partial<AppModel>): AppModel {
@@ -72,16 +73,16 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			return { error: "No record was inserted." };
 		},
 		async update(options: SqlUpdateOptions): Promise<UpdateData> {
-			const { id, where, data, includes } = options;
+			const { query, data, includes } = options;
 			const getCollection = collectionInstance(this as AppModel);
 			// const getValidOptions = getValidOptionsExtractor(this as AppModel);
 
-			if (!id && !where) {
-				return { error: "You need an id/where object to update any model" };
+			if (!query) {
+				return { error: "You need a query object to update any model" };
 			}
 			const idKey = this.insertKey!;
 
-			const query = { id, ...(where || {}) };
+			// const _query = { id, ...(query || {}) };
 			const { db } = getCollection({ query });
 			// const validOptions = getValidOptions(data);
 			await db.update(data, canReturnDrivers.includes(this.storeType!) ? [idKey] : null);
@@ -89,13 +90,13 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			return this.find!({ query, beeSkipCount: true, includes });
 		},
 		async destroy(options: DeleteOptions): Promise<DeleteData> {
-			const { id, where } = options;
+			const { query } = options;
 
-			if (!id && !where) {
-				return { error: "You need an id/where object to delete any model" };
+			if (!query) {
+				return { error: "You need a query object to delete any model" };
 			}
 			const getCollection = collectionInstance(this as AppModel);
-			const query = { id, ...(where || {}) };
+			// const _query = { id, ...(query || {}) };
 			const { db } = getCollection({ query });
 			const idKey = this.insertKey!;
 			return raa(db.del([idKey], { includeTriggerModifications: true }));

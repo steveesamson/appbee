@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { sqlModel } from "./sql-model.js";
 import type { AppModel, Model } from "$lib/index.js";
 import { commonModel } from "../common.js";
-import { Db, data } from "@src/testapp/index.js";
+import { Db, data } from "@testapp/index.js";
 
 
 let model: AppModel;
@@ -39,11 +39,11 @@ describe('sql-model.js', () => {
 		})
 
 		it('should return an array of records', async () => {
-			const output = await model.find({});
+			const output = await model.find({ query: {} });
 			expect(output).toEqual({ recordCount: 1, data: [data] })
 		})
 		it('should return an array of records with not recordCount', async () => {
-			const output = await model.find({ beeSkipCount: 1 });
+			const output = await model.find({ query: {}, beeSkipCount: true });
 			expect(output).toEqual({ data: [data] })
 		})
 		it('should return a record', async () => {
@@ -86,18 +86,18 @@ describe('sql-model.js', () => {
 		})
 
 		it('should return {data:{}}', async () => {
-			const output = await model.update({ id: 1, data: { email: 'me@me.com', name: "Steve" } });
+			const output = await model.update({ query: { id: 1 }, data: { email: 'me@me.com', name: "Steve" } });
 			expect(output).toEqual({ data })
 		})
 		it('should return {data:{}} with where clause', async () => {
 			model.storeType = 'pg';
-			const output = await model.update({ where: { id: 1 }, data: { email: 'me@me.com', name: "Steve" } });
+			const output = await model.update({ query: { id: 1 }, data: { email: 'me@me.com', name: "Steve" } });
 			expect(output).toEqual({ data })
 		})
-		it('should return an error with no id/where clause', async () => {
+		it('should return an error with no query', async () => {
 			model.storeType = 'pg';
 			const output = await model.update({ data: { email: 'me@me.com', name: "Steve" } });
-			expect(output).toEqual({ error: "You need an id/where object to update any model" })
+			expect(output).toEqual({ error: "You need a query object to update any model" })
 		})
 	})
 
@@ -108,17 +108,17 @@ describe('sql-model.js', () => {
 		})
 
 		it('should return {data:{}}', async () => {
-			const output = await model.destroy({ id: data.id });
+			const output = await model.destroy({ query: { id: data.id } });
 			expect(output).toEqual({ data: { id: data.id } })
 		})
-		it('should return {data:{}} with where clause', async () => {
-			const output = await model.destroy({ where: { id: 1 } });
+		it('should return {data:{}} with query', async () => {
+			const output = await model.destroy({ query: { id: 1 } });
 			expect(output).toEqual({ data: { id: data.id } })
 
 		})
 		it('should return an error with no id/where clause', async () => {
 			const output = await model.destroy({});
-			expect(output).toEqual({ error: "You need an id/where object to delete any model" })
+			expect(output).toEqual({ error: "You need a query object to delete any model" })
 		})
 	})
 })

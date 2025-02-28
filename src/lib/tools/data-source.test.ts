@@ -1,5 +1,5 @@
 import { expect, it, describe, beforeAll, afterAll, vi } from 'vitest';
-import { clearMocks, mockModules, base } from '@src/testapp/index.js';
+import { clearMocks, mockModules, base } from '@testapp/index.js';
 import type { Configuration } from '../common/types.js';
 import loader from '../utils/loader.js';
 import { configureSources, createSource } from './data-source.js';

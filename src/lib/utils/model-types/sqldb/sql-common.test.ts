@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { getRowCounter, getOperator, normalizeIncludes, getWheres, prepSearch, collectionInstance, getSQLFinalizer, prepWhere } from "./sql-common.js";
 import type { AppModel, FindOptions, Model, Params } from "$lib/common/types.js";
-import { Db, data } from "@src/testapp/index.js";
+import { Db, data } from "@testapp/index.js";
 import { extractOptions } from "../mongodb/mongo-common.js";
 
 

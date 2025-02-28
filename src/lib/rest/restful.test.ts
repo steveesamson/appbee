@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { handleGet, handleCreate, handleUpdate, handleDelete } from "./restful.js";
 import type { AppModel, DBAware, Request, PreCreate } from "../common/types.js";
-import { mockResponse } from "@src/testapp/index.js";
+import { mockResponse } from "@testapp/index.js";
 
 
 const publishCreate = vi.fn();

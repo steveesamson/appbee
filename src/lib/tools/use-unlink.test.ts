@@ -4,7 +4,7 @@ import type { Request } from "../common/types.js";
 import { appState } from '$lib/tools/app-state.js';
 
 import { useUnlink } from './use-unlink.js';
-import { mockResponse } from "@src/testapp/index.js";
+import { mockResponse } from "@testapp/index.js";
 
 const fileName = "/tmp/testfile.txt";
 

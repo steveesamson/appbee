@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import fs from "fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { base, clearMocks, mockModules, SECRET } from "@src/testapp/index.js";
+import { base, clearMocks, mockModules, SECRET } from "@testapp/index.js";
 import { createRestServer } from "./server.js";
 import { configure, get, post, put, destroy, head, options, setOptions, type TTransport, type Result, uploadFile } from "../tools/use-fetch.js";
 import { components } from "../utils/configurer.js";
@@ -25,7 +25,7 @@ const Transport = {} as TTransport;
 
 
 const startIO = async () => {
-	appState({ SECRET });
+	appState({ env: { SECRET } });
 	const { configuration: { application } } = components;
 	const { ioTransport, } = application;
 	const { sign } = await useToken();
@@ -400,12 +400,12 @@ describe("rest-controller.js", async () => {
 			expect(res.data.id).toBe(inserteID);
 		});
 
-		it(`expects delete '/users' without 'id' or 'where' to return error `, async () => {
+		it(`expects delete '/users' without 'query' to return error `, async () => {
 			const res = await Transport.sync<User>(`/users`, "delete");
 			expect(res.status).not.toBe(200);
 			expect(res.data).toBeUndefined();
 			expect(res.error).toBeDefined();
-			expect(res.error).toBe("Either id or where clause is required");
+			expect(res.error).toBe("You need a query object to delete any model");
 		});
 		it(`expects get '/nonexistent' to return a 'Not Found' error.`, async () => {
 			const res = await Transport.sync(`/nonexistent`, "get");

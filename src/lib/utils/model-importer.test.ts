@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import importModel from "./model-importer.js";
 import type { ModelFactory } from "../common/types.js";
-import { base } from "@src/testapp/index.js";
+import { base } from "@testapp/index.js";
 
 const loadModel = (modelFile: string) => {
     return new Promise((r, j) => {

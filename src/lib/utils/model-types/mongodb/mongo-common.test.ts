@@ -2,7 +2,7 @@
 import { expect, describe, it, vi } from "vitest";
 import { toProjection, getMongoFinalizer, getMongoParams, getOperator, getValidOptionsExtractor, normalizeIncludes, prepWhere, reduceUnset, replaceMongoId, extractOptions } from "./mongo-common.js";
 import { v, type AppModel, type Model, type FindOptions, type Params } from "$lib/common/types.js";
-import { mongoData as data, Mango } from "@src/testapp/index.js";
+import { mongoData as data, Mango } from "@testapp/index.js";
 import { useUnwrap } from "../../unwrapper.js";
 
 

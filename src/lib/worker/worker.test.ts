@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { base, clearMocks, mockModules } from "@src/testapp/index.js";
+import { base, clearMocks, mockModules } from "@testapp/index.js";
 import { work, createWorker } from "./worker.js";
 import { workerState } from "../tools/app-state.js";
 

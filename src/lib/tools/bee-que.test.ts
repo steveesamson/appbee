@@ -1,5 +1,5 @@
 import { expect, it, describe, beforeAll, afterAll, vi } from 'vitest';
-import { clearMocks, base, mockModules } from '@src/testapp/index.js';
+import { clearMocks, base, mockModules } from '@testapp/index.js';
 import { initQueue } from './bee-que.js';
 import { useRedis } from './redis.js';
 import type { Configuration, StoreConfigMap } from '../common/types.js';

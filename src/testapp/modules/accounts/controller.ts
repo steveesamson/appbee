@@ -1,9 +1,9 @@
 import { Route } from "$lib/rest/route.js";
 import type { Request, Response } from "$lib/common/types.js";
-import type { AddAccount, UpdateAccount, DeleteAccount } from "./model.js";
+import type { AddAccount, UpdateAccount, DeleteAccount, FindAccount } from "./model.js";
 const { get, post, put, destroy, patch } = Route("Accounts", "/accounts");
 
-get(`/:id?`, (req: Request, res: Response) => {
+get(`/:id?`, (req: Request<FindAccount>, res: Response) => {
   res.status(200).json({
     data: [
       { accountNo: "00001", balance: 2000 },
@@ -13,7 +13,6 @@ get(`/:id?`, (req: Request, res: Response) => {
 });
 
 post(`/`, (req: Request<AddAccount>, res: Response) => {
-  const { parameters } = req;
   const { parameters: { data } } = req;
   res.status(200).json({
     data
@@ -27,8 +26,7 @@ put(`/:id`, (req: Request<UpdateAccount>, res: Response) => {
   });
 });
 
-destroy(`/:id?`, async (req: Request, res: Response) => {
-  const { parameters: { params, query } } = req;
+destroy(`/:id?`, async (req: Request<DeleteAccount>, res: Response) => {
   res.status(200).json({ message: "Account removed" });
 });
 

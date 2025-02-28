@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { listDir, ofExtension } from './files.js';
 import { resolve } from 'path';
-import { base } from '@src/testapp/index.js';
+import { base } from '@testapp/index.js';
 
 const configFolder = resolve(base, "config");
 

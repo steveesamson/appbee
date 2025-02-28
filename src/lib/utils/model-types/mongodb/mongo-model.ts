@@ -81,24 +81,24 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			// const { id, where, $unset: _toRemove = [], relaxExclude = false, includes = 1, data } = params;
 			// const { opType = '$set', upsert = false } = options;
 
-			const { id, where, upsert, includes, ...rest } = options;
+			const { query, upsert, includes, ...rest } = options;
 
-			if (!id && !where) {
-				return { error: "You need an id/where object to update any model" };
+			if (!query) {
+				return { error: "You need a query object to update any model" };
 			}
 			// const extractOptions = getValidOptionsExtractor(this);
 			const hasKey = getUniqueKeyChecker(this);
 
-			const arg = { id, ...(where || {}) };
-			const query = extractOptions(arg);
-			const conditions = getMongoParams(query);
+			// const arg = query;
+			const qry = extractOptions(query);
+			const conditions = getMongoParams(qry);
 
 			for (const [key, val] of Object.entries(rest)) {
 				rest[key as MongoUpdateType] = extractOptions(val);
 			}
 
 			const collection = this.db.collection(this.collection);
-			const isSingle = hasKey(arg);
+			const isSingle = hasKey(query);
 			const updateOperation = isSingle ? "updateOne" : "updateMany";
 
 			// const validOptions = extractOptions(data);
@@ -115,26 +115,26 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 				{ ...rest },
 				{ upsert },
 			);
-			return modifiedCount ? this.find({ query: arg, beeSkipCount: true, includes }) : { error: "No, record was updated." };
+			return modifiedCount ? this.find({ query, beeSkipCount: true, includes }) : { error: "No, record was updated." };
 		},
 		async destroy(options: DeleteOptions): Promise<DeleteData> {
-			const { id, where } = options;
+			const { query } = options;
 
-			if (!id && !where) {
-				return { error: "You need an id/where object to delete any model" };
+			if (!query) {
+				return { error: "You need a query object to delete any model" };
 			}
 			const hasKey = getUniqueKeyChecker(this);
 			// const extractOptions = getValidOptionsExtractor(this);
 
-			const arg = { id, ...(where || {}) };
-			const args = extractOptions(arg);
-			const query = getMongoParams(args);
+			// const arg = { id, ...(query || {}) };
+			const args = extractOptions(query);
+			const qry = getMongoParams(args);
 			const collection = this.db.collection(this.collection);
-			const isSingle = hasKey(arg);
+			const isSingle = hasKey(query);
 
 			const deleteOperation = isSingle ? "deleteOne" : "deleteMany";
-			const { deletedCount } = await collection[deleteOperation](query);
-			return deletedCount ? { data: arg } : { error: "No, record was deleted" };
+			const { deletedCount } = await collection[deleteOperation](qry);
+			return deletedCount ? { data: query } : { error: "No, record was deleted" };
 		},
 	} as AppModel;
 

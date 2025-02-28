@@ -1,5 +1,5 @@
 
-import type { PolicyConfig } from "@src/lib/common/types.js";
+import type { PolicyConfig } from "$lib/common/types.js";
 
 const policies: PolicyConfig = {
     '*': true,//Global

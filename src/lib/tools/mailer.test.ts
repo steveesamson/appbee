@@ -2,7 +2,7 @@
 import fs from "fs-extra";
 import { expect, describe, it, beforeAll, afterAll, vi } from "vitest";
 import { mailer } from "./mailer.js";
-import { clearMocks, base } from "@src/testapp/index.js";
+import { clearMocks, base } from "@testapp/index.js";
 import { appState } from "./app-state.js";
 import loader from "../utils/loader.js";
 import type { SMTPConfig } from "../common/types.js";

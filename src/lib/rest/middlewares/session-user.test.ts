@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { Request, Response } from "$lib/common/types.js";
 import { restSessionUser, realtimeSessionUser } from './session-user.js';
-import { clearMocks, mockModules } from '@src/testapp/index.js';
+import { clearMocks, mockModules } from '@testapp/index.js';
 import { useToken } from '$lib/tools/security.js';
 
 describe('session-user.js', () => {

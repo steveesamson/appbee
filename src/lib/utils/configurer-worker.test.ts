@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { base, clearMocks, mockModules } from "@src/testapp/index.js";
+import { base, clearMocks, mockModules } from "@testapp/index.js";
 import { components, configureRealtimeRoutes, configureRestRoutes, configureRestServer, configureWorker, useConfig, usePlugin, useSource } from './configurer.js';
 
 

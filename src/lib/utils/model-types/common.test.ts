@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { cleanDataKey, commonModel, getUniqueKeyChecker, removeModelExcludes } from "./common.js";
-import { mockModules, clearMocks } from "@src/testapp/index.js";
+import { mockModules, clearMocks } from "@testapp/index.js";
 import type { AppModel, RequestAware } from "$lib/common/types.js";
 
 describe('common.js', () => {

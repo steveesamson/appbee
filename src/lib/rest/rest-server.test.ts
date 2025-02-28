@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { base, clearMocks, mockModules } from "@src/testapp/index.js";
+import { base, clearMocks, mockModules } from "@testapp/index.js";
 import { serve } from "./rest-server.js";
 import { appState } from "../tools/app-state.js";
 

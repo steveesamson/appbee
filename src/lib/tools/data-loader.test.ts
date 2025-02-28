@@ -1,7 +1,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { dataLoader, compileMap } from "./data-loader.js";
-// import { mockResponse } from "@src/testapp/index.js";
+// import { mockResponse } from "@testapp/index.js";
 import type { AppModel, DataLoaderOptions, Params } from "$lib/common/types.js";
 
 const publishCreate = vi.fn();

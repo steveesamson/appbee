@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { Route } from "./route.js";
 import type { RouteMethods } from "../common/types.js";
 import { configureRestServer } from "../utils/configurer.js";
-import { base, clearMocks, mockModules } from "@src/testapp/index.js";
+import { base, clearMocks, mockModules } from "@testapp/index.js";
 
 
 

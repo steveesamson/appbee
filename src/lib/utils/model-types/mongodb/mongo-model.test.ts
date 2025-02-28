@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import type { AppModel, Model } from "$lib/index.js";
 import { mongoDBModel } from "./mongo-model.js";
 import { commonModel } from "../common.js";
-import { Mango, mongoData as data } from "@src/testapp/index.js";
+import { Mango, mongoData as data } from "@testapp/index.js";
 
 let model: AppModel;
 describe('mongo-model.js', () => {
@@ -39,11 +39,11 @@ describe('mongo-model.js', () => {
 		})
 
 		it('should return an array of data', async () => {
-			const output = await model.find({});
+			const output = await model.find({ query: {} });
 			expect(output).toEqual({ recordCount: 1, data: [data] })
 		})
 		it('should return an array of data wit relaxExclude', async () => {
-			const output = await model.find({ beeSkipCount: true, relaxExclude: 1 });
+			const output = await model.find({ query: {}, beeSkipCount: true, relaxExclude: true });
 			expect(output).toEqual({ data: [data] })
 		})
 		it('should return a single object as data', async () => {
@@ -81,21 +81,21 @@ describe('mongo-model.js', () => {
 		})
 
 		it('should return {data:{}}', async () => {
-			const output = await model.update({ id: data.id, data: { email: 'me@me.com', name: "Steve" } });
+			const output = await model.update({ query: { id: data.id }, $set: { email: 'me@me.com', name: "Steve" } });
 			expect(output).toEqual({ data })
 		})
 		it('should return {data:{}} for key array', async () => {
-			const output = await model.update({ id: [data.id], data: { email: 'me@me.com', name: "Steve" } });
+			const output = await model.update({ query: { id: [data.id] }, $set: { email: 'me@me.com', name: "Steve" } });
 			expect(output).toEqual({ data: [data] })
 		})
 
-		it('should return {data:{}} with where clause', async () => {
-			const output = await model.update({ where: { id: data.id }, $unset: 'a,b,c', data: { email: 'me@me.com', name: "Steve" } });
+		it('should return {data:{}} with query', async () => {
+			const output = await model.update({ query: { id: data.id }, $unset: { a: '', b: '', c: '' }, $set: { email: 'me@me.com', name: "Steve" } });
 			expect(output).toEqual({ data })
 		})
-		it('should return an error with no id/where clause', async () => {
-			const output = await model.update({ data: { email: 'me@me.com', name: "Steve" } });
-			expect(output).toEqual({ error: "You need an id/where object to update any model" })
+		it('should return an error with no query', async () => {
+			const output = await model.update({ $set: { email: 'me@me.com', name: "Steve" } });
+			expect(output).toEqual({ error: "You need a query object to update any model" })
 		})
 
 	})
@@ -107,20 +107,20 @@ describe('mongo-model.js', () => {
 		})
 
 		it('should return {data:{}}', async () => {
-			const output = await model.destroy({ id: data.id });
+			const output = await model.destroy({ query: { id: data.id } });
 			expect(output).toEqual({ data: { id: data.id } })
 		})
-		it('should return {data:{}} with where clause', async () => {
-			const output = await model.destroy({ where: { id: data.id } });
+		it('should return {data:{}} with query', async () => {
+			const output = await model.destroy({ query: { id: data.id } });
 			expect(output).toEqual({ data: { id: data.id } })
 		})
-		it('should return array  as data with where clause of array', async () => {
-			const output = await model.destroy({ where: { id: [data.id] } });
+		it('should return array  as data with query of an array', async () => {
+			const output = await model.destroy({ query: { id: [data.id] } });
 			expect(output).toEqual({ data: { id: [data.id] } })
 		})
-		it('should return an error with no id/where clause', async () => {
+		it('should return an error with no query clause', async () => {
 			const output = await model.destroy({});
-			expect(output).toEqual({ error: "You need an id/where object to delete any model" })
+			expect(output).toEqual({ error: "You need a query object to delete any model" })
 		})
 	})
 
@@ -133,12 +133,12 @@ describe('mongo-model.js', () => {
 		})
 		it('should return an error', async () => {
 
-			const output = await model.update({ where: { id: data.id } });
+			const output = await model.update({ query: { id: data.id } });
 			expect(output).toEqual({ error: 'No, record was updated.' })
 
 		})
-		it('should return array  as data with where clause of array', async () => {
-			const output = await model.destroy({ where: { id: [data.id] } });
+		it('should return array  as data with a query of an array', async () => {
+			const output = await model.destroy({ query: { id: [data.id] } });
 			expect(output).toEqual({ error: 'No, record was deleted' })
 		})
 

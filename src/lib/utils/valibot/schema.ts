@@ -20,7 +20,7 @@ export const useSchema = <
     });
     const conditionSchema = v.object({
         params: v.optional(v.partial(v.pick(baseSchema, ['id']))),
-        where: v.optional(v.partial(baseSchema)),
+        query: v.optional(v.partial(baseSchema)),
     })
     const findSchema = v.object({
         includes: v.optional(v.union([v.string(), v.literal(1)])),
@@ -37,11 +37,11 @@ export const useSchema = <
             data: v.partial(baseSchema),
             ...conditionSchema.entries
         }),
-        v.check((input) => !!input.params?.id || !!input.where, "Either id or where clause is required")
+        v.check((input) => !!input.params?.id || !!input.query, "Either params.id or query is required")
     );
     const deleteSchema = v.pipe(
         conditionSchema,
-        v.check((input) => !!input.params?.id || !!input.where, "Either id or where clause is required")
+        v.check((input) => !!input.params?.id || !!input.query, "Either params.id or query is required")
     );
 
     return { findSchema, postSchema, updateSchema, deleteSchema };

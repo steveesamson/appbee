@@ -1,7 +1,7 @@
 import { expect, it, describe, beforeAll, afterAll, vi } from 'vitest';
 
 import { BusMessenger } from './bus-messenger.js';
-import { clearMocks, base, mockModules } from '@src/testapp/index.js';
+import { clearMocks, base, mockModules } from '@testapp/index.js';
 import { useRedis } from './redis.js';
 import type { Configuration, StoreConfigMap } from '../common/types.js';
 import loader from '../utils/loader.js';

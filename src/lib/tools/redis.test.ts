@@ -1,6 +1,6 @@
 import { expect, describe, it, beforeAll, afterAll } from "vitest";
 import { useRedis, closedOverRedis } from "./redis.js";
-import { clearMocks, base, mockModules } from "@src/testapp/index.js";
+import { clearMocks, base, mockModules } from "@testapp/index.js";
 import type { Configuration, RedisStoreConfig, StoreConfigMap } from "../common/types.js";
 import loader from "../utils/loader.js";
 

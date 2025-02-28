@@ -1,7 +1,7 @@
 /**
  * Created by steve Samson <stevee.samson@gmail.com> on 2/5/14.
  */
-import type { Request, Response, NextFunction } from "@src/lib/common/types.js";
+import type { Request, Response, NextFunction } from "$lib/common/types.js";
 
 
 export default async (req: Request, res: Response, next: NextFunction) => {

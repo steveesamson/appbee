@@ -3,7 +3,7 @@ import { cronMaster } from './cron-master.js';
 import { workerState } from './app-state.js';
 import { addDays } from 'date-fns/addDays';
 import { v, x, type AddCronReturn, type AppModel, type CronConfig, type Model } from '../common/types.js';
-import { Mango } from '@src/testapp/index.js';
+import { Mango } from '@testapp/index.js';
 import { commonModel } from '../utils/model-types/common.js';
 import { mongoDBModel } from '../utils/model-types/mongodb/mongo-model.js';
 

@@ -56,7 +56,7 @@ put(`/users/:id?`, (req: Request, res: Response) => {
     const { query = {}, params: { id }, data } = req.parameters;
 
     if (!id && !query.where) {
-        return res.status(200).json({ error: "You need an id/where object to update any model" });
+        return res.status(400).json({ error: "You need a query object to update any model" });
     }
     users = users.map((u: Params) => u.id == id ? ({ ...u, ...data }) : (u));
     const target = users.find((u: Params) => u.id == id);
@@ -66,7 +66,7 @@ put(`/users/:id?`, (req: Request, res: Response) => {
 destroy(`/users/:id?`, (req: Request, res: Response) => {
     const { params: { id }, query = {} } = req.parameters;
     if (!id && !query.where) {
-        return res.status(200).json({ error: "You need an id/where object to delete any model" });
+        return res.status(400).json({ error: "You need a query object to delete any model" });
     }
     const user = users.find((u: Params) => u.id == id);
     users = users.filter((u: Params) => u.id != id);
@@ -77,7 +77,7 @@ patch(`/users/:id?`, (req: Request, res: Response) => {
     const { params: { id }, query = {}, data } = req.parameters;
 
     if (!id && !query.where) {
-        return res.status(200).json({ error: "You need an id/where object to update any model" });
+        return res.status(400).json({ error: "You need a query object to update any model" });
     }
     users = users.map((u: Params) => u.id == id ? ({ ...u, ...data }) : (u));
     res.status(200).json({ data: users.find((u: Params) => u.id == id) });

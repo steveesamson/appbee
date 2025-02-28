@@ -50,7 +50,7 @@ export type RequestAware<T = unknown> = {
     parameters?: T;
 }
 
-export type Params<K = unknown> = {
+export type Params<K = any> = {
     [key: string]: K;
 };
 
@@ -78,27 +78,26 @@ export type PolicyConfig = GlobalPolicyConfig & {
 }
 
 
-type WithSideEffects = {
-    id?: unknown;
-    where?: Params;
-}
+// type WithSideEffects = {
+//     // id?: unknown;
+//     query: Params;
+// }
 
 export type MongoUpdateType = "$set" | "$inc" | "$unset" | "$setOnInsert" | "$currentDate";
 
 type UpdateKeys = {
-    id?: unknown;
-    where?: Params;
+    query: Params;
     upsert?: BoolType;
     includes?: string;
 }
 export type MongoUpdateOptions = UpdateKeys & {
     [key in MongoUpdateType]?: Params;
-
 }
 
-export type SqlUpdateOptions = WithSideEffects & {
-    includes?: string;
+export type SqlUpdateOptions = {
+    query: Params;
     data: Params;
+    includes?: string;
 }
 
 export type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
@@ -108,7 +107,9 @@ export type UpdateData = {
 }
 export type DeleteData = UpdateData;
 
-export type DeleteOptions = WithSideEffects;
+export type DeleteOptions = {
+    query: Params;
+};
 
 export type FindOptions = {
     includes?: string | 1;
@@ -119,7 +120,7 @@ export type FindOptions = {
     search?: string;
     beeSkipCount?: BoolType;
     relaxExclude?: BoolType;
-    query?: Params;
+    query: Params;
     params?: Params;
 }
 

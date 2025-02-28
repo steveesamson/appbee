@@ -1,7 +1,7 @@
 import { expect, describe, it, beforeAll, afterAll } from 'vitest';
 import { useEncrypt, useToken } from './security.js';
 import { appState } from '$lib/tools/app-state.js';
-import { clearMocks, mockModules, } from '@src/testapp/index.js';
+import { clearMocks, mockModules, } from '@testapp/index.js';
 
 describe('security.js', () => {
 	beforeAll(() => {

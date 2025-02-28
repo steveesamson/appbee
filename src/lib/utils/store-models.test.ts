@@ -1,5 +1,5 @@
 import { expect, describe, it, beforeAll, afterAll } from 'vitest';
-import { base, clearMocks, mockModules } from '@src/testapp/index.js';
+import { base, clearMocks, mockModules } from '@testapp/index.js';
 import loader from './loader.js';
 import { baseModel, makeModel } from './store-models.js';
 import type { Model, Source } from '../common/types.js';

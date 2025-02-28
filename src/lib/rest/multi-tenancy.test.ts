@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 import type { Request, Response } from "$lib/common/types.js";
 import multiTenancy from "./multi-tenancy.js";
 import { appState } from "../tools/app-state.js";
-import { mockResponse } from "@src/testapp/index.js";
+import { mockResponse } from "@testapp/index.js";
 
 describe("multi-tenancy.js", async () => {
 
