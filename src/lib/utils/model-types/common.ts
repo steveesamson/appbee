@@ -24,9 +24,9 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 		async postUpdate(req: RequestAware, data: Params[]): Promise<void> { },
 		async postDestroy(req: RequestAware, data: Params[]): Promise<void> { },
 		async publishCreate(req: RequestAware, data: Params | Params[]): Promise<void> {
-			const { db, io, parameters } = req;
+			const { db, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
-			await this.postCreate!({ db, io, parameters }, dat);
+			await this.postCreate!({ db, io, context }, dat);
 			if (io) {
 				const payload = getBroadcastPayload({ data: dat, verb: "create", room: _modelName });
 				broadcast(payload);
@@ -34,9 +34,9 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 			}
 		},
 		async publishUpdate(req: RequestAware, data: Params | Params[]): Promise<void> {
-			const { db, io, parameters } = req;
+			const { db, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
-			await this.postUpdate!({ db, io, parameters }, dat);
+			await this.postUpdate!({ db, io, context }, dat);
 			if (io) {
 				const payload = getBroadcastPayload({ data: dat, verb: "update", room: _modelName });
 				broadcast(payload);
@@ -44,10 +44,10 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 			}
 		},
 		async publishDestroy(req: RequestAware, data: Params | Params[]): Promise<void> {
-			const { db, io, parameters } = req;
+			const { db, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
 
-			await this.postDestroy!({ db, io, parameters }, dat);
+			await this.postDestroy!({ db, io, context }, dat);
 			if (io) {
 				const payload = getBroadcastPayload({ data: dat, verb: "destroy", room: _modelName });
 				broadcast(payload);

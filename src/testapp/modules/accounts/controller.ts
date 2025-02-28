@@ -13,14 +13,14 @@ get(`/:id?`, (req: Request<FindAccount>, res: Response) => {
 });
 
 post(`/`, (req: Request<AddAccount>, res: Response) => {
-  const { parameters: { data } } = req;
+  const { context: { data } } = req;
   res.status(200).json({
     data
   });
 });
 
 put(`/:id`, (req: Request<UpdateAccount>, res: Response) => {
-  const { parameters: { data } } = req;
+  const { context: { data } } = req;
   res.status(200).json({
     data
   });

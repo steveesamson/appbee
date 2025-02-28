@@ -25,7 +25,7 @@ describe('valibotation.js', () => {
     //         // };
     //         const
     //         const req = {
-    //             parameters: {}
+    //             context: {}
     //         } as Request;
     //         const res = {
     //             json: (e: Params) => {

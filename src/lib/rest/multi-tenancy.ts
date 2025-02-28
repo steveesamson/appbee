@@ -2,11 +2,11 @@ import type { NextFunction, Response, Request } from "$lib/common/types.js";
 import { appState } from "$lib/tools/app-state.js";
 
 const multiTenancy = (req: Request, res: Response, next: NextFunction) => {
-	const { parameters } = req;
+	const { context } = req;
 	const { env: { isMultitenant }, utils: { useSource } } = appState();
 	if (isMultitenant) {
-		if (parameters.tenant) {
-			const tenant = parameters.tenant;
+		if (context.tenant) {
+			const tenant = context.tenant;
 			req.source = useSource(tenant);
 			next();
 		} else {

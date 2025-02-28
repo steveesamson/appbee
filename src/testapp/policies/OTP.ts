@@ -8,9 +8,9 @@ const otp = function () {
 
 export default (req: Request, res: Response, next: NextFunction) => {
 
-    const { userId } = req.parameters;
+    const { userId } = req.context;
     const Otp = Models.getOtps(req);
     Otp.destroy({ where: { userId: userId } })
-    req.parameters.pin = otp();
+    req.context.pin = otp();
     next();
 };

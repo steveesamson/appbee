@@ -8,21 +8,21 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     // req = <Request>req;
 
-    if (!req.parameters.otp) {
+    if (!req.context.otp) {
         console.log("Access denied to %s", req.url);
 
         return res.status(401).json({ error: 'Invalid operation.' });
     }
 
-    const { otp, payload, userId } = req.parameters;
+    const { otp, payload, userId } = req.context;
 
     let Otps = Models.getOtps(req);
     const rw = await Otps.find({ id: otp, relax_exclude: true });
     if (rw && rw.pin === payload) {
 
         await Otps.destroy({ id: otp });
-        delete req.parameters.userId;
-        req.parameters.id = userId;
+        delete req.context.userId;
+        req.context.id = userId;
 
         next();
     } else {

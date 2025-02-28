@@ -8,18 +8,18 @@ const restRouter = () => (req: Request, res: Response, next: NextFunction) => {
 		case 'get':
 			{
 				const { includes, limit, search, offset, orderBy, orderDirection, ...rest } = query;
-				req.parameters = { query: rest, params, includes, limit, search, offset, orderBy, orderDirection };
+				req.context = { query: rest, params, includes, limit, search, offset, orderBy, orderDirection };
 				break;
 			}
 		case 'delete':
-			req.parameters = { params, query };
+			req.context = { params, query };
 			break;
 		case 'post':
-			req.parameters = { data: body };
+			req.context = { data: body };
 			break;
 		case 'put':
 		case 'patch':
-			req.parameters = { data: body, params, query };
+			req.context = { data: body, params, query };
 
 	}
 	multiTenancy(req, res, next);

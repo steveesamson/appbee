@@ -2,8 +2,8 @@ import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions
 
 const handleGet = <T extends FindOptions = FindOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
 	const model = getModel(req);
-	const { parameters } = req;
-	const { error, ...rest } = await model.find(parameters);
+	const { context } = req;
+	const { error, ...rest } = await model.find(context);
 	if (error) {
 		console.error(error);
 		return res.status(500).json({ error });
@@ -14,7 +14,7 @@ const handleCreate = <T extends CreateOptions>(getModel: GetModel, preCreate?: P
 	req: Request<T>,
 	res: Response,
 ) => {
-	const { data: _data = {}, relaxExclude, ...rest } = req.parameters;
+	const { data: _data = {}, relaxExclude, ...rest } = req.context;
 	const model = getModel(req);
 	let injection = {};
 
@@ -48,9 +48,9 @@ const handleUpdate = <T extends BaseUpdateOptions>(getModel: GetModel) => async 
 	req: Request<T>,
 	res: Response,
 ) => {
-	const { parameters } = req;
+	const { context } = req;
 	const model = getModel(req);
-	const { error, data } = await model.update(parameters);
+	const { error, data } = await model.update(context);
 	if (error) {
 		return res.status(500).json({ error });
 	}
@@ -61,12 +61,12 @@ const handleUpdate = <T extends BaseUpdateOptions>(getModel: GetModel) => async 
 	}
 };
 const handleDelete = <T extends BaseDeleteOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
-	const { parameters } = req;
-	const { where = {}, id } = parameters;
+	const { context } = req;
+	const { where = {}, id } = context;
 	const model = getModel(req);
 
 	const { data } = await model.find({ query: { ...where, id } });
-	const { error } = await model.destroy(parameters);
+	const { error } = await model.destroy(context);
 	if (error) {
 		return res.status(500).json({ error });
 	}

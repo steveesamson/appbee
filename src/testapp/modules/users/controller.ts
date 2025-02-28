@@ -19,7 +19,7 @@ let users: Params[] = [
 ];
 
 get(`/:id?`, (req: Request, res: Response) => {
-    const { search, params: { id }, query: { ROW_COUNT } } = req.parameters;
+    const { search, params: { id }, query: { ROW_COUNT } } = req.context;
 
     if (search) {
         return res.status(200).json({ data: users.filter((u: Params) => u.username.indexOf(search) !== -1) });
@@ -34,14 +34,14 @@ get(`/:id?`, (req: Request, res: Response) => {
 })
 
 post(`/users`, (req: Request, res: Response) => {
-    const { parameters: { data } } = req;
+    const { context: { data } } = req;
     data.id = 4;
     users = [...users, data];
     res.status(200).json({ data });
 });
 
 post(`/users/upload`, async (req: Request, res: Response) => {
-    const { parameters: { data: { withError } }, files } = req;
+    const { context: { data: { withError } }, files } = req;
     if (files && files.length) {
         const firstFile: MultiPartFile = files[0];
         const tempDir = withError ? '/tmpppp' : '/tmp';
@@ -53,7 +53,7 @@ post(`/users/upload`, async (req: Request, res: Response) => {
 });
 
 put(`/users/:id?`, (req: Request, res: Response) => {
-    const { query = {}, params: { id }, data } = req.parameters;
+    const { query = {}, params: { id }, data } = req.context;
 
     if (!id && !query.where) {
         return res.status(400).json({ error: "You need a query object to update any model" });
@@ -64,7 +64,7 @@ put(`/users/:id?`, (req: Request, res: Response) => {
 });
 
 destroy(`/users/:id?`, (req: Request, res: Response) => {
-    const { params: { id }, query = {} } = req.parameters;
+    const { params: { id }, query = {} } = req.context;
     if (!id && !query.where) {
         return res.status(400).json({ error: "You need a query object to delete any model" });
     }
@@ -74,7 +74,7 @@ destroy(`/users/:id?`, (req: Request, res: Response) => {
 });
 
 patch(`/users/:id?`, (req: Request, res: Response) => {
-    const { params: { id }, query = {}, data } = req.parameters;
+    const { params: { id }, query = {}, data } = req.context;
 
     if (!id && !query.where) {
         return res.status(400).json({ error: "You need a query object to update any model" });

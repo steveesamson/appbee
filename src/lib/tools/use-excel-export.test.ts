@@ -26,7 +26,7 @@ describe('use-excell-export.js', () => {
             } as unknown as Response;
 
             const req = {
-                parameters: {
+                context: {
                     storeName: 'test-store', content: `<table>
                     <tr>
                     <td>Steve S. Samson</td>

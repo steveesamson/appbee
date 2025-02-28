@@ -54,7 +54,7 @@ describe("restful.js", async () => {
 			const getModel = withModel();
 			const res = mockResponse('data', "find");
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleGet(getModel);
 			await handler(req, res);
@@ -64,7 +64,7 @@ describe("restful.js", async () => {
 			const getModel = withModel();
 			const res = mockResponse('data', 'create');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleCreate(getModel);
 			await handler(req, res);
@@ -77,7 +77,7 @@ describe("restful.js", async () => {
 			const res = mockResponse('data', 'create');
 
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleCreate(getModel, preCreate);
 			await handler(req, res);
@@ -88,7 +88,7 @@ describe("restful.js", async () => {
 			const res = mockResponse('data', 'update');
 
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleUpdate(getModel);
 			await handler(req, res);
@@ -98,7 +98,7 @@ describe("restful.js", async () => {
 			const getModel = withModel();
 			const res = mockResponse('data', 'find');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleDelete(getModel);
 			await handler(req, res);
@@ -114,7 +114,7 @@ describe("restful.js", async () => {
 			const getModel = withModel("error");
 			const res = mockResponse('error', 'find');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleGet(getModel);
 			await handler(req, res);
@@ -124,7 +124,7 @@ describe("restful.js", async () => {
 			const getModel = withModel("error");
 			const res = mockResponse('error', 'create');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleCreate(getModel);
 			await handler(req, res);
@@ -136,7 +136,7 @@ describe("restful.js", async () => {
 			const preCreate = {} as unknown as PreCreate;
 			const res = mockResponse('error', 'create');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleCreate(getModel, preCreate);
 
@@ -148,7 +148,7 @@ describe("restful.js", async () => {
 			const getModel = withModel("error");
 			const res = mockResponse('error', 'update');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleUpdate(getModel);
 			await handler(req, res);
@@ -159,7 +159,7 @@ describe("restful.js", async () => {
 			const getModel = withModel("error");
 			const res = mockResponse('error', 'destroy');
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			const handler = handleDelete(getModel);
 			await handler(req, res);

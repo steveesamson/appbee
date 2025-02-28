@@ -23,7 +23,7 @@ export * as x from "../utils/valibot/extensions.js"
 //         S,
 //         V
 //     > {
-//     parameters: T;
+//     context: T;
 //     files?: MultiPartFile[];
 //     source?: Source;
 //     io?: Socket;
@@ -31,7 +31,7 @@ export * as x from "../utils/valibot/extensions.js"
 //     currentUser?: Params;
 // };
 export interface Request<T = any> extends ExpressRequest {
-    parameters: T;
+    context: T;
     files?: MultiPartFile[];
     source?: Source;
     io?: Socket;
@@ -47,7 +47,7 @@ export type DBAware = {
 export type RequestAware<T = unknown> = {
     db?: any;
     io?: Socket;
-    parameters?: T;
+    context?: T;
 }
 
 export type Params<K = any> = {

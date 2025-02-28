@@ -33,16 +33,16 @@ describe("multi-tenancy.js", async () => {
 			appState({ env: { isMultitenant: false } });
 			const next = vi.fn();
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 
 			multiTenancy(req, {} as Response, next);
-			expect(req.parameters).toEqual({});
+			expect(req.context).toEqual({});
 			expect(req.source).toBe('core-source');
 			expect(next).toHaveBeenCalled()
 		})
 
-		it('should call next with error when isMultitenant=true and req.parameters.tenant is not found.', () => {
+		it('should call next with error when isMultitenant=true and req.context.tenant is not found.', () => {
 			appState({ env: { isMultitenant: true } });
 
 			const res = mockResponse('error', "Unable to determine tenant in a multi tenant env.");
@@ -50,19 +50,19 @@ describe("multi-tenancy.js", async () => {
 			const next = vi.fn(() => {
 			});
 			const req = {
-				parameters: {},
+				context: {},
 			} as Request;
 			multiTenancy(req, res, next);
 		})
-		it('should call next when isMultitenant=true and req.parameters.tenant is set.', () => {
+		it('should call next when isMultitenant=true and req.context.tenant is set.', () => {
 			appState({ env: { isMultitenant: true } });
 			const next = vi.fn();
 			const req = {
-				parameters: { tenant: 'some-tenant' },
+				context: { tenant: 'some-tenant' },
 			} as unknown as Request;
 
 			multiTenancy(req, {} as Response, next);
-			expect(req.parameters).toEqual({ tenant: 'some-tenant' });
+			expect(req.context).toEqual({ tenant: 'some-tenant' });
 			expect(req.source).toBe('tenant-source');
 			expect(next).toHaveBeenCalled()
 		})

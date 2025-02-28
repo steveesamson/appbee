@@ -6,7 +6,7 @@ import { errorMessage } from "../utils/handle-error.js";
 
 export const useUnlink = () => (req: Request, res: Response) => {
 	const { env: { UPLOAD_DIR } } = appState();
-	const { files = undefined } = req.parameters;
+	const { files = undefined } = req.context;
 	if (files) {
 		const fileList: string[] = files.split(",").map((s: string) => s.trim()).filter((s: string) => !!s);
 

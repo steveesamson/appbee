@@ -54,8 +54,8 @@ describe('common.js', () => {
 			expect(model).toBeDefined();
 			expect(model.publishCreate).toBeDefined();
 			expect(model.publishCreate).toBeTypeOf('function');
-			await model.publishCreate({ parameters: {}, io: {}, db: {} } as RequestAware, {});
-			await model.publishCreate({ parameters: {}, io: {}, db: {} } as RequestAware, [{}]);
+			await model.publishCreate({ context: {}, io: {}, db: {} } as RequestAware, {});
+			await model.publishCreate({ context: {}, io: {}, db: {} } as RequestAware, [{}]);
 		})
 
 		it('should resolve publishUpdate', async () => {
@@ -63,8 +63,8 @@ describe('common.js', () => {
 			expect(model).toBeDefined();
 			expect(model.publishUpdate).toBeDefined();
 			expect(model.publishUpdate).toBeTypeOf('function');
-			await model.publishUpdate({ parameters: {}, io: {}, db: {} } as RequestAware, {});
-			await model.publishUpdate({ parameters: {}, io: {}, db: {} } as RequestAware, [{}]);
+			await model.publishUpdate({ context: {}, io: {}, db: {} } as RequestAware, {});
+			await model.publishUpdate({ context: {}, io: {}, db: {} } as RequestAware, [{}]);
 		})
 
 		it('should resolve publishDestroy', async () => {
@@ -72,8 +72,8 @@ describe('common.js', () => {
 			expect(model).toBeDefined();
 			expect(model.publishDestroy).toBeDefined();
 			expect(model.publishDestroy).toBeTypeOf('function');
-			model.publishDestroy({ parameters: {}, io: {}, db: {} } as RequestAware, {});
-			model.publishDestroy({ parameters: {}, io: {}, db: {} } as RequestAware, [{}]);
+			model.publishDestroy({ context: {}, io: {}, db: {} } as RequestAware, {});
+			model.publishDestroy({ context: {}, io: {}, db: {} } as RequestAware, [{}]);
 		})
 	})
 

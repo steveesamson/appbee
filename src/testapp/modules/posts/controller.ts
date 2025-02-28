@@ -18,7 +18,7 @@ let users: Params[] = [
     }
 ]
 get(`/:id?`, (req: Request, res: Response) => {
-    const { id, search, ROW_COUNT } = req.parameters;
+    const { id, search, ROW_COUNT } = req.context;
 
     if (search) {
         return res.status(200).json({ data: users.filter((u: Params) => u.username.indexOf(search) !== -1) });
@@ -33,14 +33,14 @@ get(`/:id?`, (req: Request, res: Response) => {
 })
 
 post(`/posts`, (req: Request, res: Response) => {
-    const newUser = req.parameters;
+    const newUser = req.context;
     newUser.id = 4;
     users = [...users, newUser];
     res.status(200).json({ data: newUser });
 });
 
 put(`/posts/:id?`, (req: Request, res: Response) => {
-    const { id, where, ...others } = req.parameters;
+    const { id, where, ...others } = req.context;
 
     if (!id && !where) {
         return res.status(200).json({ error: "You need an id/where object to update any model" });
@@ -50,7 +50,7 @@ put(`/posts/:id?`, (req: Request, res: Response) => {
 });
 
 destroy(`/posts/:id?`, (req: Request, res: Response) => {
-    const { id, where } = req.parameters;
+    const { id, where } = req.context;
     if (!id && !where) {
         return res.status(200).json({ error: "You need an id/where object to delete any model" });
     }
@@ -60,7 +60,7 @@ destroy(`/posts/:id?`, (req: Request, res: Response) => {
 });
 
 patch(`/posts/:id?`, (req: Request, res: Response) => {
-    const { id, where, ...others } = req.parameters;
+    const { id, where, ...others } = req.context;
 
     if (!id && !where) {
         return res.status(200).json({ error: "You need an id/where object to update any model" });

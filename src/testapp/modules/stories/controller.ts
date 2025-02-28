@@ -5,7 +5,7 @@ const { get, post, put, destroy, patch } = Route("Stories", "/stories");
 
 get(`/send`, (req: Request, res: Response) => {
 
-  const { query: { story } } = req.parameters;
+  const { query: { story } } = req.context;
   res.status(200).send(`${story}`);
 });
 

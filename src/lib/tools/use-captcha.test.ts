@@ -23,7 +23,7 @@ describe('use-captcha.js', () => {
             } as Response;
 
             const req = {
-                parameters: {}
+                context: {}
             } as unknown as Request;
 
             await useCaptcha()(req, res);

@@ -25,7 +25,7 @@ describe('use-unlink.js', () => {
 			const res = mockResponse('text', "Files successfully deleted");
 
 			const req = {
-				parameters: { files: 'testfile.txt,non-existent.txt' }
+				context: { files: 'testfile.txt,non-existent.txt' }
 			} as unknown as Request;
 
 
@@ -38,7 +38,7 @@ describe('use-unlink.js', () => {
 			const res = mockResponse('error', "There are no files");
 
 			const req = {
-				parameters: {}
+				context: {}
 			} as unknown as Request;
 			await useUnlink()(req, res);
 
