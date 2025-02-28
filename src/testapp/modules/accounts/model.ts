@@ -14,10 +14,10 @@ const Accounts: Model<typeof schema> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { findSchema, postSchema, updateSchema, deleteSchema } = useSchema(schema);
+const { readSchema, createSchema, updateSchema, deleteSchema } = useSchema(schema);
 
-export type FindAccount = Infer<typeof findSchema>;
-export type AddAccount = Infer<typeof postSchema>;
+export type FindAccount = Infer<typeof readSchema>;
+export type AddAccount = Infer<typeof createSchema>;
 export type UpdateAccount = Infer<typeof updateSchema>;
 export type DeleteAccount = Infer<typeof deleteSchema>;
 

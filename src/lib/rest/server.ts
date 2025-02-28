@@ -1,10 +1,4 @@
 import { join } from "path";
-// import type { RedisClientType } from 'redis'
-// import { useRedis } from "../tools/redis.js";
-// import { initQueue } from "../tools/bee-que.js";
-// import { initEventBus } from "../tools/event-bus.js";
-// import { mailer } from "../tools/mailer.js";
-// import { createAdapter } from "@socket.io/redis-adapter";
 import express, { Router } from "express";
 import compression from "compression";
 import errorHandler from "errorhandler";
@@ -13,11 +7,11 @@ import helmet from "helmet";
 import { Server } from "socket.io";
 import { createServer as createHTTPServer } from "http";
 import methodOverride from "method-override";
-import { components, configureRealtimeRoutes, configureRestRoutes, configureRestServer, isDev, useConfig, usePlugin, useSource } from "../utils/configurer.js";
+import { components, configureRealtimeRoutes, configureRestRoutes, configureRestServer, useConfig, usePlugin, useSource } from "../utils/configurer.js";
 import { appState } from "../tools/app-state.js";
 import { restSessionUser } from "./middlewares/session-user.js";
 import beeMultiparts from "./multiparts.js";
-import type { Params, Resource, Utils, Application } from "../common/types.js";
+import type { Params, Resource, Utils, Application, RequestHandler } from "../common/types.js";
 import restRouter from "./rest-router.js";
 import resolveAsyncAwait from "../tools/resolve-asyn-await.js";
 import { dataLoader } from "../tools/data-loader.js";
@@ -135,7 +129,7 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 	);
 
 	if (middlewares && middlewares.length) {
-		app.use(...middlewares);
+		app.use(...middlewares as RequestHandler[]);
 	}
 	const ioServerOptions = {
 		cors: corsOptions,

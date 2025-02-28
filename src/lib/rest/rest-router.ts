@@ -1,7 +1,7 @@
 import multiTenancy from "./multi-tenancy.js";
-import type { Request, Response, NextFunction } from "../common/types.js";
+import type { Request, Response, NextFunction, RequestHandler } from "../common/types.js";
 
-const restRouter = () => (req: Request, res: Response, next: NextFunction) => {
+const restRouter = (): RequestHandler => (req: Request, res: Response, next: NextFunction) => {
 
 	const { method, body = {}, params = {}, query = {} } = req;
 	switch (method.toLowerCase()) {

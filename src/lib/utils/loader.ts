@@ -1,6 +1,6 @@
 import { resolve, basename } from "path";
 import { ofExtension, listDir, fileExists } from "./files.js";
-import type { RouteMap, MiddlewareRoutine, Configuration, ConfigKeys, ModelFactory, RestRequestHandler } from "../common/types.js";
+import type { RouteMap, Configuration, ConfigKeys, ModelFactory, RestRequestHandler } from "../common/types.js";
 import { denyAll, allowAll } from "$lib/rest/policies/index.js";
 import { routes } from "$lib/rest/route.js";
 import importModel from "./model-importer.js";
@@ -47,15 +47,14 @@ const loader = (base: string) => {
 		return modules;
 	};
 
-	const loadPolicy = async (policies: string[]): Promise<MiddlewareRoutine[]> => {
-		const policiesMap: MiddlewareRoutine[] = [];
+	const loadPolicy = async (policies: string[]): Promise<RestRequestHandler[]> => {
+		const policiesMap: RestRequestHandler[] = [];
 		// const middlewares = Router();
 		if (policies.includes("allowAll")) {
 			// middlewares.use(allowAll);
-			policiesMap.push(allowAll);
+			policiesMap.push(allowAll as RestRequestHandler);
 		}
 		if (policies.includes("denyAll")) {
-			// middlewares.use(denyAll);
 			policiesMap.push(denyAll);
 		}
 

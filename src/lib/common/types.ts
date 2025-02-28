@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import type { ParamsDictionary, Query } from 'express-serve-static-core';
-import type { Application, Request as ExpressRequest, Response, NextFunction } from "express";
+// import type { RequestHandler, ParamsDictionary, Query } from 'express-serve-static-core';
+import type { Application, RequestHandler, Request as ExpressRequest, Response, NextFunction } from "express";
 import type { ScheduledTask } from "node-cron";
-export type { Application, Response, NextFunction };
+export type { RequestHandler, Application, Response, NextFunction };
 import * as useFetch from "../tools/use-fetch.js";
 import { Socket, Server } from "socket.io";
 import type { PolicyMap } from "../utils/configure-policies.js";
@@ -77,12 +77,6 @@ export type PolicyConfig = GlobalPolicyConfig & {
     [key in HTTP_METHODS]?: MethodPolicy;
 }
 
-
-// type WithSideEffects = {
-//     // id?: unknown;
-//     query: Params;
-// }
-
 export type MongoUpdateType = "$set" | "$inc" | "$unset" | "$setOnInsert" | "$currentDate";
 
 type UpdateKeys = {
@@ -100,7 +94,7 @@ export type SqlUpdateOptions = {
     includes?: string;
 }
 
-export type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
+type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
 export type UpdateData = {
     data?: Params | Params[];
     error?: string;
@@ -183,7 +177,7 @@ export type Model<T extends Base = Base> = Partial<AppModel> & {
 };
 export type RestRequestHandler<T = any> = (req: Request<T>, res: Response, next?: NextFunction) => any;
 
-export type MiddlewareRoutine<T = any> = (req: Request<T>, res: Response, next: NextFunction) => any;
+// export type MiddlewareRoutine<T = any> = (req: Request<T>, res: Response, next: NextFunction) => any;
 
 export type PreCreate<T = any> = (req: Request<T>) => Params;
 
@@ -197,6 +191,7 @@ export type IORoutes = {
 
 //method path is the key, ControllerRequest, the handler is the value
 export type RouteConfig = Record<string, RestRequestHandler[] | string>;
+// export type RouteConfig = Record<string, RestRequestHandler[]>;
 
 //controller name is the key, its Routes is the value
 export type RouteMap = Record<string, RouteConfig>;
@@ -318,7 +313,8 @@ export type Modules = {
     controllers: RouteMap;
     policies: PolicyMap;
     plugins: Plugins;
-    middlewares: RestRequestHandler[];
+    // middlewares: RestRequestHandler[];
+    middlewares: ((req: Request, res: Response, next?: NextFunction) => any)[];
 }
 
 export type AddCronReturn = (() => void) | undefined;

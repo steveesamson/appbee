@@ -15,14 +15,14 @@ export const useSchema = <
     baseSchema: T,
 ) => {
     const withOmittedId = v.omit(baseSchema, ['id']);
-    const postSchema = v.object({
+    const createSchema = v.object({
         data: v.union([withOmittedId, v.array(withOmittedId)]),
     });
     const conditionSchema = v.object({
         params: v.optional(v.partial(v.pick(baseSchema, ['id']))),
         query: v.optional(v.partial(baseSchema)),
     })
-    const findSchema = v.object({
+    const readSchema = v.object({
         includes: v.optional(v.union([v.string(), v.literal(1)])),
         offset: v.optional(v.pipe(v.number(), v.integer(), v.toMinValue(0))),
         limit: v.optional(v.pipe(v.number(), v.integer(), v.toMinValue(0))),
@@ -44,7 +44,7 @@ export const useSchema = <
         v.check((input) => !!input.params?.id || !!input.query, "Either params.id or query is required")
     );
 
-    return { findSchema, postSchema, updateSchema, deleteSchema };
+    return { createSchema, readSchema, updateSchema, deleteSchema };
 };
 
 

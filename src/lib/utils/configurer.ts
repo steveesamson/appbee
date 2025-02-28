@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import type { Application, Components, RestRequestHandler, HTTP_METHODS, IORequest, IORoutes, IOSocketRequest, MiddlewareRoutine, Modules, Params, Configuration, Source, DataSource, PolicyConfig } from "$lib/common/types.js";
+import type { Application, Components, RequestHandler, HTTP_METHODS, IORequest, IORoutes, IOSocketRequest, Modules, Params, Configuration, Source, DataSource, PolicyConfig } from "$lib/common/types.js";
 import { Router } from "express";
 import { routes } from "$lib/rest/route.js";
 import realtimeRouter from "$lib/rest/realtime-router.js";
@@ -11,8 +11,6 @@ import restRouter from "../rest/rest-router.js";
 import { realtimeSessionUser } from "../rest/middlewares/session-user.js";
 import { configurePolicies, type PolicyMap } from "./configure-policies.js";
 import { useGlobals } from "./use-globals.js";
-
-// const isDev = process.env.NODE_ENV === 'development' || process.env.TEST === "true";
 
 const baseTrap: { base: string; } = { base: '' };
 const ioRoutes: IORoutes = {
@@ -72,13 +70,13 @@ const configureRestRoutes = async (policiesMap: PolicyMap) => {
 			const nextGlobalPolicy = nextPolicyParams.parent || globalPolicy;
 			const nextPolicy = nextPolicyParams[key];
 			const policyNames: string[] = dedupeArray<string>(nextPolicy ? nextPolicy : nextGlobalPolicy);
-			const policies: MiddlewareRoutine[] = [restRouter() as MiddlewareRoutine, ...await loadPolicy(policyNames)];
+			const policies = [restRouter(), ...await loadPolicy(policyNames)];
 
-			router[method as HTTP_METHODS](rpath, policies, ...handler as RestRequestHandler[]);
+			router[method as HTTP_METHODS](rpath, policies as RequestHandler[], ...handler as RequestHandler[]);
 			const ioRoute = components.ioRoutes[method as HTTP_METHODS];
 
 			if (ioRoute) {
-				ioRoute[rpath] = registerRealtimePolicies([...policies, ...handler as RestRequestHandler[]]);
+				ioRoute[rpath] = registerRealtimePolicies([...policies, ...handler as RequestHandler[]]);
 			}
 
 		}

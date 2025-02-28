@@ -1,4 +1,4 @@
-import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions, Params } from "../common/types.js";
+import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions, Params, MongoUpdateType } from "../common/types.js";
 
 const handleGet = <T extends FindOptions = FindOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
 	const model = getModel(req);
@@ -10,7 +10,7 @@ const handleGet = <T extends FindOptions = FindOptions>(getModel: GetModel) => a
 	}
 	res.status(200).json({ ...rest });
 };
-const handleCreate = <T extends CreateOptions>(getModel: GetModel, preCreate?: PreCreate<T>) => async (
+const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetModel, preCreate?: PreCreate<T>) => async (
 	req: Request<T>,
 	res: Response,
 ) => {
@@ -37,20 +37,29 @@ const handleCreate = <T extends CreateOptions>(getModel: GetModel, preCreate?: P
 
 };
 type BaseDeleteOptions = {
-	id?: any;
-	where?: Params;
+	params?: {
+		id?: unknown;
+	},
+	query?: Params;
 }
-type BaseUpdateOptions = BaseDeleteOptions & {
-	data?: Params;
+type BaseSqlUpdateOptions = BaseDeleteOptions & {
+	data: Params;
 }
-// const handleUpdate = <T extends UpdateOptions>(getModel: GetModel) => async (
-const handleUpdate = <T extends BaseUpdateOptions>(getModel: GetModel) => async (
+
+type BaseMongoDBUpdateOptions = BaseDeleteOptions & {
+	[key in MongoUpdateType]?: Params;
+}
+type UpdateOptions = BaseSqlUpdateOptions | BaseMongoDBUpdateOptions;
+
+const handleUpdate = <T extends UpdateOptions = UpdateOptions>(getModel: GetModel) => async (
 	req: Request<T>,
 	res: Response,
 ) => {
 	const { context } = req;
+	const { query: qry = {}, params = {}, ...rest } = context;
 	const model = getModel(req);
-	const { error, data } = await model.update(context);
+	const query = { ...qry, ...params }
+	const { error, data } = await model.update({ query, ...rest });
 	if (error) {
 		return res.status(500).json({ error });
 	}
@@ -60,13 +69,13 @@ const handleUpdate = <T extends BaseUpdateOptions>(getModel: GetModel) => async 
 		res.status(200).json({ data });
 	}
 };
-const handleDelete = <T extends BaseDeleteOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
+const handleDelete = <T extends BaseDeleteOptions = BaseDeleteOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
 	const { context } = req;
-	const { where = {}, id } = context;
+	const { query: qry = {}, params = {} } = context;
 	const model = getModel(req);
-
-	const { data } = await model.find({ query: { ...where, id } });
-	const { error } = await model.destroy(context);
+	const query = { ...qry, ...params }
+	const { data } = await model.find({ query });
+	const { error } = await model.destroy({ query });
 	if (error) {
 		return res.status(500).json({ error });
 	}

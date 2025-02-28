@@ -22,9 +22,9 @@ const Route = (name: string, mountPoint = ""): RouteMethods => {
 	route.mountPoint = mountPoint;
 	routes[name] = route;
 
-	const { postSchema, updateSchema, deleteSchema } = useSchema(schema);
+	const { createSchema, updateSchema, deleteSchema } = useSchema(schema);
 
-	type CreateType = v.InferOutput<typeof postSchema>;
+	type CreateType = v.InferOutput<typeof createSchema>;
 	type UpdateType = v.InferOutput<typeof updateSchema>;
 	type DeleteType = v.InferOutput<typeof deleteSchema>;
 
@@ -39,7 +39,7 @@ const Route = (name: string, mountPoint = ""): RouteMethods => {
 		post(path: string, handlerOrPreCreate?: RestRequestHandler<CreateType> | PreCreate<CreateType>) {
 			path = normalizePath(path, mountPoint);
 			const validators: RestRequestHandler<CreateType>[] = [];
-			validators.push(validateSchema<CreateType>(postSchema));
+			validators.push(validateSchema<CreateType>(createSchema));
 
 			if (handlerOrPreCreate && typeof handlerOrPreCreate === 'function') {
 				if (handlerOrPreCreate.length === 1) {

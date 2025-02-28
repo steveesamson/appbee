@@ -1,4 +1,4 @@
-import type { Response, NextFunction, Params, Request } from "$lib/common/types.js";
+import type { Response, NextFunction, Params, Request, RequestHandler } from "$lib/common/types.js";
 import { useToken } from "$lib/tools/security.js";
 
 const patchOnCurrentUser = async (req: Request) => {
@@ -15,7 +15,7 @@ const patchOnCurrentUser = async (req: Request) => {
 		}
 	}
 }
-export const restSessionUser = () => async (req: Request, res: Response, next: NextFunction) => {
+export const restSessionUser = (): RequestHandler => async (req: Request, res: Response, next: NextFunction) => {
 	await patchOnCurrentUser(req);
 	next();
 };

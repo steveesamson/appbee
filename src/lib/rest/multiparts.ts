@@ -3,11 +3,11 @@
  * Created by steve Samson <stevee.samson@gmail.com> on 2/16/14.
  */
 
-import type { Response, NextFunction, Request } from "$lib/common/types.js";
+import type { Response, NextFunction, Request, RequestHandler } from "$lib/common/types.js";
 import useChunkDecoder from "./chunk-decoder.js";
 import useFileUploader from "./file-uploader.js";
 
-const multipart = () => (req: Request, res: Response, next: NextFunction) => {
+const multipart = (): RequestHandler => (req: Request, res: Response, next: NextFunction) => {
 
 	const contentType = req.headers["content-type"];
 
