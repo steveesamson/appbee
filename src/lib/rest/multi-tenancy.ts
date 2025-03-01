@@ -4,6 +4,7 @@ import { appState } from "$lib/tools/app-state.js";
 const multiTenancy = (req: Request, res: Response, next: NextFunction) => {
 	const { context } = req;
 	const { env: { isMultitenant }, utils: { useSource } } = appState();
+
 	if (isMultitenant) {
 		if (context.tenant) {
 			const tenant = context.tenant;

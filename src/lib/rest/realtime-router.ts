@@ -58,6 +58,10 @@ const ioRouter = async ({ req, method, cb, socket, ioRoutes }: IORequest) => {
 		return res.status(404).error("Not Found");
 	}
 
+	// req.aware = () => {
+	// 	return { io: req.io, source: req.source, context: req.context };
+	// }
+
 	const handler = ioRoutes[mtd][url];
 	handler(req as unknown as Request, res as unknown as Response);
 };

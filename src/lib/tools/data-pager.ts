@@ -12,7 +12,7 @@ export const dataPager: DataPager = ({
 	let offset = 0;
 	const log = logDebug(debug);
 	const start = async () => {
-		const { data = [], error, recordCount = 0 } = await model.find({ ...params, offset, limit: LIMIT, includes });
+		const { data = [], error, recordCount = 0 } = await model.find({ query: params, offset, limit: LIMIT, includes });
 		log({ model: model.instanceName, data, error, recordCount, next: offset + LIMIT });
 		if (error) {
 			return onPage([]);

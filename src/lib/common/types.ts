@@ -37,6 +37,7 @@ export interface Request<T = any> extends ExpressRequest {
     io?: Socket;
     _query: { sid: string };
     currentUser?: Params;
+    aware: () => ({ io?: Socket; source?: Source; context: T });
 };
 
 export type HTTP_METHODS = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'head' | 'options';
@@ -45,7 +46,7 @@ export type DBAware = {
     source?: Source;
 }
 export type RequestAware<T = unknown> = {
-    db?: any;
+    source?: Source;
     io?: Socket;
     context?: T;
 }
@@ -94,7 +95,7 @@ export type SqlUpdateOptions = {
     includes?: string;
 }
 
-type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
+export type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
 export type UpdateData = {
     data?: Params | Params[];
     error?: string;
@@ -106,9 +107,9 @@ export type DeleteOptions = {
 };
 
 export type FindOptions = {
-    includes?: string | 1;
-    offset?: string;
-    limit?: string;
+    includes?: string | string[] | 1;
+    offset?: number;
+    limit?: number;
     orderBy?: string;
     orderDirection?: "ASC" | "DESC" | "asc" | "desc";
     search?: string;
@@ -144,18 +145,19 @@ export type DbFinalizer = {
 
 export type ResolveData = Params | Params[];
 export type AppModel = {
-    pipeline(): Params[];
-    resolveResult(data: ResolveData, includeMap: Params<1 | string>): Promise<ResolveData>;
-    find(options: FindOptions): Promise<FindData>;
-    create(options: CreateOptions): Promise<CreateData>;
-    update(options: UpdateOptions): Promise<UpdateData>;
-    destroy(options: DeleteOptions): Promise<DeleteData>;
-    postCreate<T = any>(req: RequestAware<T>, data: Params[]): Promise<void>;
-    postUpdate<T = any>(req: RequestAware<T>, data: Params[]): Promise<void>;
-    postDestroy<T = any>(req: RequestAware<T>, data: Params[]): Promise<void>;
-    publishCreate<T = any>(req: RequestAware<T>, data: Params | Params[]): void;
-    publishUpdate<T = any>(req: RequestAware<T>, data: Params | Params[]): void;
-    publishDestroy<T = any>(req: RequestAware<T>, data: Params | Params[]): void;
+    aware: () => DBAware;
+    pipeline: () => Params[];
+    resolveResult: (data: ResolveData, includeMap: Params<1 | string>) => Promise<ResolveData>;
+    find: (options: FindOptions) => Promise<FindData>;
+    create: (options: CreateOptions) => Promise<CreateData>;
+    update: (options: UpdateOptions) => Promise<UpdateData>;
+    destroy: (options: DeleteOptions) => Promise<DeleteData>;
+    postCreate: <T = any>(req: RequestAware<T>, data: Params[]) => Promise<void>;
+    postUpdate: <T = any>(req: RequestAware<T>, data: Params[]) => Promise<void>;
+    postDestroy: <T = any>(req: RequestAware<T>, data: Params[]) => Promise<void>;
+    publishCreate: <T = any>(req: RequestAware<T>, data: Params | Params[]) => void;
+    publishUpdate: <T = any>(req: RequestAware<T>, data: Params | Params[]) => void;
+    publishDestroy: <T = any >(req: RequestAware<T>, data: Params | Params[]) => void;
     storeType?: string;
     dbSchema: string;
     // schema: T;
@@ -265,12 +267,12 @@ export type LdapConfig = {
 
 
 export type Encrypt = {
-    verify(plain: string, hash: string): Promise<boolean>;
-    hash(plain: string): Promise<string>;
+    verify: (plain: string, hash: string) => Promise<boolean>;
+    hash: (plain: string) => Promise<string>;
 }
 export type Token = {
-    verify(token: string): Promise<Params | string | number>;
-    sign(load: Params): Promise<string>;
+    verify: (token: string) => Promise<Params | string | number>;
+    sign: (load: Params) => Promise<string>;
 }
 
 export type CronConfig = {
@@ -391,7 +393,7 @@ export type DataPagerOptions = {
     includes?: string | string[] | 1;
     LIMIT?: number;
     debug?: BoolType;
-    onPage: (data: Params[], next?: () => void) => void;
+    onPage: <T extends Params = Params>(data: T[], next?: () => void) => void;
 };
 
 export type DataPager = (dataPagerOptions: DataPagerOptions) => { start: () => Promise<void>; };

@@ -22,6 +22,9 @@ const restRouter = (): RequestHandler => (req: Request, res: Response, next: Nex
 			req.context = { data: body, params, query };
 
 	}
+	req.aware = () => {
+		return { io: req.io, source: req.source, context: req.context };
+	}
 	multiTenancy(req, res, next);
 };
 

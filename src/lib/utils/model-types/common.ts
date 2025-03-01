@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { AppModel, FindData, Model, OneData, Params, RequestAware } from "$lib/common/types.js";
+import type { AppModel, CreateData, DeleteData, FindData, Model, Params, RequestAware, UpdateData } from "$lib/common/types.js";
 import capitalize from "lodash/capitalize.js";
 import { getBroadcastPayload, broadcast } from "./index.js";
 
@@ -20,34 +20,34 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 		searchPath: [], //['attachments'] excludes from mclean.
 		orderBy: "",
 		insertKey: "id",
-		async postCreate(req: RequestAware, data: Params[]): Promise<void> { },
-		async postUpdate(req: RequestAware, data: Params[]): Promise<void> { },
-		async postDestroy(req: RequestAware, data: Params[]): Promise<void> { },
-		async publishCreate(req: RequestAware, data: Params | Params[]): Promise<void> {
-			const { db, io, context } = req;
+		async postCreate<T = unknown>(req: RequestAware<T>, data: Params[]): Promise<void> { },
+		async postUpdate<T = unknown>(req: RequestAware<T>, data: Params[]): Promise<void> { },
+		async postDestroy<T = unknown>(req: RequestAware<T>, data: Params[]): Promise<void> { },
+		async publishCreate<T = unknown>(req: RequestAware<T>, data: Params | Params[]): Promise<void> {
+			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
-			await this.postCreate!({ db, io, context }, dat);
+			await this.postCreate!({ source, io, context }, dat);
 			if (io) {
 				const payload = getBroadcastPayload({ data: dat, verb: "create", room: _modelName });
 				broadcast(payload);
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
-		async publishUpdate(req: RequestAware, data: Params | Params[]): Promise<void> {
-			const { db, io, context } = req;
+		async publishUpdate<T = unknown>(req: RequestAware<T>, data: Params | Params[]): Promise<void> {
+			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
-			await this.postUpdate!({ db, io, context }, dat);
+			await this.postUpdate!({ source, io, context }, dat);
 			if (io) {
 				const payload = getBroadcastPayload({ data: dat, verb: "update", room: _modelName });
 				broadcast(payload);
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
-		async publishDestroy(req: RequestAware, data: Params | Params[]): Promise<void> {
-			const { db, io, context } = req;
+		async publishDestroy<T = unknown>(req: RequestAware<T>, data: Params | Params[]): Promise<void> {
+			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
 
-			await this.postDestroy!({ db, io, context }, dat);
+			await this.postDestroy!({ source, io, context }, dat);
 			if (io) {
 				const payload = getBroadcastPayload({ data: dat, verb: "destroy", room: _modelName });
 				broadcast(payload);
@@ -57,13 +57,13 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 		async find(options: Params): Promise<FindData> {
 			return { data: [], recordCount: 0 };
 		},
-		async create(options: Params): Promise<OneData> {
+		async create(options: Params): Promise<CreateData> {
 			return { data: {} };
 		},
-		async update(options: Params): Promise<OneData> {
+		async update(options: Params): Promise<UpdateData> {
 			return { data: {} };
 		},
-		async destroy(options: Params): Promise<OneData> {
+		async destroy(options: Params): Promise<DeleteData> {
 			return { data: {} };
 		},
 	};

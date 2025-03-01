@@ -14,7 +14,7 @@ const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetMode
 	req: Request<T>,
 	res: Response,
 ) => {
-	const { data: _data = {}, relaxExclude, ...rest } = req.context;
+	const { data: _data = {}, relaxExclude, includes } = req.context;
 	const model = getModel(req);
 	let injection = {};
 
@@ -25,11 +25,11 @@ const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetMode
 		injection = preCreate(req);
 	}
 
-	const payload = { ..._data, ...rest, ...injection };
-	const { error, data } = await model.create({ relaxExclude, data: payload });
+	const payload = { ..._data, ...injection };
+	const { error, data } = await model.create({ relaxExclude, includes, data: payload });
 
 	if (data) {
-		model.publishCreate(req, data);
+		model.publishCreate<CreateOptions>(req.aware(), data);
 		res.status(201).json({ data: data });
 	} else {
 		res.status(500).json({ error });
@@ -65,7 +65,7 @@ const handleUpdate = <T extends UpdateOptions = UpdateOptions>(getModel: GetMode
 	}
 
 	if (data) {
-		model.publishUpdate(req, data);
+		model.publishUpdate<UpdateOptions>(req.aware(), data);
 		res.status(200).json({ data });
 	}
 };
@@ -81,7 +81,7 @@ const handleDelete = <T extends BaseDeleteOptions = BaseDeleteOptions>(getModel:
 	}
 
 	if (data) {
-		model.publishDestroy(req, data);
+		model.publishDestroy<BaseDeleteOptions>(req.aware(), data);
 		res.status(200).json({ data });
 	}
 };

@@ -1,7 +1,7 @@
 import { Route } from "$lib/rest/route.js";
 import type { Request, Response, MultiPartFile, Params } from "$lib/common/types.js";
 
-const { get, post, put, patch, destroy } = Route("Users", "/users");
+const { get, post, put, patch, destroy, model } = Route("Users", "/users");
 
 let users: Params[] = [
     {
@@ -37,6 +37,8 @@ post(`/users`, (req: Request, res: Response) => {
     const { context: { data } } = req;
     data.id = 4;
     users = [...users, data];
+    const Users = model.Users(req);
+    Users.publishCreate(req.aware(), data);
     res.status(200).json({ data });
 });
 

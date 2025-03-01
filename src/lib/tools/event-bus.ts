@@ -54,7 +54,7 @@ class DevBus implements EventBusType {
 
 	broadcast(load: Params) {
 		const { env: { IO } } = appState();
-		IO.emit("comets", load);
+		IO?.emit("comets", load);
 		// const { verb, room, data } = load;
 		// this.emit(`${verb}::${room}`, data);
 	}

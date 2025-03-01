@@ -160,7 +160,7 @@ export const extractOptions = (opts: Params = {}) => {
 
 export const prepWhere = (context: AppModel, options: FindOptions) => {
 	const collection = context.db.collection(context.collection);
-	const { includes = "", offset = '0', limit, orderBy, orderDirection, search, query = {} } = options;
+	const { includes = "", offset = 0, limit, orderBy, orderDirection, search, query = {} } = options;
 
 	const projections =
 		typeof includes === "string" && includes.trim().length
@@ -210,9 +210,9 @@ export const prepWhere = (context: AppModel, options: FindOptions) => {
 	} else {
 		facetArgs.push({ $sort: { _id: 1 } });
 	}
-	facetArgs.push({ $skip: parseInt(offset, 10) });
+	facetArgs.push({ $skip: offset });
 	if (limit) {
-		facetArgs.push({ $limit: parseInt(limit, 10) });
+		facetArgs.push({ $limit: limit });
 	}
 	const cursor = collection.aggregate([
 		{ $match: { ...queries } },

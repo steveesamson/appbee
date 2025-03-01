@@ -151,7 +151,7 @@ export const getSQLFinalizer = (context: AppModel) => async (options: DbFinalize
 };
 
 export const prepWhere = (context: AppModel, options: FindOptions) => {
-	const { includes = "*", offset = "0", limit, orderBy, orderDirection, search, query = {} } = options;
+	const { includes = "*", offset = 0, limit, orderBy, orderDirection, search, query = {} } = options;
 	let projections = includes;
 	if (isArray(includes)) {
 		projections = includes.join(", ");
@@ -159,10 +159,10 @@ export const prepWhere = (context: AppModel, options: FindOptions) => {
 	const getCollection = collectionInstance(context);
 	const { db, modelName } = getCollection({ query, search });
 
-	db.offset(parseInt(offset, 10));
+	db.offset(offset);
 
 	if (limit) {
-		db.limit(parseInt(limit, 10));
+		db.limit(limit);
 	}
 
 	let direction = orderDirection?.toUpperCase();

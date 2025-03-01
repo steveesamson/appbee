@@ -49,6 +49,7 @@ export const makeModel = (storeName: string, defaultModel: Partial<AppModel>, { 
 	emblished["uniqueKeys"] = union(baseKeys, defaultKeys);
 	// models[storeName] = emblished;	
 	models[stringToModelKeyType(storeName)] = ((mdl: AppModel) => {
+
 		return (req: DBAware): AppModel => {
 			const copy = clone(mdl);
 			if (mdl.store) {
@@ -61,11 +62,12 @@ export const makeModel = (storeName: string, defaultModel: Partial<AppModel>, { 
 
 			if (!req.source) {
 				console.error(`${capitalize(storeName)}:Null source object, check all your database connections. Looks like no db was configured...`);
+				copy.aware = () => ({});
 			}
 			if (req.source) {
 				copy.db = req.source.db;
 				copy.storeType = req.source.storeType;
-				req.source = undefined;
+				copy.aware = () => ({ source: req.source });
 			}
 
 			return copy;

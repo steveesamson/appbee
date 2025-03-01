@@ -63,12 +63,14 @@ describe("restful.js", async () => {
 		it('expects handleCreate to succeed', async () => {
 			const getModel = withModel();
 			const res = mockResponse('data', 'create');
+			const _aware = { io: null, source: null, context: {} };
 			const req = {
 				context: {},
+				aware: () => _aware
 			} as Request;
 			const handler = handleCreate(getModel);
 			await handler(req, res);
-			expect(publishCreate).toHaveBeenCalledWith(req, "create")
+			expect(publishCreate).toHaveBeenCalledWith(_aware, "create")
 		})
 
 		it('expects handleCreate with preCreate to succeed', async () => {
@@ -76,33 +78,39 @@ describe("restful.js", async () => {
 			const preCreate = vi.fn();
 			const res = mockResponse('data', 'create');
 
+			const _aware = { io: null, source: null, context: {} };
 			const req = {
 				context: {},
+				aware: () => _aware
 			} as Request;
 			const handler = handleCreate(getModel, preCreate);
 			await handler(req, res);
-			expect(publishCreate).toHaveBeenCalledWith(req, "create")
+			expect(publishCreate).toHaveBeenCalledWith(_aware, "create")
 		})
 		it('expects handleUpdate to succeed', async () => {
 			const getModel = withModel();
 			const res = mockResponse('data', 'update');
 
+			const _aware = { io: null, source: null, context: {} };
 			const req = {
 				context: {},
+				aware: () => _aware
 			} as Request;
 			const handler = handleUpdate(getModel);
 			await handler(req, res);
-			expect(publishUpdate).toHaveBeenCalledWith(req, "update")
+			expect(publishUpdate).toHaveBeenCalledWith(_aware, "update")
 		})
 		it('expects handleDelete to succeed', async () => {
 			const getModel = withModel();
 			const res = mockResponse('data', 'find');
+			const _aware = { io: null, source: null, context: {} };
 			const req = {
 				context: {},
+				aware: () => _aware
 			} as Request;
 			const handler = handleDelete(getModel);
 			await handler(req, res);
-			expect(publishDestroy).toHaveBeenCalledWith(req, "find")
+			expect(publishDestroy).toHaveBeenCalledWith(_aware, "find")
 		})
 
 

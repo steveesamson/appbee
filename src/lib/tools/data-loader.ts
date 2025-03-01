@@ -59,7 +59,7 @@ export const dataLoader: DataLoader = <T>() => {
 		const requests = jobs.map(({ model, from, to, includes }: IntermediateJob) => {
 			const payload = dedupeArray(data.map((next: T) => `${next[from]}`));
 			log({ [to]: payload });
-			return model.find({ [to]: payload, includes });
+			return model.find({ query: { [to]: payload }, includes });
 		});
 
 		const res = (await Promise.all(requests)) as LoaderResponse[];
