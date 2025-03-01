@@ -93,6 +93,7 @@ describe('store-models.js', () => {
 			const Users = models.Users({ source: { storeType: 'mysql', db: {} } });
 			expect(Users.collection).toBe("users");
 			expect(Users.instanceName).toBe("Users");
+			expect(Users.aware()).toBeDefined();
 		});
 
 		it('should return model when preferred store is set', async () => {

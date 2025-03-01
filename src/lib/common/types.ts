@@ -45,10 +45,10 @@ export type ConfigKeys = 'application' | 'bus' | 'ldap' | 'policy' | 'security' 
 export type DBAware = {
     source?: Source;
 }
-export type RequestAware<T = unknown> = {
+export type RequestAware<T = any> = {
     source?: Source;
     io?: Socket;
-    context?: T;
+    context: T;
 }
 
 export type Params<K = any> = {
@@ -143,6 +143,9 @@ export type DbFinalizer = {
     beeSkipCount?: BoolType
 }
 
+export type AfterData<T = any> = T;
+export type PubData<T = any> = T | T[];
+
 export type ResolveData = Params | Params[];
 export type AppModel = {
     aware: () => DBAware;
@@ -152,12 +155,12 @@ export type AppModel = {
     create: (options: CreateOptions) => Promise<CreateData>;
     update: (options: UpdateOptions) => Promise<UpdateData>;
     destroy: (options: DeleteOptions) => Promise<DeleteData>;
-    postCreate: <T = any>(req: RequestAware<T>, data: Params[]) => Promise<void>;
-    postUpdate: <T = any>(req: RequestAware<T>, data: Params[]) => Promise<void>;
-    postDestroy: <T = any>(req: RequestAware<T>, data: Params[]) => Promise<void>;
-    publishCreate: <T = any>(req: RequestAware<T>, data: Params | Params[]) => void;
-    publishUpdate: <T = any>(req: RequestAware<T>, data: Params | Params[]) => void;
-    publishDestroy: <T = any >(req: RequestAware<T>, data: Params | Params[]) => void;
+    postCreate: (req: RequestAware, data: AfterData[]) => Promise<void>;
+    postUpdate: (req: RequestAware, data: AfterData[]) => Promise<void>;
+    postDestroy: (req: RequestAware, data: AfterData[]) => Promise<void>;
+    publishCreate: (req: RequestAware, data: PubData) => void;
+    publishUpdate: (req: RequestAware, data: PubData) => void;
+    publishDestroy: (req: RequestAware, data: PubData) => void;
     storeType?: string;
     dbSchema: string;
     // schema: T;

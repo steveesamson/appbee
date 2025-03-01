@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { AppModel, CreateData, DeleteData, FindData, Model, Params, RequestAware, UpdateData } from "$lib/common/types.js";
+import type { AppModel, CreateData, DeleteData, FindData, Model, Params, RequestAware, UpdateData, AfterData, PubData } from "$lib/common/types.js";
 import capitalize from "lodash/capitalize.js";
 import { getBroadcastPayload, broadcast } from "./index.js";
 
@@ -20,10 +20,10 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 		searchPath: [], //['attachments'] excludes from mclean.
 		orderBy: "",
 		insertKey: "id",
-		async postCreate<T = unknown>(req: RequestAware<T>, data: Params[]): Promise<void> { },
-		async postUpdate<T = unknown>(req: RequestAware<T>, data: Params[]): Promise<void> { },
-		async postDestroy<T = unknown>(req: RequestAware<T>, data: Params[]): Promise<void> { },
-		async publishCreate<T = unknown>(req: RequestAware<T>, data: Params | Params[]): Promise<void> {
+		async postCreate(req: RequestAware, data: AfterData[]): Promise<void> { },
+		async postUpdate(req: RequestAware, data: AfterData[]): Promise<void> { },
+		async postDestroy(req: RequestAware, data: AfterData[]): Promise<void> { },
+		async publishCreate(req: RequestAware, data: PubData): Promise<void> {
 			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
 			await this.postCreate!({ source, io, context }, dat);
@@ -33,7 +33,7 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 				console.log("PublishCreate to %s", _modelName);
 			}
 		},
-		async publishUpdate<T = unknown>(req: RequestAware<T>, data: Params | Params[]): Promise<void> {
+		async publishUpdate(req: RequestAware, data: PubData): Promise<void> {
 			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
 			await this.postUpdate!({ source, io, context }, dat);
@@ -43,7 +43,7 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 				console.log("PublishUpdate to %s", _modelName);
 			}
 		},
-		async publishDestroy<T = unknown>(req: RequestAware<T>, data: Params | Params[]): Promise<void> {
+		async publishDestroy(req: RequestAware, data: PubData): Promise<void> {
 			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];
 
