@@ -14,7 +14,7 @@ const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetMode
 	req: Request<T>,
 	res: Response,
 ) => {
-	const { data: _data = {}, relaxExclude, includes } = req.context;
+	const { data: _data, relaxExclude, includes } = req.context;
 	const model = getModel(req);
 	let injection = {};
 
@@ -25,8 +25,7 @@ const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetMode
 		injection = preCreate(req);
 	}
 
-	const payload = { ..._data, ...injection };
-	const { error, data } = await model.create({ relaxExclude, includes, data: payload });
+	const { error, data } = await model.create({ relaxExclude, includes, data: { ..._data, ...injection } });
 
 	if (data) {
 		model.publishCreate(req.aware(), data);

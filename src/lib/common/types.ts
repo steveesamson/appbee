@@ -121,7 +121,7 @@ export type FindOptions = {
 
 
 export type CreateOptions = {
-    data: Params | Params[];
+    data: Params;
     includes?: string;
     relaxExclude?: BoolType;
 }

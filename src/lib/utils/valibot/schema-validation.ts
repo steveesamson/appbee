@@ -27,7 +27,7 @@ export default function <T extends Params>(schema: Base) {
                 }
             }
             const eStr = errorArray.join("; ");
-            // console.log("VALID:", { context, eStr })
+            console.log("VALID:", { context, eStr })
             return res.status(400).json({ error: eStr });
         }
     }
