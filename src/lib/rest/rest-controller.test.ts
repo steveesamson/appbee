@@ -8,7 +8,7 @@ import { components } from "../utils/configurer.js";
 import type { MultiPartFile, Params, Application } from "../common/types.js";
 import { useToken } from "../tools/security.js";
 import { appState } from "../tools/app-state.js";
-import { Route } from "./route.js";
+import { Restful } from "./route.js";
 
 type Account = { accountNo: string; balance: number; }
 type User = { username: string; id: number; count: number; }
@@ -438,8 +438,8 @@ describe("rest-controller.js", async () => {
 			expect(res.status).toBe(200);
 
 		});
-		it('expects Route of `fakeModel` to throw error', () => {
-			expect(() => Route('fakeModel', 'fakemodel')).toThrowError(/No model/);
+		it('expects Restful of `fakeModel` to throw error', () => {
+			expect(() => Restful('fakeModel', 'fakemodel')).toThrowError(/No model/);
 		})
 	})
 

@@ -1,7 +1,7 @@
-import { Route } from "$lib/rest/route.js";
+import { Restful } from "$lib/rest/route.js";
 import type { Request, Response } from "$lib/common/types.js";
 
-const { get, post, put, destroy, patch } = Route("Stories", "/stories");
+const { get, post, put, destroy, patch } = Restful("Stories", "/stories");
 
 get(`/send`, (req: Request, res: Response) => {
 

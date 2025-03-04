@@ -54,7 +54,7 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 				console.log("PublishDestroy to %s", _modelName);
 			}
 		},
-		async find(options: Params): Promise<FindData> {
+		async find<T = any>(options: Params): Promise<FindData<T>> {
 			return { data: [], recordCount: 0 };
 		},
 		async create(options: Params): Promise<CreateData> {

@@ -2,13 +2,12 @@ import { v, type Request, type Response, type NextFunction, type Params } from "
 import { useUnwrap } from "$lib/utils/unwrapper.js";
 import type { Base } from "$lib/utils/valibot/schema.js";
 
-export default function <T extends Params>(schema: Base) {
+export const validateSchema = <T extends Params>(schema: Base) => {
+
+    return (req: Request<T>, res: Response, next?: NextFunction) => {
 
 
-    return function (req: Request<T>, res: Response, next?: NextFunction) {
-
-        const { context } = req;
-
+        const { context = {} } = req;
         const { nuInput, unWrap } = useUnwrap(context);
         const { issues, output, success } = v.safeParse(schema, nuInput);
 
@@ -33,3 +32,4 @@ export default function <T extends Params>(schema: Base) {
     }
 
 };
+

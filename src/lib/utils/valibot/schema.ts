@@ -20,8 +20,8 @@ export const useSchema = <
         // bulk: v.optional(v.array(withOmittedId)),
     });
     const conditionSchema = v.object({
-        params: v.optional(v.partial(v.pick(baseSchema, ['id']))),
-        query: v.optional(v.partial(baseSchema)),
+        params: v.partial(v.pick(baseSchema, ['id'])),
+        query: v.partial(baseSchema),
     })
     const readSchema = v.object({
         includes: v.optional(v.union([v.string(), v.literal(1)])),
@@ -30,8 +30,8 @@ export const useSchema = <
         orderBy: v.optional(v.keyof(baseSchema)),
         orderDirection: v.optional(v.union([v.literal("asc"), v.literal("desc")])),
         search: v.optional(v.string()),
-        query: v.optional(v.partial(baseSchema)),
-        params: v.optional(v.partial(v.pick(baseSchema, ['id']))),
+        query: v.partial(baseSchema),
+        params: v.any(),
     })
     const updateSchema = v.pipe(
         v.object({

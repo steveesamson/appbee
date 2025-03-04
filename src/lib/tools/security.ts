@@ -6,15 +6,15 @@ import { appState } from "$lib/tools/app-state.js";
 const scryptAsync = promisify(scrypt);
 
 const useToken = async (): Promise<Token> => {
-	const { sign: _s, verify: _v } = await import("jsonwebtoken");
+	const { default: jwt } = await import("jsonwebtoken");
 	return {
 		async sign(load: Params): Promise<string> {
 			const { env: { SECRET } } = appState();
-			return _s(load, SECRET!);
+			return jwt.sign(load, SECRET!);
 		},
 		async verify(token: string): Promise<Params | string | number> {
 			const { env: { SECRET } } = appState();
-			return _v(token, SECRET!);
+			return jwt.verify(token, SECRET!);
 
 		},
 	}

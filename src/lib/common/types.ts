@@ -96,8 +96,8 @@ export type SqlUpdateOptions = {
 }
 
 export type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
-export type UpdateData = {
-    data?: Params | Params[];
+export type UpdateData<T = any> = {
+    data?: T | T[];
     error?: string;
 }
 export type DeleteData = UpdateData;
@@ -106,32 +106,32 @@ export type DeleteOptions = {
     query: Params;
 };
 
-export type FindOptions = {
+export type FindOptions<T = any> = {
     includes?: string | string[] | 1;
     offset?: number;
     limit?: number;
     orderBy?: string;
     orderDirection?: "ASC" | "DESC" | "asc" | "desc";
-    search?: string;
+    search: string;
     beeSkipCount?: BoolType;
     relaxExclude?: BoolType;
-    query: Params;
-    params?: Params;
+    query: Partial<T>;
+    params: any;
 }
 
 
 export type CreateOptions = {
-    data: Params;
+    data: any;
     includes?: string;
     relaxExclude?: BoolType;
 }
-export type CreateData = {
-    data?: Params | Params[];
+export type CreateData<T = any> = {
+    data?: T | T[];
     error?: string;
 };
 
-export type FindData = {
-    data?: Params | Params[];
+export type FindData<T = any> = {
+    data?: T | T[];
     recordCount?: number;
     error?: string;
 };
@@ -151,9 +151,9 @@ export type AppModel = {
     aware: () => DBAware;
     pipeline: () => Params[];
     resolveResult: (data: ResolveData, includeMap: Params<1 | string>) => Promise<ResolveData>;
-    find: (options: FindOptions) => Promise<FindData>;
-    create: (options: CreateOptions) => Promise<CreateData>;
-    update: (options: UpdateOptions) => Promise<UpdateData>;
+    find: <T = any>(options: Partial<FindOptions>) => Promise<FindData<T>>;
+    create: <T = any>(options: CreateOptions) => Promise<CreateData<T>>;
+    update: <T = any>(options: UpdateOptions) => Promise<UpdateData<T>>;
     destroy: (options: DeleteOptions) => Promise<DeleteData>;
     postCreate: (req: RequestAware, data: AfterData[]) => Promise<void>;
     postUpdate: (req: RequestAware, data: AfterData[]) => Promise<void>;
@@ -417,16 +417,18 @@ export type DataLoaderOptions<T> = {
     debug?: true | false;
 };
 export type DataLoader = <T>() => (dataLoaderOptions: DataLoaderOptions<T>) => Promise<T>;
-
+type RouteKeys = 'get' | 'post' | 'put' | 'destroy' | 'patch' | 'options' | 'head';
 export type RouteMethods = {
-    model: Models;
-    get: (path: string, handler?: RestRequestHandler) => RouteMethods;
-    post: (path: string, handlerOrPreCreate?: RestRequestHandler | PreCreate) => RouteMethods;
-    put: (path: string, handler?: RestRequestHandler) => RouteMethods;
-    destroy: (path: string, handler?: RestRequestHandler) => RouteMethods;
-    patch: (path: string, handler?: RestRequestHandler) => RouteMethods;
-    options: (path: string, handler: RestRequestHandler) => RouteMethods;
-    head: (path: string, handler: RestRequestHandler) => RouteMethods;
+    [key in RouteKeys]: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+}
+export type CrudMethods = {
+    get: (path: string, handler?: RestRequestHandler) => CrudMethods;
+    post: (path: string, handlerOrPreCreate?: RestRequestHandler | PreCreate) => CrudMethods;
+    put: (path: string, handler?: RestRequestHandler) => CrudMethods;
+    destroy: (path: string, handler?: RestRequestHandler) => CrudMethods;
+    patch: (path: string, handler?: RestRequestHandler) => CrudMethods;
+    options: (path: string, handler: RestRequestHandler) => CrudMethods;
+    head: (path: string, handler: RestRequestHandler) => CrudMethods;
 }
 
 export type IOSocketRequest = Params;
@@ -545,6 +547,7 @@ export type AppState = {
         VIEW_DIR: string;
         STATIC_DIR: string;
     },
+    model: Models;
     utils: Utils;
     useBus: () => EventBusType;
     useQueue?: (queueName: string) => BeeQueueType;

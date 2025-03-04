@@ -67,16 +67,15 @@ const configureRestRoutes = async (policiesMap: PolicyMap) => {
 
 			const [method, rpath] = key.split(/\s+/).map((s: string) => s.trim());
 			const nextPolicyParams = policiesMap[method as HTTP_METHODS] || {};
-			const nextGlobalPolicy = nextPolicyParams.parent || globalPolicy;
+			const nextGlobalPolicy = nextPolicyParams.parent && nextPolicyParams.parent.length ? nextPolicyParams.parent : globalPolicy;
 			const nextPolicy = nextPolicyParams[key];
-			const policyNames: string[] = dedupeArray<string>(nextPolicy ? nextPolicy : nextGlobalPolicy);
+			const policyNames: string[] = dedupeArray<string>(nextPolicy && nextPolicy.length ? nextPolicy : nextGlobalPolicy);
 			const policies = [restRouter(), ...await loadPolicy(policyNames)];
-
 			router[method as HTTP_METHODS](rpath, policies as RequestHandler[], ...handler as RequestHandler[]);
 			const ioRoute = components.ioRoutes[method as HTTP_METHODS];
 
 			if (ioRoute) {
-				ioRoute[rpath] = registerRealtimePolicies([...policies, ...handler as RequestHandler[]]);
+				ioRoute[rpath] = registerRealtimePolicies([...policies as RequestHandler[], ...handler as RequestHandler[]]);
 			}
 
 		}
@@ -128,8 +127,8 @@ const configureRestServer = async (base: string, extension: Params = {}) => {
 
 	// Load models
 	components.models = await loadModels({ store: configuration.store, useSource });
-
-
+	await useGlobals(isDev, base, components.models);
+	// console.log('models:', Object.keys(components.models));
 	//Load middlewares
 	components.modules.middlewares = await loadMiddlewares();
 
@@ -140,7 +139,7 @@ const configureRestServer = async (base: string, extension: Params = {}) => {
 
 	components.modules.plugins = await loadPlugins();
 
-	await useGlobals(isDev, base, components.models);
+
 };
 
 const configureWorker = async (base: string, extension: Params = {}) => {
@@ -156,8 +155,8 @@ const configureWorker = async (base: string, extension: Params = {}) => {
 
 	// Load models
 	components.models = await loadModels({ store: configuration.store, useSource });
-	components.modules.plugins = await loadPlugins();
 	await useGlobals(isDev, base, components.models);
+	components.modules.plugins = await loadPlugins();
 };
 
 export {

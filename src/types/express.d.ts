@@ -10,12 +10,13 @@ declare global {
     namespace Express {
 
         // interface Request {
-        //     context: unknown;
+        //     context: any;
         //     files?: MultiPartFile[];
         //     source?: Source;
         //     io?: Socket;
         //     _query: { sid: string };
         //     currentUser?: Params;
+        //     aware: () => ({ io?: Socket; source?: Source; context: any });
         // }
 
         interface Application {

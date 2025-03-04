@@ -74,5 +74,4 @@ export const makeModel = (storeName: string, defaultModel: Partial<AppModel>, { 
 		};
 
 	})(emblished as AppModel);
-
 };

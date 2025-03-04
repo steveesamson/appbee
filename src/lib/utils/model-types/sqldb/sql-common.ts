@@ -150,7 +150,7 @@ export const getSQLFinalizer = (context: AppModel) => async (options: DbFinalize
 	}
 };
 
-export const prepWhere = (context: AppModel, options: FindOptions) => {
+export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params">) => {
 	const { includes = "*", offset = 0, limit, orderBy, orderDirection, search, query = {} } = options;
 	let projections = includes;
 	if (isArray(includes)) {

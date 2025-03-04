@@ -21,9 +21,9 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 		pipeline() {
 			return [];
 		},
-		async find(options: FindOptions): Promise<FindData> {
+		async find(options: Omit<FindOptions, "params">): Promise<FindData> {
 			const {
-				includes: includeString,
+				includes: includeString = 1,
 				offset,
 				limit,
 				orderBy,
@@ -36,7 +36,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			const includeMap = normalizeIncludes(`${includeString}`, this);
 			const includes = includeMap[_modelName!];
 
-			const expectedOptions: FindOptions = {
+			const expectedOptions: Omit<FindOptions, "params"> = {
 				includes,
 				offset,
 				limit,

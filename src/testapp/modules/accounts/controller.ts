@@ -1,7 +1,7 @@
-import { Route } from "$lib/rest/route.js";
+import { Restful } from "$lib/rest/route.js";
 import type { Request, Response } from "$lib/common/types.js";
 import type { AddAccount, UpdateAccount, DeleteAccount, FindAccount } from "./model.js";
-const { get, post, put, destroy, patch } = Route("Accounts", "/accounts");
+const { get, post, put, destroy, patch } = Restful("Accounts", "/accounts");
 
 get(`/:id?`, (req: Request<FindAccount>, res: Response) => {
   res.status(200).json({

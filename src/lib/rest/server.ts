@@ -12,7 +12,6 @@ import { appState } from "../tools/app-state.js";
 import { restSessionUser } from "./middlewares/session-user.js";
 import beeMultiparts from "./multiparts.js";
 import type { Params, Resource, Utils, Application, RequestHandler } from "../common/types.js";
-import restRouter from "./rest-router.js";
 import resolveAsyncAwait from "../tools/resolve-asyn-await.js";
 import { dataLoader } from "../tools/data-loader.js";
 import { dataPager } from "../tools/data-pager.js";
@@ -23,12 +22,13 @@ import { useExcelExport } from "../tools/use-excel-export.js";
 import { useUnlink } from "../tools/use-unlink.js";
 import { useToken, useEncrypt } from "../tools/security.js";
 import objectIsEmpty from "../utils/object-is-empty.js";
+import restRouter from "./rest-router.js";
 
 
 export const createRestServer = async (base: string, extension: Params = {}): Promise<Application> => {
 	await configureRestServer(base, extension);
 
-	const { configuration, modules } = components;
+	const { configuration, modules, models: model } = components;
 
 	const { view, application, security, bus, smtp } = configuration;
 	const { staticDir = "", viewDir = "", } = view;
@@ -108,7 +108,7 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		});
 	}
 
-	appState({ utils });
+	appState({ utils, model });
 	const app: Application = express();
 	app.set("trust proxy", true);
 
@@ -124,12 +124,11 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		methodOverride(),
 		restSessionUser(),
 		beeMultiparts(),
-		restRouter(),
 		errorHandler()
 	);
 
 	if (middlewares && middlewares.length) {
-		app.use(...middlewares as RequestHandler[]);
+		app.use(restRouter(), ...middlewares as RequestHandler[]);
 	}
 	const ioServerOptions = {
 		cors: corsOptions,

@@ -23,9 +23,9 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 		async resolveResult(data: ResolveData, _: Params<1 | string>): Promise<ResolveData> {
 			return data;
 		},
-		async find(options: FindOptions): Promise<FindData> {
+		async find(options: Omit<FindOptions, "params">): Promise<FindData> {
 			const {
-				includes: includeString,
+				includes: includeString = 1,
 				offset,
 				limit,
 				orderBy,
@@ -38,7 +38,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			const includeMap = normalizeIncludes(`${includeString}`, this as AppModel);
 			const includes = includeMap[_modelName!];
 
-			const expectedOptions: FindOptions = {
+			const expectedOptions: Omit<FindOptions, "params"> = {
 				includes,
 				offset,
 				limit,
