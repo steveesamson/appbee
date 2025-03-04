@@ -1,7 +1,7 @@
-import { Restful } from "$lib/rest/route.js";
+import { Route } from "$lib/rest/route.js";
 import type { Params, Request, Response } from "$lib/common/types.js";
 
-const { get, post, put, patch, destroy, head, options } = Restful("Posts", "/posts");
+const { get, post, put, patch, destroy, head, options } = Route("Posts", "/posts");
 
 let users: Params[] = [
     {

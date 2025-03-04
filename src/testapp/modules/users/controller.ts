@@ -1,8 +1,8 @@
-import { Restful } from "$lib/rest/route.js";
+import { Route } from "$lib/rest/route.js";
 import type { Request, Response, MultiPartFile, Params, FindOptions } from "$lib/common/types.js";
 import { appState } from "$lib/index.js";
 
-const { get, post, put, patch, destroy } = Restful("Users", "/users");
+const { get, post, put, patch, destroy } = Route("Users", "/users");
 
 let users: Params[] = [
     {

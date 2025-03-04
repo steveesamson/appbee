@@ -417,19 +417,26 @@ export type DataLoaderOptions<T> = {
     debug?: true | false;
 };
 export type DataLoader = <T>() => (dataLoaderOptions: DataLoaderOptions<T>) => Promise<T>;
-type RouteKeys = 'get' | 'post' | 'put' | 'destroy' | 'patch' | 'options' | 'head';
+
+// type RouteKeys = 'get' | 'post' | 'put' | 'destroy' | 'patch' | 'options' | 'head';
+// type RouteHandler = {
+//     [key in RouteKeys]: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+// }
 export type RouteMethods = {
-    [key in RouteKeys]: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+    get: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+    post: (path: string, ...handlerOrPreCreate: (RestRequestHandler | PreCreate)[]) => RouteMethods;
+    put: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+    destroy: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+    patch: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+    options: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
+    head: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
 }
-export type CrudMethods = {
-    get: (path: string, handler?: RestRequestHandler) => CrudMethods;
-    post: (path: string, handlerOrPreCreate?: RestRequestHandler | PreCreate) => CrudMethods;
-    put: (path: string, handler?: RestRequestHandler) => CrudMethods;
-    destroy: (path: string, handler?: RestRequestHandler) => CrudMethods;
-    patch: (path: string, handler?: RestRequestHandler) => CrudMethods;
-    options: (path: string, handler: RestRequestHandler) => CrudMethods;
-    head: (path: string, handler: RestRequestHandler) => CrudMethods;
-}
+// export type CrudMethods = {
+//     handleRead: () => RestRequestHandler[];
+//     handleCreate: (preCreate?: PreCreate) => RestRequestHandler[];
+//     handleUpdate: () => RestRequestHandler[];
+//     handleDelete: () => RestRequestHandler[];
+// }
 
 export type IOSocketRequest = Params;
 

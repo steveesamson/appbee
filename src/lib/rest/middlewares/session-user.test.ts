@@ -23,7 +23,7 @@ describe('session-user.js', () => {
 			const jwt = await sign({ a: 'a' });
 			const req = {
 				headers: {
-					'authorization': `bearer ${jwt}`
+					'authorization': `Bearer ${jwt}`
 				}
 			} as Request;
 			const next = vi.fn(() => {
@@ -46,7 +46,7 @@ describe('session-user.js', () => {
 			const req = {
 				_query: {},
 				headers: {
-					'authorization': `bearer ${jwt}`
+					'authorization': `Bearer ${jwt}`
 				}
 			} as Request;
 			const next = vi.fn(() => {
@@ -63,7 +63,7 @@ describe('session-user.js', () => {
 					sid: 'sid'
 				},
 				headers: {
-					'authorization': `bearer ${jwt}`
+					'authorization': `Bearer ${jwt}`
 				}
 			} as Request;
 			const next = vi.fn(() => {

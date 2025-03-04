@@ -140,18 +140,20 @@ export const mockModules = () => {
 
 
     vi.mock('jsonwebtoken', () => ({
+        default: {
 
-        sign: vi.fn(async () => {
-            return 'signed';
-        }),
+            sign: vi.fn(async () => {
+                return 'signed';
+            }),
 
-        verify: vi.fn(async () => {
-            const { env: { SECRET: old } } = appState();
-            if (old !== SECRET) {
-                return null;
-            }
-            return 'verified';
-        })
+            verify: vi.fn(async () => {
+                const { env: { SECRET: old } } = appState();
+                if (old !== SECRET) {
+                    return null;
+                }
+                return 'verified';
+            })
+        }
     }));
 
     vi.mock('bee-queue', () => {

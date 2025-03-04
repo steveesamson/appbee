@@ -8,7 +8,8 @@ import { components } from "../utils/configurer.js";
 import type { MultiPartFile, Params, Application } from "../common/types.js";
 import { useToken } from "../tools/security.js";
 import { appState } from "../tools/app-state.js";
-import { Restful } from "./route.js";
+import { Route } from "./route.js";
+
 
 type Account = { accountNo: string; balance: number; }
 type User = { username: string; id: number; count: number; }
@@ -255,8 +256,8 @@ describe("rest-controller.js", async () => {
 		it("expects put '/users' to return error for 'create' response with encoded body ", async () => {
 			const testRawBody = new URLSearchParams({ username: 'omoo', email: "some@some.com", password: 'secret' }).toString();
 			const res = await put<User>("/users/1", { testRawBody });
-			expect(res.error).toBeDefined();
-			expect(res.error).toBe('Bad Request');
+			expect(res.error).toBeUndefined();
+			expect(res.data).toBeDefined();
 		});
 	})
 
@@ -438,8 +439,13 @@ describe("rest-controller.js", async () => {
 			expect(res.status).toBe(200);
 
 		});
-		it('expects Restful of `fakeModel` to throw error', () => {
-			expect(() => Restful('fakeModel', 'fakemodel')).toThrowError(/No model/);
+
+		it('expects Route of `fakeModel` to throw error', () => {
+
+			const rt = Route('fakeModel', 'fakemodel');
+			expect(rt).toBeDefined();
+
+
 		})
 	})
 

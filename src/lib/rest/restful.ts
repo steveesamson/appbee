@@ -1,6 +1,6 @@
 import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions, Params, MongoUpdateType } from "../common/types.js";
 
-const handleGet = <T extends FindOptions = FindOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
+const handleGet = <T = FindOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
 	const model = getModel(req);
 	const { context } = req;
 	const { error, ...rest } = await model.find(context);

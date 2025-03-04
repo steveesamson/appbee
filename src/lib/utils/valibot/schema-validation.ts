@@ -26,7 +26,6 @@ export const validateSchema = <T extends Params>(schema: Base) => {
                 }
             }
             const eStr = errorArray.join("; ");
-            console.log("VALID:", { context, eStr })
             return res.status(400).json({ error: eStr });
         }
     }

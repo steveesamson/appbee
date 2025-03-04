@@ -4,7 +4,7 @@ import { useToken } from "$lib/tools/security.js";
 const patchOnCurrentUser = async (req: Request) => {
 	const header = req.headers["authorization"];
 	if (header) {
-		if (header.startsWith("bearer ")) {
+		if (header.startsWith("Bearer ")) {
 			const token = header.substring(7);
 
 			const { verify } = await useToken();

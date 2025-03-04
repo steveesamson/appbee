@@ -1,4 +1,5 @@
-import type { RestRequestHandler, PreCreate, RouteConfig, RouteMap, RouteMethods, GetModel, FindOptions, v, CrudMethods } from "../common/types.js";
+import type { RestRequestHandler, PreCreate, RouteConfig, RouteMap, RouteMethods, GetModel, FindOptions } from "../common/types.js";
+import { v } from "../common/types.js";
 import { normalizePath } from "../utils/path-normalizer.js";
 import { handleCreate, handleGet, handleUpdate, handleDelete } from "./restful.js"
 import { components } from "../utils/configurer.js";
@@ -8,36 +9,113 @@ import { getSchema } from "../utils/model-importer.js";
 import { useSchema } from "../utils/valibot/schema.js";
 
 const routes: RouteMap = {};
+type Mount = `/${string}`;
+const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): RouteMethods => {
+	const { models } = components;
+	const candidate = useModule ? useModule : module;
+	const getModel = models[stringToModelKeyType(candidate)] as GetModel;
+	const schema = getSchema(candidate);
 
-const Route = (name: string, mountPoint = ""): RouteMethods => {
+	if (!getModel || !schema) {
+		console.warn(`No model was found for module:${candidate}. I hope this is deliberate.`);
+	}
+
 	const route: RouteConfig = {};
 	route.mountPoint = mountPoint;
-	routes[name] = route;
+	routes[module] = route;
+
+	const { readSchema, createSchema, updateSchema, deleteSchema } = schema ? useSchema(schema) : { readSchema: null, createSchema: null, updateSchema: null, deleteSchema: null };
+
 
 	const maps: RouteMethods = {
 		get(path: string, ...handler: RestRequestHandler[]) {
 			path = normalizePath(path, mountPoint);
-			route[`get ${path}`] = handler;
+			const validators: RestRequestHandler[] = [];
+
+			if (handler && handler.length) {
+				validators.push(...handler);
+			} else if (readSchema) {
+				type ReadType = v.InferOutput<typeof readSchema>;
+				validators.push(handleGet<ReadType>(getModel!));
+			}
+			route[`get ${path}`] = [...validators];
 			return maps;
 		},
-		post(path: string, ...handler: RestRequestHandler[]) {
+		post(path: string, ...handlerOrPreCreate: (RestRequestHandler | PreCreate)[]) {
 			path = normalizePath(path, mountPoint);
-			route[`post ${path}`] = handler;
+			let validators: RestRequestHandler[] = [];
+
+			if (handlerOrPreCreate.length) {
+				const hasHandler = handlerOrPreCreate.some((next) => {
+					return typeof next === 'function' && next.length === 2;
+				});
+				const hasPrecreate = handlerOrPreCreate.some((next) => {
+					return typeof next === 'function' && next.length === 1;
+				});
+
+				if (hasHandler && hasPrecreate) {
+					throw Error("You cannot pass a pre-create routine since you're handling the request.");
+				}
+				if (hasHandler) {
+					validators = [...validators, ...handlerOrPreCreate];
+				}
+
+				if (hasPrecreate && createSchema) {
+					const pre = handlerOrPreCreate[0];
+					type CreateType = v.InferOutput<typeof createSchema>;
+					validators.push(validateSchema<CreateType>(createSchema!));
+					validators.push(handleCreate<CreateType>(getModel!, pre as PreCreate<CreateType>));
+				}
+			} else if (createSchema) {
+				type CreateType = v.InferOutput<typeof createSchema>;
+				validators.push(validateSchema<CreateType>(createSchema!));
+				validators.push(handleCreate<CreateType>(getModel!));
+			}
+			route[`post ${path}`] = [...validators];
+
 			return maps;
 		},
 		put(path: string, ...handler: RestRequestHandler[]) {
 			path = normalizePath(path, mountPoint);
-			route[`put ${path}`] = handler;
+			const validators: RestRequestHandler[] = [];
+
+			if (handler.length) {
+				validators.push(...handler);
+			} else if (updateSchema) {
+				type UpdateType = v.InferOutput<typeof updateSchema>;
+				validators.push(validateSchema<UpdateType>(updateSchema!));
+				handleUpdate<UpdateType>(getModel!);
+			}
+
+			route[`put ${path}`] = [...validators];
 			return maps;
 		},
 		destroy(path: string, ...handler: RestRequestHandler[]) {
 			path = normalizePath(path, mountPoint);
-			route[`delete ${path}`] = handler;
+			const validators: RestRequestHandler[] = [];
+
+			if (handler.length) {
+				validators.push(...handler);
+			} else if (deleteSchema) {
+				type DeleteType = v.InferOutput<typeof deleteSchema>;
+				validators.push(validateSchema<DeleteType>(deleteSchema!));
+				handleDelete<DeleteType>(getModel!);
+			}
+			route[`delete ${path}`] = [...validators];
+
 			return maps;
 		},
 		patch(path: string, ...handler: RestRequestHandler[]) {
 			path = normalizePath(path, mountPoint);
-			route[`patch ${path}`] = handler;
+			const validators: RestRequestHandler[] = [];
+			if (handler.length) {
+				validators.push(...handler);
+			} else if (updateSchema) {
+				type UpdateType = v.InferOutput<typeof updateSchema>;
+				validators.push(validateSchema<UpdateType>(updateSchema!));
+				handleUpdate<UpdateType>(getModel!);
+			}
+			route[`patch ${path}`] = [...validators];
 			return maps;
 		},
 		head(path: string, ...handler: RestRequestHandler[]) {
@@ -53,88 +131,5 @@ const Route = (name: string, mountPoint = ""): RouteMethods => {
 	};
 	return maps;
 };
-
-const Restful = (name: string, mountPoint = "", targetModel?: string): CrudMethods => {
-	const { models } = components;
-	const candidate = targetModel ? targetModel : name;
-	const getModel = models[stringToModelKeyType(candidate)] as GetModel;
-	const schema = getSchema(candidate);
-
-	if (!getModel || !schema) {
-		throw new Error(`No model was found for module:${candidate}`);
-	}
-
-	const route: RouteConfig = {};
-	route.mountPoint = mountPoint;
-	routes[name] = route;
-
-	const { createSchema, updateSchema, deleteSchema } = useSchema(schema);
-
-	type CreateType = v.InferOutput<typeof createSchema>;
-	type UpdateType = v.InferOutput<typeof updateSchema>;
-	type DeleteType = v.InferOutput<typeof deleteSchema>;
-
-	const maps: CrudMethods = {
-		get(path: string, handler?: RestRequestHandler<FindOptions>) {
-			path = normalizePath(path, mountPoint);
-			const requestHandler = handler ? handler : handleGet<FindOptions>(getModel);
-			route[`get ${path}`] = [requestHandler as RestRequestHandler<FindOptions>];
-			return maps;
-		},
-		post(path: string, handlerOrPreCreate?: RestRequestHandler<CreateType> | PreCreate<CreateType>) {
-			path = normalizePath(path, mountPoint);
-			const validators: RestRequestHandler<CreateType>[] = [];
-			validators.push(validateSchema<CreateType>(createSchema));
-
-			if (handlerOrPreCreate && typeof handlerOrPreCreate === 'function') {
-				if (handlerOrPreCreate.length === 1) {
-					route[`post ${path}`] = [...validators, handleCreate<CreateType>(getModel, handlerOrPreCreate as PreCreate<CreateType>)];
-				} else {
-					route[`post ${path}`] = [...validators, handlerOrPreCreate];
-				}
-			} else {
-				route[`post ${path}`] = [...validators, handleCreate<CreateType>(getModel)];
-			}
-			return maps;
-		},
-		put(path: string, handler?: RestRequestHandler<UpdateType>) {
-			path = normalizePath(path, mountPoint);
-			const validators: RestRequestHandler<UpdateType>[] = [];
-			validators.push(validateSchema<UpdateType>(updateSchema));
-			const requestHandler = handler ? handler : handleUpdate<UpdateType>(getModel);
-			route[`put ${path}`] = [...validators, requestHandler];
-			return maps;
-		},
-		destroy(path: string, handler?: RestRequestHandler<DeleteType>) {
-			path = normalizePath(path, mountPoint);
-			const validators: RestRequestHandler<DeleteType>[] = [];
-			validators.push(validateSchema<DeleteType>(deleteSchema));
-			const requestHandler = handler ? handler : handleDelete<DeleteType>(getModel);
-			route[`delete ${path}`] = [...validators, requestHandler];
-
-			return maps;
-		},
-		patch(path: string, handler?: RestRequestHandler<UpdateType>) {
-			path = normalizePath(path, mountPoint);
-			const validators: RestRequestHandler<UpdateType>[] = [];
-			validators.push(validateSchema<UpdateType>(updateSchema));
-			const requestHandler = handler ? handler : handleUpdate<UpdateType>(getModel);
-			route[`patch ${path}`] = [...validators, requestHandler];
-
-			return maps;
-		},
-		head(path: string, handler: RestRequestHandler) {
-			path = normalizePath(path, mountPoint);
-			route[`head ${path}`] = [handler];
-			return maps;
-		},
-		options(path: string, handler: RestRequestHandler) {
-			path = normalizePath(path, mountPoint);
-			route[`options ${path}`] = [handler];
-			return maps;
-		},
-	};
-	return maps;
-};
-export { Route, Restful, routes };
+export { Route, routes };
 
