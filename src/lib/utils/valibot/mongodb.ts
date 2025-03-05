@@ -14,20 +14,21 @@ const isObjectId = function () {
         _ObjectId = ObjectId;
     }
     return function (input: unknown) {
+        const res = { isOk: false, value: undefined };
         if (typeof input !== "string") {
-            return false;
+            return res;
         }
 
         if (!/^[0-9a-fA-F]{24}$/.test(input)) {
-            return false;
+            return res;
         }
 
-        // const { ObjectId: cached } = validatorCache;
-        // if (cached) {
-        return _ObjectId.isValid(input);
-        // }
-        // validatorCache.ObjectId = ObjectId;
-        // return ObjectId.isValid(input);
+        const isOk = _ObjectId.isValid(input);
+        res.isOk = isOk;
+        if (isOk) {
+            res.value = new _ObjectId(input);
+        }
+        return res;
     }
 
 }
@@ -110,9 +111,16 @@ export function objectId(
         // },
         '~run'(dataset, config) {
             const isValid = isObjectId();
-            if (dataset.value && isValid(dataset.value)) {
-                // @ts-expect-error
-                dataset.typed = true;
+            if (dataset.value) {
+                const { isOk, value } = isValid(dataset.value)
+                if (isOk) {
+                    dataset.value = value
+                    // @ts-expect-error
+                    dataset.typed = true;
+                } else {
+                    _addIssue(this, 'objectId', dataset, config);
+                }
+
             } else {
                 _addIssue(this, 'objectId', dataset, config);
             }

@@ -143,7 +143,7 @@ export type DbFinalizer = {
     beeSkipCount?: BoolType
 }
 
-export type AfterData<T = any> = T | T[];
+export type AfterData<T = any> = T[];
 export type PubData<T = any> = T | T[];
 
 export type ResolveData<T = any> = T | T[];
