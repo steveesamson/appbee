@@ -20,9 +20,9 @@ export const commonModel = (modelName: string, preferredCollection?: string): Mo
 		searchPath: [], //['attachments'] excludes from mclean.
 		orderBy: "",
 		insertKey: "id",
-		async postCreate(req: RequestAware, data: AfterData[]): Promise<void> { },
-		async postUpdate(req: RequestAware, data: AfterData[]): Promise<void> { },
-		async postDestroy(req: RequestAware, data: AfterData[]): Promise<void> { },
+		async postCreate(req: RequestAware, data: AfterData): Promise<void> { },
+		async postUpdate(req: RequestAware, data: AfterData): Promise<void> { },
+		async postDestroy(req: RequestAware, data: AfterData): Promise<void> { },
 		async publishCreate(req: RequestAware, data: PubData): Promise<void> {
 			const { source, io, context } = req;
 			const dat = Array.isArray(data) ? data : [data];

@@ -1,4 +1,4 @@
-import type { Params, FindOptions, DeleteOptions, AppModel, FindData, CreateOptions, CreateData, MongoUpdateOptions, MongoUpdateType, UpdateData, DeleteData, ResolveData } from "$lib/common/types.js";
+import type { Params, FindOptions, DeleteOptions, AppModel, FindData, CreateOptions, CreateData, MongoUpdateOptions, MongoUpdateType, UpdateData, DeleteData, ResolveData, IncludeMap } from "$lib/common/types.js";
 import raa from "$lib/tools/resolve-asyn-await.js";
 import {
 	prepWhere,
@@ -15,7 +15,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 	const derived: AppModel = {
 		...base,
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		async resolveResult(data: ResolveData, includeMap: Params<1 | string>): Promise<ResolveData> {
+		async resolveResult(data: ResolveData, includeMap: IncludeMap): Promise<ResolveData> {
 			return data;
 		},
 		pipeline() {

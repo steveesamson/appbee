@@ -1,4 +1,4 @@
-import type { DataLoader, DataLoaderOptions, LoaderJob, Params } from "$lib/common/types.js";
+import type { DataLoader, DataLoaderOptions, LoaderJob, Params, ResolveData } from "$lib/common/types.js";
 import toDedupeArray from "$lib/utils/string-to-dedupe-array.js";
 import dedupeArray from "$lib/utils/dedupe-array.js";
 import logDebug from "./log-debug.js";
@@ -29,9 +29,9 @@ export const compileMap = (mapString = ""): Params<string> => {
 };
 
 
-export const dataLoader: DataLoader = <T>() => {
+export const dataLoader: DataLoader = <T = any>() => {
 
-	return async ({ name, input, pipeline = [], debug = false }: DataLoaderOptions<T>): Promise<T> => {
+	return async ({ name, input, pipeline = [], debug = false }: DataLoaderOptions<T>): Promise<ResolveData<T>> => {
 		const log = logDebug(debug);
 		log(`##********** Loading ${name} ********##`);
 
@@ -101,6 +101,6 @@ export const dataLoader: DataLoader = <T>() => {
 			}
 			return next;
 		});
-		return (isArray ? loadedData : loadedData[0]) as T;
+		return (isArray ? loadedData : loadedData[0]) as ResolveData<T>;
 	};
 };

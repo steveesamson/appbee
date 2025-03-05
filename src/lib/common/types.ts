@@ -54,7 +54,7 @@ export type RequestAware<T = any> = {
 export type Params<K = any> = {
     [key: string]: K;
 };
-
+export type IncludeMap = Params<1 | string>;
 export type Result = {
     data?: Params;
     error?: string;
@@ -143,21 +143,21 @@ export type DbFinalizer = {
     beeSkipCount?: BoolType
 }
 
-export type AfterData<T = any> = T;
+export type AfterData<T = any> = T | T[];
 export type PubData<T = any> = T | T[];
 
-export type ResolveData = Params | Params[];
+export type ResolveData<T = any> = T | T[];
 export type AppModel = {
     aware: () => DBAware;
     pipeline: () => Params[];
-    resolveResult: (data: ResolveData, includeMap: Params<1 | string>) => Promise<ResolveData>;
+    resolveResult: (data: ResolveData, includeMap: IncludeMap) => Promise<ResolveData>;
     find: <T = any>(options: Partial<FindOptions>) => Promise<FindData<T>>;
     create: <T = any>(options: CreateOptions) => Promise<CreateData<T>>;
     update: <T = any>(options: UpdateOptions) => Promise<UpdateData<T>>;
     destroy: (options: DeleteOptions) => Promise<DeleteData>;
-    postCreate: (req: RequestAware, data: AfterData[]) => Promise<void>;
-    postUpdate: (req: RequestAware, data: AfterData[]) => Promise<void>;
-    postDestroy: (req: RequestAware, data: AfterData[]) => Promise<void>;
+    postCreate: (req: RequestAware, data: AfterData) => Promise<void>;
+    postUpdate: (req: RequestAware, data: AfterData) => Promise<void>;
+    postDestroy: (req: RequestAware, data: AfterData) => Promise<void>;
     publishCreate: (req: RequestAware, data: PubData) => void;
     publishUpdate: (req: RequestAware, data: PubData) => void;
     publishDestroy: (req: RequestAware, data: PubData) => void;
@@ -412,11 +412,11 @@ type Pipeline = Array<LoaderJob>;
 
 export type DataLoaderOptions<T> = {
     name: string;
-    input: T;
+    input: ResolveData<T>;
     pipeline: Pipeline;
     debug?: true | false;
 };
-export type DataLoader = <T>() => (dataLoaderOptions: DataLoaderOptions<T>) => Promise<T>;
+export type DataLoader = <T>() => (dataLoaderOptions: DataLoaderOptions<T>) => Promise<ResolveData<T>>;
 
 // type RouteKeys = 'get' | 'post' | 'put' | 'destroy' | 'patch' | 'options' | 'head';
 // type RouteHandler = {

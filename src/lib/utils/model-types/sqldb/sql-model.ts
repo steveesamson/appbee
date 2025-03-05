@@ -1,7 +1,7 @@
 import isArray from "lodash/isArray.js";
 import raa from "$lib/tools/resolve-asyn-await.js";
 
-import type { Params, FindOptions, DeleteOptions, FindData, SqlUpdateOptions, AppModel, CreateData, CreateOptions, UpdateData, DeleteData, ResolveData } from "$lib/common/types.js";
+import type { FindOptions, DeleteOptions, FindData, SqlUpdateOptions, AppModel, CreateData, CreateOptions, UpdateData, DeleteData, ResolveData, IncludeMap } from "$lib/common/types.js";
 
 import {
 	collectionInstance,
@@ -20,7 +20,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 	const derived: AppModel = {
 		...base,
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		async resolveResult(data: ResolveData, _: Params<1 | string>): Promise<ResolveData> {
+		async resolveResult(data: ResolveData, _: IncludeMap): Promise<ResolveData> {
 			return data;
 		},
 		async find(options: Omit<FindOptions, "params">): Promise<FindData> {
