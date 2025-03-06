@@ -495,15 +495,19 @@ export type Utils = {
     cronMaster: CronMaster;
     useFetch: () => typeof useFetch;
     mailer?: (smtpConfig: SMTPConfig) => SendMail;
-    useCaptcha: () => RestRequestHandler;
-    useExcelExport: () => RestRequestHandler;
-    useUnlink: () => RestRequestHandler;
     useRedis?: () => import('redis').RedisClientType;
     usePlugin: <T extends keyof Plugins>(name: T) => Plugins[T];
     useConfig: <T extends keyof Configuration>(config: T) => Configuration[T];
     useSource: (source: string) => Source;
     useToken: () => Promise<Token>;
     useEncrypt: () => Promise<Encrypt>;
+
+}
+export type Handlers = {
+    useCaptcha: () => RestRequestHandler;
+    useExcelExport: () => RestRequestHandler;
+    useUnlink: () => RestRequestHandler;
+    withSchema: <T extends Params>(schema: Base) => RestRequestHandler<T>;
 }
 
 export type ToObjectId = (value: any) => any | any[];

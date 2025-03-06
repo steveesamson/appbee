@@ -17,9 +17,6 @@ import { dataLoader } from "../tools/data-loader.js";
 import { dataPager } from "../tools/data-pager.js";
 import { cronMaster } from "../tools/cron-master.js";
 import * as usefetch from "../tools/use-fetch.js";
-import { useCaptcha } from "../tools/use-captcha.js";
-import { useExcelExport } from "../tools/use-excel-export.js";
-import { useUnlink } from "../tools/use-unlink.js";
 import { useToken, useEncrypt } from "../tools/security.js";
 import objectIsEmpty from "../utils/object-is-empty.js";
 import restRouter from "./rest-router.js";
@@ -51,20 +48,18 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		dataPager,
 		cronMaster,
 		useFetch,
-		useCaptcha,
-		useExcelExport,
-		useUnlink,
 		useSource,
 		usePlugin,
 		useConfig,
 		useToken,
-		useEncrypt
+		useEncrypt,
 	}
 
 	if (!objectIsEmpty(smtp)) {
 		const { mailer } = await import('../tools/mailer.js');
 		utils.mailer = mailer;
 	}
+
 	appState({
 		env: {
 			APP_NAME: appName,

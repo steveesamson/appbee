@@ -1,8 +1,3 @@
-// import type { RedisClientType } from 'redis'
-// import { useRedis } from "../tools/redis.js";
-// import { mailer } from "../tools/mailer.js";
-// import { initQueue } from "../tools/bee-que.js";
-// import { initEventBus } from "../tools/event-bus.js";
 import { existsSync as x } from "fs";
 import { join } from "path";
 import type { Params, Utils, WorkerApp } from "$lib/common/types.js";
@@ -12,9 +7,6 @@ import resolveAsyncAwait from "../tools/resolve-asyn-await.js";
 import { dataLoader } from "../tools/data-loader.js";
 import { dataPager } from "../tools/data-pager.js";
 import { cronMaster } from "../tools/cron-master.js";
-import { useCaptcha } from "../tools/use-captcha.js";
-import { useExcelExport } from "../tools/use-excel-export.js";
-import { useUnlink } from "../tools/use-unlink.js";
 import * as usefetch from "../tools/use-fetch.js";
 import { useEncrypt, useToken } from "../tools/security.js";
 import objectIsEmpty from "../utils/object-is-empty.js";
@@ -37,20 +29,17 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 	const { useMultiTenant, uploadDir = "", templateDir = "", appName = "" } = application;
 
 	const useFetch = () => usefetch;
-	const utils: Utils = {
+	const utils: Omit<Utils, 'useValidator'> = {
 		raa: resolveAsyncAwait,
 		dataLoader,
 		dataPager,
 		cronMaster,
 		useFetch,
-		useCaptcha,
-		useExcelExport,
-		useUnlink,
 		useSource,
 		usePlugin,
 		useConfig,
 		useToken,
-		useEncrypt
+		useEncrypt,
 	}
 
 	if (!objectIsEmpty(smtp)) {
