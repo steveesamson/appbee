@@ -94,61 +94,16 @@ export const getMongoParams = (opts: Params) => {
 	return Object.entries(opts).reduce(whereReducer, {});
 };
 
-// const mango: { ObjectId?: any } = {}; // cache ObjectId
 
-// const toObjectId = function (val: any) {
-
-// 	if (mango.ObjectId) {
-// 		const { ObjectId } = mango;
-// 		if (Array.isArray(val)) {
-// 			return val.map(i => new ObjectId(`${i}`));
-// 		} else {
-// 			return new ObjectId(`${val}`);
-// 		}
-// 	} else {
-// 		return import('mongodb').then(({ ObjectId }) => {
-// 			mango.ObjectId = ObjectId;
-// 			if (Array.isArray(val)) {
-// 				return val.map(i => new ObjectId(`${i}`));
-// 			} else {
-// 				return new ObjectId(`${val}`);
-// 			}
-// 		})
-// 	}
-
-// }
-// export const getValidOptionsExtractor = (context: AppModel) => (opts: Params = {}) => {
-// 	const optsCopy: Params = clone(opts);
-
-// 	// const convert = createConverter(optsCopy, toObjectId);
-
-// 	for (const [keyWithOperator, val] of Object.entries(optsCopy)) {
-// 		const key = cleanDataKey(keyWithOperator);
-
-// 		// if (!(key in context.schema?.shape)) {
-// 		// 	delete optsCopy[keyWithOperator];
-// 		// }
-// 		// else {
-// 		// const type = context.schema[key]?.trim();
-// 		// if (type) {
-// 		// 	convert(type as Converter, keyWithOperator, val);
-// 		// }
-
-// 		if (key === "id") {
-// 			const newKey = keyWithOperator.replace("id", "_id");
-// 			optsCopy[newKey] = optsCopy[keyWithOperator];
-// 			delete optsCopy[keyWithOperator];
-// 		}
-// 		// }
-// 	}
-// 	return optsCopy;
-// };
-
-export const extractOptions = (opts: Params = {}) => {
+export const validOptionsExtractor = (context: AppModel) => (opts: Params = {}) => {
 	const optsCopy: Params = clone(opts);
+	const { transients = [] } = context;
 
 	for (const keyWithOperator of Object.keys(optsCopy)) {
 		const key = cleanDataKey(keyWithOperator);
+		if (transients.length && transients.includes(key)) {
+			delete optsCopy[keyWithOperator];
+		}
 		if (key === "id") {
 			const newKey = keyWithOperator.replace("id", "_id");
 			optsCopy[newKey] = optsCopy[keyWithOperator];
@@ -157,6 +112,21 @@ export const extractOptions = (opts: Params = {}) => {
 	}
 	return optsCopy;
 };
+
+// export const extractOptions = (opts: Params = {}) => {
+
+// 	const optsCopy: Params = clone(opts);
+
+// 	for (const keyWithOperator of Object.keys(optsCopy)) {
+// 		const key = cleanDataKey(keyWithOperator);
+// 		if (key === "id") {
+// 			const newKey = keyWithOperator.replace("id", "_id");
+// 			optsCopy[newKey] = optsCopy[keyWithOperator];
+// 			delete optsCopy[keyWithOperator];
+// 		}
+// 	}
+// 	return optsCopy;
+// };
 
 export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params">) => {
 	const collection = context.db.collection(context.collection);
@@ -169,8 +139,7 @@ export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params"
 				? toProjection(includes)
 				: 1;
 
-	// const extractOptions = getValidOptionsExtractor(context);
-
+	const extractOptions = validOptionsExtractor(context);
 	const validOpts = extractOptions({ ...query });
 	let queries = getMongoParams(validOpts);
 

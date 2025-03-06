@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, describe, it, vi } from "vitest";
-import { toProjection, getMongoFinalizer, getMongoParams, getOperator, getValidOptionsExtractor, normalizeIncludes, prepWhere, reduceUnset, replaceMongoId, extractOptions } from "./mongo-common.js";
+import { toProjection, getMongoFinalizer, getMongoParams, getOperator, validOptionsExtractor, normalizeIncludes, prepWhere, reduceUnset, replaceMongoId } from "./mongo-common.js";
 import { v, type AppModel, type Model, type FindOptions, type Params } from "$lib/common/types.js";
 import { mongoData as data, Mango } from "@testapp/index.js";
 import { useUnwrap } from "../../unwrapper.js";
@@ -132,10 +132,10 @@ describe('mongo-common.js', () => {
 			expect(output).toEqual({ a: { '$ne': 10 }, b: { '$gt': 20 }, c: { '$ne': 45 }, d: { '$lt': 5 }, e: { '$gte': 6 }, f: { '$lte': 9 }, g: { '$nin': ['start', 'stop'] }, h: { '$in': [23, 90] }, i: 77 })
 		})
 	})
-	describe('extractOptions', () => {
+	describe('validOptionsExtractor', () => {
 		it('should be defined', () => {
-			expect(extractOptions).toBeDefined();
-			expect(extractOptions).toBeTypeOf('function');
+			expect(validOptionsExtractor).toBeDefined();
+			expect(validOptionsExtractor).toBeTypeOf('function');
 		})
 		it('should return valid mongodb params object that match model schema', () => {
 
@@ -145,13 +145,32 @@ describe('mongo-common.js', () => {
 				b: v.number()
 			});
 			const model: Model<typeof schema> = {
-				schema
+				schema,
+				transients: []
 			}
 			const _input = { id: 1, "a <>": '10', 'b >': 20, 'c !=': 45, 'd<': 5, 'e>=': 6, 'f<=': 9, "g~": ['start', 'stop'], h: [23, 90], i: 77 };
 			const { nuInput: input, unWrap } = useUnwrap(_input);
 			const out = v.parse(schema, input);
 			const nuinput = unWrap(out);
+			const extractOptions = validOptionsExtractor(model);
 			const output = extractOptions(nuinput);
+
+			expect(output).toEqual({ _id: 1, "a <>": '10', 'b >': 20 })
+		})
+		it('should return valid mongodb params object with transients removed', () => {
+
+			const schema = v.object({
+				id: v.number(),
+				a: v.string(),
+				b: v.number()
+			});
+			const model: Model<typeof schema> = {
+				schema,
+				transients: ['c', 'd', 'e', 'f', 'g', 'h', 'i']
+			}
+			const _input = { id: 1, "a <>": '10', 'b >': 20, 'c !=': 45, 'd<': 5, 'e>=': 6, 'f<=': 9, "g~": ['start', 'stop'], h: [23, 90], i: 77 };
+			const extractOptions = validOptionsExtractor(model);
+			const output = extractOptions(_input);
 
 			expect(output).toEqual({ _id: 1, "a <>": '10', 'b >': 20 })
 		})

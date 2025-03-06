@@ -5,7 +5,7 @@ import {
 	getMongoParams,
 	getMongoFinalizer,
 	normalizeIncludes,
-	extractOptions,
+	validOptionsExtractor,
 } from "./mongo-common.js";
 import { getUniqueKeyChecker } from "../common.js";
 
@@ -53,7 +53,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			return raa(finalize({ query, relaxExclude, beeSkipCount, includeMap }, cursor));
 		},
 		async create(options: CreateOptions): Promise<CreateData> {
-			// const extractOptions = getValidOptionsExtractor(this);
+			const extractOptions = validOptionsExtractor(this);
 			const { relaxExclude = false, includes, data } = options;
 
 			// const payload = data;
@@ -78,15 +78,12 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			return { error: "No record was inserted." };
 		},
 		async update(options: MongoUpdateOptions): Promise<UpdateData> {
-			// const { id, where, $unset: _toRemove = [], relaxExclude = false, includes = 1, data } = params;
-			// const { opType = '$set', upsert = false } = options;
-
 			const { query, upsert, includes, ...rest } = options;
 
 			if (!query) {
 				return { error: "You need a query object to update any model" };
 			}
-			// const extractOptions = getValidOptionsExtractor(this);
+			const extractOptions = validOptionsExtractor(this);
 			const hasKey = getUniqueKeyChecker(this);
 
 			// const arg = query;
@@ -100,15 +97,6 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			const collection = this.db.collection(this.collection);
 			const isSingle = hasKey(query);
 			const updateOperation = isSingle ? "updateOne" : "updateMany";
-
-			// const validOptions = extractOptions(data);
-			// const markedForRemoval = !!_toRemove && typeof _toRemove === "string" ? _toRemove.split(",") : _toRemove;
-			// const $unset = reduceUnset(markedForRemoval);
-			// let removal = {};
-			// if (markedForRemoval.length) {
-			// 	removal = { $unset };
-			// }
-			// const removal = markedForRemoval.length ? { $unset } : {};
 
 			const { modifiedCount } = await collection[updateOperation](
 				conditions,
@@ -124,9 +112,8 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 				return { error: "You need a query object to delete any model" };
 			}
 			const hasKey = getUniqueKeyChecker(this);
-			// const extractOptions = getValidOptionsExtractor(this);
+			const extractOptions = validOptionsExtractor(this);
 
-			// const arg = { id, ...(query || {}) };
 			const args = extractOptions(query);
 			const qry = getMongoParams(args);
 			const collection = this.db.collection(this.collection);

@@ -2,7 +2,6 @@
 import isArray from "lodash/isArray.js";
 
 import type { FindOptions, AppModel, Params, DbFinalizer, FindData } from "$lib/common/types.js";
-// import { createConverter, type Converter } from "../converter.js";
 import { cleanDataKey, getUniqueKeyChecker, removeModelExcludes } from "../common.js";
 
 
@@ -92,35 +91,29 @@ export const collectionInstance = (context: AppModel) => (options: Params) => {/
 	if (context.dbSchema) {
 		db.withSchema(context.dbSchema);
 	}
-	// const validOptions = getValidOptionsExtractor(context);
 	if (search) {
 		prepSearch(search, context.searchPath, db, modelName);
 	}
-	// const validOpts = validOptions(query);
 	// getWheres(db, modelName, validOpts);
 	getWheres(db, modelName, query);
 
 	return { db, modelName };
 };
 
-// export const getValidOptionsExtractor = (context: AppModel) => (opts: Params = {}) => {
-// 	const optsCopy: Params = { ...opts };
-// 	const convert = createConverter(optsCopy);
-
-// 	for (const [keyWithOperator, val] of Object.entries(optsCopy)) {
-// 		const key = cleanDataKey(keyWithOperator);
-
-// 		if (!(key in context.schema)) {
-// 			delete optsCopy[keyWithOperator];
-// 		} else {
-// 			const type = context.schema[key]?.trim();
-// 			if (type) {
-// 				convert(type as Converter, keyWithOperator, val);
-// 			}
-// 		}
-// 	}
-// 	return optsCopy;
-// };
+export const validOptionsExtractor = (context: AppModel) => (opts: Params = {}) => {
+	const optsCopy: Params = { ...opts };
+	const { transients = [] } = context;
+	if (!transients.length) {
+		return optsCopy;
+	}
+	for (const keyWithOperator of Object.keys(optsCopy)) {
+		const key = cleanDataKey(keyWithOperator);
+		if (transients.includes(key)) {
+			delete optsCopy[keyWithOperator];
+		}
+	}
+	return optsCopy;
+};
 
 
 

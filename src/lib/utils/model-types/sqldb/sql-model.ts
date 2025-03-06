@@ -1,15 +1,14 @@
 import isArray from "lodash/isArray.js";
 import raa from "$lib/tools/resolve-asyn-await.js";
-
-import type { FindOptions, DeleteOptions, FindData, SqlUpdateOptions, AppModel, CreateData, CreateOptions, UpdateData, DeleteData, ResolveData, IncludeMap } from "$lib/common/types.js";
+import type { FindOptions, DeleteOptions, FindData, SqlUpdateOptions, AppModel, CreateData, CreateOptions, UpdateData, DeleteData, ResolveData, IncludeMap, Params } from "$lib/common/types.js";
 
 import {
 	collectionInstance,
 	getSQLFinalizer,
 	normalizeIncludes,
 	prepWhere,
+	validOptionsExtractor,
 } from "./sql-common.js";
-// import _ from "lodash";
 
 
 export const sqlModel = function (base: Partial<AppModel>): AppModel {
@@ -54,15 +53,14 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 		},
 		async create(options: CreateOptions): Promise<CreateData> {
 			const { relaxExclude, includes, data } = options;
-			// const getValidOptions = getValidOptionsExtractor(this as AppModel);
+			const getValidOptions = validOptionsExtractor(this as AppModel);
 			const isMultiple = data && isArray(data);
 
-			// const validOptions = isMultiple ? data.map((next: Params) => getValidOptions(next)) : getValidOptions(data);
-			// const validOptions = isMultiple ? data.map((next: Params) => getValidOptions(next)) : getValidOptions(data);
+			const _data = isMultiple ? data.map((next: Params) => getValidOptions(next)) : getValidOptions(data);
 
 			const idKey = this.insertKey!;
 			const result = await this.db(this.collection).insert(
-				data,
+				_data,
 				canReturnDrivers.includes(this.storeType!) ? [idKey] : null,
 			);
 			if (result?.length) {
@@ -75,17 +73,16 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 		async update(options: SqlUpdateOptions): Promise<UpdateData> {
 			const { query, data, includes } = options;
 			const getCollection = collectionInstance(this as AppModel);
-			// const getValidOptions = getValidOptionsExtractor(this as AppModel);
+			const getValidOptions = validOptionsExtractor(this as AppModel);
 
 			if (!query) {
 				return { error: "You need a query object to update any model" };
 			}
 			const idKey = this.insertKey!;
 
-			// const _query = { id, ...(query || {}) };
 			const { db } = getCollection({ query });
-			// const validOptions = getValidOptions(data);
-			await db.update(data, canReturnDrivers.includes(this.storeType!) ? [idKey] : null);
+			const _data = getValidOptions(data);
+			await db.update(_data, canReturnDrivers.includes(this.storeType!) ? [idKey] : null);
 
 			return this.find!({ query, beeSkipCount: true, includes });
 		},
@@ -96,7 +93,6 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 				return { error: "You need a query object to delete any model" };
 			}
 			const getCollection = collectionInstance(this as AppModel);
-			// const _query = { id, ...(query || {}) };
 			const { db } = getCollection({ query });
 			const idKey = this.insertKey!;
 			return raa(db.del([idKey], { includeTriggerModifications: true }));

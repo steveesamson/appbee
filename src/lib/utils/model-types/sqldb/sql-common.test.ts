@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { getRowCounter, getOperator, normalizeIncludes, getWheres, prepSearch, collectionInstance, getSQLFinalizer, prepWhere } from "./sql-common.js";
+import { getRowCounter, getOperator, normalizeIncludes, getWheres, prepSearch, collectionInstance, getSQLFinalizer, prepWhere, validOptionsExtractor } from "./sql-common.js";
 import type { AppModel, FindOptions, Model, Params } from "$lib/common/types.js";
 import { Db, data } from "@testapp/index.js";
-import { extractOptions } from "../mongodb/mongo-common.js";
+// import { extractOptions } from "../mongodb/mongo-common.js";
 
 
 describe('sql-common.js', () => {
@@ -215,16 +215,29 @@ describe('sql-common.js', () => {
 
 	});
 
-	describe('extractOptions', () => {
+	describe('validOptionsExtractor', () => {
 
 		it('should be defined', () => {
-			expect(extractOptions).toBeDefined();
-			expect(extractOptions).toBeTypeOf('function');
+			expect(validOptionsExtractor).toBeDefined();
+			expect(validOptionsExtractor).toBeTypeOf('function');
 		})
-		it('should return valid mongodb params object that matches model type', () => {
+		it('should return valid sql params object that matches model type', () => {
 			const input = { id: '12344555', "a <>": 10, 'b >': 20 };
+			const model = {
+				transients: [],
+			} as AppModel;
+			const extractOptions = validOptionsExtractor(model);
 			const extract = extractOptions(input);
-			expect(extract).toEqual({ _id: '12344555', "a <>": 10, 'b >': 20 })
+			expect(extract).toEqual({ id: '12344555', "a <>": 10, 'b >': 20 })
+		})
+		it('should return valid sql params object with transient removed', () => {
+			const input = { id: '12344555', "a <>": 10, 'b >': 20 };
+			const model = {
+				transients: ['a'],
+			} as AppModel;
+			const extractOptions = validOptionsExtractor(model);
+			const extract = extractOptions(input);
+			expect(extract).toEqual({ id: '12344555', 'b >': 20 })
 		})
 	})
 

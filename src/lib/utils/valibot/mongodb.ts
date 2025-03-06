@@ -111,19 +111,19 @@ export function objectId(
         // },
         '~run'(dataset, config) {
             const isValid = isObjectId();
-            if (dataset.value) {
-                const { isOk, value } = isValid(dataset.value)
-                if (isOk) {
-                    dataset.value = value
-                    // @ts-expect-error
-                    dataset.typed = true;
-                } else {
-                    _addIssue(this, 'objectId', dataset, config);
-                }
-
+            // if (dataset.value) {
+            const { isOk, value } = isValid(dataset.value)
+            if (isOk) {
+                dataset.value = value
+                // @ts-expect-error
+                dataset.typed = true;
             } else {
                 _addIssue(this, 'objectId', dataset, config);
             }
+
+            // } else {
+            //     _addIssue(this, 'objectId', dataset, config);
+            // }
             // @ts-expect-error
             return dataset as OutputDataset<ObjectId, ObjectIdIssue>;
         },

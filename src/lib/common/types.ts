@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import type { RequestHandler, ParamsDictionary, Query } from 'express-serve-static-core';
 import type { Application, RequestHandler, Request as ExpressRequest, Response, NextFunction } from "express";
 import type { ScheduledTask } from "node-cron";
 export type { RequestHandler, Application, Response, NextFunction };
@@ -30,6 +29,7 @@ export * as x from "../utils/valibot/extensions.js"
 //     _query: { sid: string };
 //     currentUser?: Params;
 // };
+
 export interface Request<T = any> extends ExpressRequest {
     context: T;
     files?: MultiPartFile[];
@@ -166,6 +166,7 @@ export type AppModel = {
     // schema: T;
     uniqueKeys: string[];
     includes: string[];
+    transients: string[];
     searchPath: string[];
     excludes: string[];
     instanceName: string;
@@ -418,10 +419,6 @@ export type DataLoaderOptions<T> = {
 };
 export type DataLoader = <T>() => (dataLoaderOptions: DataLoaderOptions<T>) => Promise<ResolveData<T>>;
 
-// type RouteKeys = 'get' | 'post' | 'put' | 'destroy' | 'patch' | 'options' | 'head';
-// type RouteHandler = {
-//     [key in RouteKeys]: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
-// }
 export type RouteMethods = {
     get: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
     post: (path: string, ...handlerOrPreCreate: (RestRequestHandler | PreCreate)[]) => RouteMethods;
@@ -431,12 +428,6 @@ export type RouteMethods = {
     options: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
     head: (path: string, ...handler: RestRequestHandler[]) => RouteMethods;
 }
-// export type CrudMethods = {
-//     handleRead: () => RestRequestHandler[];
-//     handleCreate: (preCreate?: PreCreate) => RestRequestHandler[];
-//     handleUpdate: () => RestRequestHandler[];
-//     handleDelete: () => RestRequestHandler[];
-// }
 
 export type IOSocketRequest = Params;
 
