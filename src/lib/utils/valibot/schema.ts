@@ -17,6 +17,7 @@ export const useSchema = <
     const withOmittedId = v.omit(baseSchema, ['id']);
     const createSchema = v.object({
         data: withOmittedId,
+        params: v.partial(baseSchema),
         // bulk: v.optional(v.array(withOmittedId)),
     });
     const conditionSchema = v.object({

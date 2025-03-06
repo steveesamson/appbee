@@ -13,7 +13,7 @@ const restRouter = (): RequestHandler => (req: Request, res: Response, next: Nex
 		req.context = { params, query };
 	}
 	if (mtd === 'post') {
-		req.context = { data: body };
+		req.context = { data: body, params };
 	}
 	if (['put', 'patch'].includes(mtd)) {
 		req.context = { data: body, params, query };
