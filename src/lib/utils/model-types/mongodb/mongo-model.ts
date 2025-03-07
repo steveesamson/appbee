@@ -65,14 +65,14 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 
 			const insertOperation = isMultiple ? "insertMany" : "insertOne";
 
-			const { insertedCount, ops } = await collection[insertOperation](validOptions);
+			const res = await collection[insertOperation](validOptions);
 
 
 			const idKey = this.insertKey;
-			if (insertedCount) {
+			if (res.acknowledged) {
 				const query = isMultiple
-					? { beeSkipCount: true, query: { [idKey!]: ops.map((a: Params) => a["_id"].toString()) }, relaxExclude, includes }
-					: { beeSkipCount: true, query: { [idKey!]: ops[0]["_id"].toString() }, relaxExclude, includes };
+					? { beeSkipCount: true, query: { [idKey!]: Object.values(res.insertedIds) }, relaxExclude, includes }
+					: { beeSkipCount: true, query: { [idKey!]: res.insertedId }, relaxExclude, includes };
 				return this.find(query);
 			}
 			return { error: "No record was inserted." };

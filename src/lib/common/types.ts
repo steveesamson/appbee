@@ -163,7 +163,7 @@ export type AppModel = {
     publishDestroy: (req: RequestAware, data: PubData) => void;
     storeType?: string;
     dbSchema: string;
-    // schema: T;
+    schema: Base;
     uniqueKeys: string[];
     includes: string[];
     transients: string[];

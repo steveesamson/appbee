@@ -214,6 +214,10 @@ export const getMongoFinalizer = (context: AppModel) => async (options: DbFinali
 
 	const hasKey = getUniqueKeyChecker(context);
 	if (hasKey(query)) {
+
+		if (!data.length) {
+			return { data: undefined };
+		}
 		let oneData = data[0] as Params;
 		if (data && !relaxExclude && context.excludes?.length) {
 			oneData = removeExcludes(oneData) as Params;

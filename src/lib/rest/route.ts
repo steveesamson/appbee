@@ -20,9 +20,16 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 		console.warn(`No model was found for module:${candidate}. I hope this is deliberate.`);
 	}
 
-	const route: RouteConfig = {};
-	route.mountPoint = mountPoint;
-	routes[module] = route;
+	// const route: RouteConfig = {};
+	// route.mountPoint = mountPoint;
+	// routes[module] = route;
+
+	let route: RouteConfig | undefined = Object.values(routes).find((next) => next.mountPoint === mountPoint);
+	if (!route) {
+		route = {};
+		route.mountPoint = mountPoint;
+		routes[module] = route;
+	}
 
 	const { readSchema, createSchema, updateSchema, deleteSchema } = schema ? useSchema(schema) : { readSchema: null, createSchema: null, updateSchema: null, deleteSchema: null };
 
@@ -35,8 +42,8 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 			if (handler && handler.length) {
 				validators.push(...handler);
 			} else if (readSchema) {
-				type ReadType = v.InferOutput<typeof readSchema>;
-				validators.push(handleGet<ReadType>(getModel!));
+				// type ReadType = v.InferOutput<typeof readSchema>;
+				validators.push(handleGet(getModel!));
 			}
 			route[`get ${path}`] = [...validators];
 			return maps;
@@ -62,14 +69,14 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 
 				if (hasPrecreate && createSchema) {
 					const pre = handlerOrPreCreate[0];
-					type CreateType = v.InferOutput<typeof createSchema>;
-					validators.push(validateSchema<CreateType>(createSchema!));
-					validators.push(handleCreate<CreateType>(getModel!, pre as PreCreate<CreateType>));
+					// type CreateType = v.InferOutput<typeof createSchema>;
+					validators.push(validateSchema(createSchema!));
+					validators.push(handleCreate(getModel!, pre as PreCreate));
 				}
 			} else if (createSchema) {
-				type CreateType = v.InferOutput<typeof createSchema>;
-				validators.push(validateSchema<CreateType>(createSchema!));
-				validators.push(handleCreate<CreateType>(getModel!));
+				// type CreateType = v.InferOutput<typeof createSchema>;
+				validators.push(validateSchema(createSchema!));
+				validators.push(handleCreate(getModel!));
 			}
 			route[`post ${path}`] = [...validators];
 
@@ -82,9 +89,9 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 			if (handler.length) {
 				validators.push(...handler);
 			} else if (updateSchema) {
-				type UpdateType = v.InferOutput<typeof updateSchema>;
-				validators.push(validateSchema<UpdateType>(updateSchema!));
-				handleUpdate<UpdateType>(getModel!);
+				// type UpdateType = v.InferOutput<typeof updateSchema>;
+				validators.push(validateSchema(updateSchema!));
+				handleUpdate(getModel!);
 			}
 
 			route[`put ${path}`] = [...validators];
@@ -97,9 +104,9 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 			if (handler.length) {
 				validators.push(...handler);
 			} else if (deleteSchema) {
-				type DeleteType = v.InferOutput<typeof deleteSchema>;
-				validators.push(validateSchema<DeleteType>(deleteSchema!));
-				handleDelete<DeleteType>(getModel!);
+				// type DeleteType = v.InferOutput<typeof deleteSchema>;
+				validators.push(validateSchema(deleteSchema!));
+				handleDelete(getModel!);
 			}
 			route[`delete ${path}`] = [...validators];
 
@@ -111,9 +118,9 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 			if (handler.length) {
 				validators.push(...handler);
 			} else if (updateSchema) {
-				type UpdateType = v.InferOutput<typeof updateSchema>;
-				validators.push(validateSchema<UpdateType>(updateSchema!));
-				handleUpdate<UpdateType>(getModel!);
+				// type UpdateType = v.InferOutput<typeof updateSchema>;
+				validators.push(validateSchema(updateSchema!));
+				handleUpdate(getModel!);
 			}
 			route[`patch ${path}`] = [...validators];
 			return maps;

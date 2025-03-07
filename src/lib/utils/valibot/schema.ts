@@ -14,14 +14,13 @@ export const useSchema = <
 >(
     baseSchema: T,
 ) => {
-    const withOmittedId = v.omit(baseSchema, ['id']);
+    const withOmittedId = v.partial(baseSchema, ['id']);
     const createSchema = v.object({
-        data: withOmittedId,
+        data: v.union([withOmittedId, v.array(withOmittedId)]),
         params: v.partial(baseSchema),
-        // bulk: v.optional(v.array(withOmittedId)),
     });
     const conditionSchema = v.object({
-        params: v.partial(v.pick(baseSchema, ['id'])),
+        params: v.partial(baseSchema),
         query: v.partial(baseSchema),
     })
     const readSchema = v.object({

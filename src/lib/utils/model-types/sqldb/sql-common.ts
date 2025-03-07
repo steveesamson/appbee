@@ -126,6 +126,9 @@ export const getSQLFinalizer = (context: AppModel) => async (options: DbFinalize
 	const unResolved = await db;
 
 	if (hasKey(query)) {
+		if (!unResolved.length) {
+			return { data: undefined };
+		}
 		const unResolvedOne = unResolved[0];
 		let data = await context.resolveResult(unResolvedOne, includeMap);
 		if (!relaxExclude && context.excludes.length) {

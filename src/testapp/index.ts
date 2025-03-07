@@ -286,16 +286,16 @@ export class Mango {
                 }
             },
             insertOne() {
-                return dis.withError ? { insertedCount: 0 } : { insertedCount: 1, ops: [{ _id: '67a2b1f94d1c3bd7610536a9' }] }
+                return dis.withError ? { acknowledged: false } : { acknowledged: true, insertedId: '67a2b1f94d1c3bd7610536a9' }
             },
             insertMany() {
-                return dis.withError ? { insertedCount: 0 } : { insertedCount: 1, ops: [{ _id: '67a2b1f94d1c3bd7610536a9' }] }
+                return dis.withError ? { acknowledged: 0 } : { acknowledged: true, insertedIds: { 0: '67a2b1f94d1c3bd7610536a9' } }
             },
             updateOne() {
-                return dis.withError ? { modifiedCount: 0 } : { modifiedCount: 1, ops: [{ _id: '67a2b1f94d1c3bd7610536a9' }] }
+                return dis.withError ? { modifiedCount: 0 } : { modifiedCount: 1 }
             },
             updateMany() {
-                return dis.withError ? { modifiedCount: 0 } : { modifiedCount: 1, ops: [{ _id: '67a2b1f94d1c3bd7610536a9' }] }
+                return dis.withError ? { modifiedCount: 0 } : { modifiedCount: 1 }
             },
             deleteOne() {
                 return dis.withError ? { deletedCount: 0 } : { deletedCount: 1 }

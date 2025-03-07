@@ -18,12 +18,11 @@ const useChunkDecoder = (req: Request, res: Response, next: NextFunction, { isJs
         try {
             if (isJson && chunk) {
                 const body = JSON.parse(chunk);
-                req.body = extend({}, body);
+                req.body = body;
                 return next();
 
             } else if (isUrlEncoded) {
                 const body = qs.decode(chunk);
-                // req.body = extend({}, body);
                 req.body = body;
                 return next();
             }

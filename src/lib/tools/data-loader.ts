@@ -1,4 +1,4 @@
-import type { DataLoader, DataLoaderOptions, LoaderJob, Params, ResolveData } from "$lib/common/types.js";
+import { v, type DataLoader, type DataLoaderOptions, type LoaderJob, type Params, type ResolveData } from "$lib/common/types.js";
 import toDedupeArray from "$lib/utils/string-to-dedupe-array.js";
 import dedupeArray from "$lib/utils/dedupe-array.js";
 import logDebug from "./log-debug.js";
@@ -57,7 +57,16 @@ export const dataLoader: DataLoader = <T = any>() => {
 
 
 		const requests = jobs.map(({ model, from, to, includes }: IntermediateJob) => {
-			const payload = dedupeArray(data.map((next: T) => `${next[from]}`));
+			const targetSchema = model.schema.entries[to];
+
+			const payload = dedupeArray(data.map((next: T) => {
+				const { output, success, issues } = v.safeParse(targetSchema, `${next[from]}`);
+				if (!success) {
+					throw Error(`DataLoader errror: ${issues[0].message} in loader:${name}`);
+				}
+				return output;
+			}));
+
 			log({ [to]: payload });
 			return model.find({ query: { [to]: payload }, includes });
 		});
@@ -76,12 +85,19 @@ export const dataLoader: DataLoader = <T = any>() => {
 		log({ jobs });
 
 		const loadedData = data.map((next: T) => {
-			for (const { jobData = {}, jobMap = {}, selects = undefined } of jobs) {
-				if (Array.isArray(jobData)) {
-					throw Error("Data loader pipeline must return a single object, not an array of objects.")
-				}
+			for (const { from, to, jobData = {}, jobMap = {}, selects = undefined } of jobs) {
+				// if (Array.isArray(jobData) && ![1, data.length].includes(jobData.length)) {
+				//     throw Error("Data loader pipeline must return a single object, not an array of objects.");
+				// }
 
-				let foundMatch = jobData;
+				const nextDatas = Array.isArray(jobData) ? jobData : [jobData];
+				let foundMatch = nextDatas.find((nextData) => {
+					const keyOnData = `${next[from]}`;
+					const keyOnJobData = `${nextData[to]}`;
+					return keyOnData === keyOnJobData;
+				});
+
+				if (!foundMatch) continue;
 				if (selects) {
 					const picked = selects.reduce((acc: Params, s: string) => {
 						acc[s] = foundMatch![s];

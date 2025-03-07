@@ -29,7 +29,7 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 	const { useMultiTenant, uploadDir = "", templateDir = "", appName = "" } = application;
 
 	const useFetch = () => usefetch;
-	const utils: Omit<Utils, 'useValidator'> = {
+	const utils: Utils = {
 		raa: resolveAsyncAwait,
 		dataLoader,
 		dataPager,

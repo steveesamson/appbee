@@ -1,17 +1,17 @@
 import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions, Params, MongoUpdateType } from "../common/types.js";
 
-const handleGet = <T = FindOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
+const handleGet = (getModel: GetModel) => async (req: Request<FindOptions>, res: Response) => {
 	const model = getModel(req);
-	const { context } = req;
-	const { error, ...rest } = await model.find(context);
+	const { context: { query = {}, params = {}, ...rem } } = req;
+	const { error, ...rest } = await model.find({ query: { ...query, ...params }, ...rem });
 	if (error) {
 		console.error(error);
 		return res.status(500).json({ error });
 	}
 	res.status(200).json({ ...rest });
 };
-const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetModel, preCreate?: PreCreate<T>) => async (
-	req: Request<T>,
+const handleCreate = (getModel: GetModel, preCreate?: PreCreate<CreateOptions>) => async (
+	req: Request<CreateOptions>,
 	res: Response,
 ) => {
 	const { data: _data, relaxExclude, includes } = req.context;
@@ -25,7 +25,10 @@ const handleCreate = <T extends CreateOptions = CreateOptions>(getModel: GetMode
 		injection = preCreate(req);
 	}
 
-	const { error, data } = await model.create({ relaxExclude, includes, data: { ..._data, ...injection } });
+	const load = Array.isArray(_data) ? _data.map((next) => ({ ...next, ...injection })) : { ..._data, ...injection };
+	const { error, data } = await model.create({ relaxExclude, includes, data: load });
+
+	// const { error, data } = await model.create({ relaxExclude, includes, data: { ..._data, ...injection } });
 
 	if (data) {
 		model.publishCreate(req.aware(), data);
@@ -50,8 +53,8 @@ type BaseMongoDBUpdateOptions = BaseDeleteOptions & {
 }
 type UpdateOptions = BaseSqlUpdateOptions | BaseMongoDBUpdateOptions;
 
-const handleUpdate = <T extends UpdateOptions = UpdateOptions>(getModel: GetModel) => async (
-	req: Request<T>,
+const handleUpdate = (getModel: GetModel) => async (
+	req: Request<UpdateOptions>,
 	res: Response,
 ) => {
 	const { context } = req;
@@ -68,7 +71,7 @@ const handleUpdate = <T extends UpdateOptions = UpdateOptions>(getModel: GetMode
 		res.status(200).json({ data });
 	}
 };
-const handleDelete = <T extends BaseDeleteOptions = BaseDeleteOptions>(getModel: GetModel) => async (req: Request<T>, res: Response) => {
+const handleDelete = (getModel: GetModel) => async (req: Request<BaseDeleteOptions>, res: Response) => {
 	const { context } = req;
 	const { query: qry = {}, params = {} } = context;
 	const model = getModel(req);
