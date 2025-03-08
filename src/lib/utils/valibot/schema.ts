@@ -16,7 +16,7 @@ export const useSchema = <
 ) => {
     const withOmittedId = v.partial(baseSchema, ['id']);
     const createSchema = v.object({
-        data: v.union([withOmittedId, v.array(withOmittedId)]),
+        data: withOmittedId,
         params: v.partial(baseSchema),
     });
     const conditionSchema = v.object({
@@ -38,11 +38,11 @@ export const useSchema = <
             data: v.partial(baseSchema),
             ...conditionSchema.entries
         }),
-        v.check((input) => !!input.params?.id || !!input.query, "Either params.id or query is required")
+        v.check((input) => !!input.params || !!input.query, "Either params or query is required")
     );
     const deleteSchema = v.pipe(
         conditionSchema,
-        v.check((input) => !!input.params?.id || !!input.query, "Either params.id or query is required")
+        v.check((input) => !!input.params || !!input.query, "Either params or query is required")
     );
 
     return { createSchema, readSchema, updateSchema, deleteSchema };

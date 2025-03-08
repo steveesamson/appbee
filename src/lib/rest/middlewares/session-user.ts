@@ -10,7 +10,7 @@ const patchOnCurrentUser = async (req: Request) => {
 			const { verify } = await useToken();
 			const decoded = await verify(token);
 			if (decoded) {
-				req.currentUser = decoded as Params;
+				req.currentUser = decoded as any;
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 // import os from "node:os";
 import fs from "fs-extra";
 import { expect, describe, it, beforeAll, afterAll, vi } from "vitest";
-import { mailer } from "./mailer.js";
+import { useMailer } from "./mailer.js";
 import { clearMocks, base } from "@testapp/index.js";
 import { appState } from "./app-state.js";
 import loader from "../utils/loader.js";
@@ -51,14 +51,14 @@ describe('mailer.js', () => {
 	describe("definition", () => {
 
 		it('expects it to be defined', () => {
-			expect(mailer).toBeDefined();
-			expect(mailer).toBeTypeOf('function');
+			expect(useMailer).toBeDefined();
+			expect(useMailer).toBeTypeOf('function');
 		})
 	})
 	describe("sendMail", () => {
 
 		it('should throw error', async () => {
-			const sendMail = mailer(smtp);
+			const sendMail = useMailer(smtp);
 
 			await expect(async () => await sendMail({
 				subject: "Test email",
@@ -69,7 +69,7 @@ describe('mailer.js', () => {
 
 		})
 		it('should send email with template', async () => {
-			const sendMail = mailer(smtp);
+			const sendMail = useMailer(smtp);
 			const sendInfo = await sendMail({
 				subject: "Test email",
 				to: 'test-receiver@test.com',
@@ -86,7 +86,7 @@ describe('mailer.js', () => {
 			})
 		})
 		it('should send email with html', async () => {
-			const sendMail = mailer(smtp);
+			const sendMail = useMailer(smtp);
 			const sendInfo = await sendMail({
 				subject: "Test email",
 				to: 'test-receiver@test.com',
@@ -103,7 +103,7 @@ describe('mailer.js', () => {
 			})
 		})
 		it('should send email with text', async () => {
-			const sendMail = mailer(smtp);
+			const sendMail = useMailer(smtp);
 			const sendInfo = await sendMail({
 				subject: "Test email",
 				to: 'test-receiver@test.com',
@@ -121,7 +121,7 @@ describe('mailer.js', () => {
 		})
 
 		it('should send email with no "from"', async () => {
-			const sendMail = mailer(smtp);
+			const sendMail = useMailer(smtp);
 			const sendInfo = await sendMail({
 				subject: "Test email",
 				to: 'test-receiver@test.com',

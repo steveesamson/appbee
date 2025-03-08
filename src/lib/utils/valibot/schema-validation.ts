@@ -1,6 +1,7 @@
 import { v, type Request, type Response, type NextFunction, type Params } from "$lib/common/types.js";
 import { useUnwrap } from "$lib/utils/unwrapper.js";
 import type { Base } from "$lib/utils/valibot/schema.js";
+import { StatusCodes } from "http-status-codes";
 
 export const validateSchema = <T extends Params>(schema: Base) => {
 
@@ -26,7 +27,7 @@ export const validateSchema = <T extends Params>(schema: Base) => {
                 }
             }
             const eStr = errorArray.join("; ");
-            return res.status(400).json({ error: eStr });
+            return res.status(StatusCodes.BAD_REQUEST).json({ error: eStr });
         }
     }
 

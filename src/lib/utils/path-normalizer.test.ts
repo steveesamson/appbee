@@ -9,14 +9,15 @@ describe('path-normalizer.js', () => {
     it('expects normalizePath to be a function', () => {
         expect(normalizePath).toBeTypeOf('function');
     });
-    it('expects normalizePath of base / and MP of users to return "users"', () => {
-        const expected = "users"
-        const path = normalizePath('/', 'users');
+    it('expects normalizePath of base / and MP of users to return "/"', () => {
+        const expected = "/users"
+        const path = normalizePath('/', '/users');
         expect(path).toBe(expected);
     });
-    it('expects normalizePath of base /profile and MP of users to return "users/profile"', () => {
-        const expected = "users/profile"
-        const path = normalizePath('/profile', 'users');
+
+    it('expects normalizePath of base /users/profile and MP of users to return "/profile"', () => {
+        const expected = "/users/profile"
+        const path = normalizePath('/profile', '/users');
         expect(path).toBe(expected);
     });
 

@@ -7,17 +7,11 @@ import helmet from "helmet";
 import { Server } from "socket.io";
 import { createServer as createHTTPServer } from "http";
 import methodOverride from "method-override";
-import { components, configureRealtimeRoutes, configureRestRoutes, configureRestServer, useConfig, usePlugin, useSource } from "../utils/configurer.js";
+import { components, configureRealtimeRoutes, configureRestRoutes, configureRestServer } from "../utils/configurer.js";
 import { appState } from "../tools/app-state.js";
 import { restSessionUser } from "./middlewares/session-user.js";
 import beeMultiparts from "./multiparts.js";
-import type { Params, Resource, Utils, Application, RequestHandler } from "../common/types.js";
-import resolveAsyncAwait from "../tools/resolve-asyn-await.js";
-import { dataLoader } from "../tools/data-loader.js";
-import { dataPager } from "../tools/data-pager.js";
-import { cronMaster } from "../tools/cron-master.js";
-import * as usefetch from "../tools/use-fetch.js";
-import { useToken, useEncrypt } from "../tools/security.js";
+import type { Params, Resource, Application, RequestHandler } from "../common/types.js";
 import objectIsEmpty from "../utils/object-is-empty.js";
 import restRouter from "./rest-router.js";
 
@@ -41,23 +35,10 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		}));
 
 	resources.push({ name: "Core", value: "core", id: resources.length + 1 });
-	const useFetch = () => usefetch;
-	const utils: Utils = {
-		raa: resolveAsyncAwait,
-		dataLoader,
-		dataPager,
-		cronMaster,
-		useFetch,
-		useSource,
-		usePlugin,
-		useConfig,
-		useToken,
-		useEncrypt,
-	}
 
 	if (!objectIsEmpty(smtp)) {
-		const { mailer } = await import('../tools/mailer.js');
-		utils.mailer = mailer;
+		const { useMailer } = await import('../tools/mailer.js');
+		appState({ useMailer });
 	}
 
 	appState({
@@ -89,11 +70,11 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		redisClient = await useRedis(bus!, profile);
 		const { useQueue, useWorker } = initQueue(redisClient!.duplicate());
 		const useBus = initEventBus({ redisClient: redisClient!.duplicate(), profile });
-		utils.useRedis = closedOverRedis(redisClient!.duplicate());
 		appState({
 			useQueue,
 			useWorker,
 			useBus,
+			useRedis: closedOverRedis(redisClient!.duplicate())
 		});
 	} else {
 		const { initEventBus } = await import(brel);
@@ -103,7 +84,7 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		});
 	}
 
-	appState({ utils, model });
+	appState({ model });
 	const app: Application = express();
 	app.set("trust proxy", true);
 

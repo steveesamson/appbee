@@ -1,17 +1,18 @@
 import { Route } from "$lib/rest/route.js";
 import type { Request, Response } from "$lib/common/types.js";
+import { StatusCodes } from "http-status-codes";
 
 const { get, post, put, destroy, patch } = Route("Stories", "/stories");
 
 get(`/send`, (req: Request, res: Response) => {
 
-  const { query: { story } } = req.context;
-  res.status(200).send(`${story}`);
+  const { query } = req.context;
+  res.status(StatusCodes.OK).send(`${query.story}`);
 });
 
 get(`/`, (req: Request, res: Response) => {
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: [
       { accountNo: "00001", balance: 2000 },
       { accountNo: "00003", balance: 5000 }
@@ -21,13 +22,13 @@ get(`/`, (req: Request, res: Response) => {
 
 post(`/`, (req: Request, res: Response) => {
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: req.body
   });
 });
 
 put(`/:id`, (req: Request, res: Response) => {
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: {
       ...req.body
     }
@@ -35,13 +36,13 @@ put(`/:id`, (req: Request, res: Response) => {
 });
 
 destroy(`/:id?`, async (req: Request, res: Response) => {
-  res.status(200).json({ message: "Account removed" });
+  res.status(StatusCodes.OK).json({ message: "Account removed" });
 });
 
 
 patch(`/:id`, (req: Request, res: Response) => {
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: {
       ...req.body,
       balance: 15000

@@ -30,40 +30,26 @@ export declare class Mango {
             }[]>;
         };
         insertOne(): {
-            insertedCount: number;
-            ops?: undefined;
+            acknowledged: boolean;
+            insertedId?: undefined;
         } | {
-            insertedCount: number;
-            ops: {
-                _id: string;
-            }[];
+            acknowledged: boolean;
+            insertedId: string;
         };
         insertMany(): {
-            insertedCount: number;
-            ops?: undefined;
+            acknowledged: number;
+            insertedIds?: undefined;
         } | {
-            insertedCount: number;
-            ops: {
-                _id: string;
-            }[];
+            acknowledged: boolean;
+            insertedIds: {
+                0: string;
+            };
         };
         updateOne(): {
             modifiedCount: number;
-            ops?: undefined;
-        } | {
-            modifiedCount: number;
-            ops: {
-                _id: string;
-            }[];
         };
         updateMany(): {
             modifiedCount: number;
-            ops?: undefined;
-        } | {
-            modifiedCount: number;
-            ops: {
-                _id: string;
-            }[];
         };
         deleteOne(): {
             deletedCount: number;

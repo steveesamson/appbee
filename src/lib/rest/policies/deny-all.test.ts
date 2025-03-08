@@ -1,6 +1,7 @@
 import { it, expect, describe, vi } from 'vitest';
 import denyAll from './deny-all.js';
 import type { Params, Request, Response } from '$lib/common/types.js';
+import { StatusCodes } from 'http-status-codes';
 
 const json = vi.fn();
 const status = vi.fn();
@@ -23,7 +24,7 @@ describe('deny-all.js', () => {
         denyAll({ url: '/some-path' } as Request, mockRes())
         expect(status).toBeCalled();
         expect(json).toBeCalled();
-        expect(status).toHaveBeenCalledWith(401);
+        expect(status).toHaveBeenCalledWith(StatusCodes.UNAUTHORIZED);
         expect(json).toHaveBeenCalledWith({ error: "Unauthorized" });
     })
 })

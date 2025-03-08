@@ -2,7 +2,7 @@ import cronRunner, { type ScheduledTask } from 'node-cron';
 import { format } from 'date-fns/format';
 import type { AddCronReturn, BoolType, CronConfig, CronJob, CronMaster, Params } from '../common/types.js';
 import { workerState } from './app-state.js';
-import { dataPager } from './data-pager.js';
+import { useDataPager } from './data-pager.js';
 
 const createCronMaster = (): CronMaster => {
     const cronStack: Params<CronJob> = {};
@@ -91,7 +91,7 @@ const createCronMaster = (): CronMaster => {
             const jobsQueue = useQueue!('cronJobs');
             const req = { source: useSource('core') };
 
-            const servicePager = dataPager({
+            const servicePager = useDataPager({
                 model: model.Service(req),
                 params: { status: ['running', 'starting'] },
                 onPage: (services?: Params[], next?: () => void) => {
@@ -129,6 +129,6 @@ const createCronMaster = (): CronMaster => {
         }
     }
 }
-const cronMaster: CronMaster = createCronMaster();
+const useCronMaster: CronMaster = createCronMaster();
 
-export { cronMaster };
+export { useCronMaster };

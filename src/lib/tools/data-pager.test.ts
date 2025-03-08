@@ -1,5 +1,5 @@
 import { it, describe, expect, vi } from 'vitest';
-import { dataPager } from './data-pager.js';
+import { useDataPager } from './data-pager.js';
 import type { Params } from '../common/types.js';
 
 const mockModel = (withError = false) => {
@@ -18,8 +18,8 @@ const mockModel = (withError = false) => {
 describe('data-pager.js', () => {
 
 	it('should be defined', () => {
-		expect(dataPager).toBeDefined();
-		expect(dataPager).toBeTypeOf('function');
+		expect(useDataPager).toBeDefined();
+		expect(useDataPager).toBeTypeOf('function');
 	})
 	it('should load data with no error', async () => {
 		const onPage = vi.fn((data: Params, next: () => void | undefined) => {
@@ -27,7 +27,7 @@ describe('data-pager.js', () => {
 				next();
 			}
 		});
-		const { start } = dataPager({ model: mockModel(), params: {}, LIMIT: 5, debug: false, onPage });
+		const { start } = useDataPager({ model: mockModel(), params: {}, LIMIT: 5, debug: false, onPage });
 		expect(start).toBeTypeOf('function');
 		await start();
 		expect(onPage).toHaveBeenCalled();
@@ -35,7 +35,7 @@ describe('data-pager.js', () => {
 	})
 	it('should load data with error', async () => {
 		const onPage = vi.fn();
-		const { start } = dataPager({ model: mockModel(true), params: {}, LIMIT: 5, debug: false, onPage });
+		const { start } = useDataPager({ model: mockModel(true), params: {}, LIMIT: 5, debug: false, onPage });
 		expect(start).toBeTypeOf('function');
 		await start();
 		expect(onPage).toHaveBeenCalled();

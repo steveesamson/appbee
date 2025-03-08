@@ -346,7 +346,7 @@ export type CronMaster = {
     has: (cronKey: string) => BoolType
 }
 
-export type Mailer = (smtpConfig: SMTPConfig) => SendMail;
+export type UseMailer = (smtpConfig: SMTPConfig) => SendMail;
 
 export type SendMail = (options: MailOptions) => Promise<import('nodemailer/lib/smtp-transport/index.js').SMTPTransport.SentMessageInfo>;
 
@@ -490,24 +490,23 @@ export type MultiPartFile = FileRenameTo & {
 
 export type Utils = {
     raa: (promise: Promise<Params>) => Promise<Result>;
-    dataLoader: DataLoader;
-    dataPager: DataPager;
-    cronMaster: CronMaster;
+    useDataLoader: DataLoader;
+    useDataPager: DataPager;
+    useCronMaster: CronMaster;
     useFetch: () => typeof useFetch;
-    mailer?: (smtpConfig: SMTPConfig) => SendMail;
-    useRedis?: () => import('redis').RedisClientType;
     usePlugin: <T extends keyof Plugins>(name: T) => Plugins[T];
     useConfig: <T extends keyof Configuration>(config: T) => Configuration[T];
     useSource: (source: string) => Source;
     useToken: () => Promise<Token>;
     useEncrypt: () => Promise<Encrypt>;
+    asArray: <T = any>(input: T | T[]) => T[];
 
 }
-export type Handlers = {
-    useCaptcha: () => RestRequestHandler;
-    useExcelExport: () => RestRequestHandler;
-    useUnlink: () => RestRequestHandler;
-    withSchema: <T extends Params>(schema: Base) => RestRequestHandler<T>;
+export type Use = {
+    captcha: () => RestRequestHandler;
+    excelExport: () => RestRequestHandler;
+    unlink: () => RestRequestHandler;
+    schema: <T extends Params>(schema: Base) => RestRequestHandler<T>;
 }
 
 export type ToObjectId = (value: any) => any | any[];
@@ -526,10 +525,11 @@ export type WorkerState = {
         SECRET: string;
     },
     model: Models;
-    utils: Utils;
+    useMailer: (smtpConfig: SMTPConfig) => SendMail;
     useBus: () => EventBusType;
     useQueue?: (queueName: string) => BeeQueueType;
     useWorker?: (queueName: string) => BeeQueueType;
+    useRedis?: () => import('redis').RedisClientType;
 }
 export type AppState = {
     env: {
@@ -550,8 +550,9 @@ export type AppState = {
         STATIC_DIR: string;
     },
     model: Models;
-    utils: Utils;
+    useMailer: (smtpConfig: SMTPConfig) => SendMail;
     useBus: () => EventBusType;
     useQueue?: (queueName: string) => BeeQueueType;
     useWorker?: (queueName: string) => BeeQueueType;
+    useRedis?: () => import('redis').RedisClientType;
 }

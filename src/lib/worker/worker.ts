@@ -1,14 +1,8 @@
 import { existsSync as x } from "fs";
 import { join } from "path";
-import type { Params, Utils, WorkerApp } from "$lib/common/types.js";
+import type { Params, WorkerApp } from "$lib/common/types.js";
 import { workerState } from "../tools/app-state.js";
-import { configureWorker, components, useSource, usePlugin, useConfig } from "../utils/configurer.js";
-import resolveAsyncAwait from "../tools/resolve-asyn-await.js";
-import { dataLoader } from "../tools/data-loader.js";
-import { dataPager } from "../tools/data-pager.js";
-import { cronMaster } from "../tools/cron-master.js";
-import * as usefetch from "../tools/use-fetch.js";
-import { useEncrypt, useToken } from "../tools/security.js";
+import { configureWorker, components } from "../utils/configurer.js";
 import objectIsEmpty from "../utils/object-is-empty.js";
 
 export const work = async (base: string, app: WorkerApp): Promise<void> => {
@@ -28,23 +22,9 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 	const { application, security, bus, smtp } = configuration;
 	const { useMultiTenant, uploadDir = "", templateDir = "", appName = "" } = application;
 
-	const useFetch = () => usefetch;
-	const utils: Utils = {
-		raa: resolveAsyncAwait,
-		dataLoader,
-		dataPager,
-		cronMaster,
-		useFetch,
-		useSource,
-		usePlugin,
-		useConfig,
-		useToken,
-		useEncrypt,
-	}
-
 	if (!objectIsEmpty(smtp)) {
-		const { mailer } = await import("../tools/mailer.js");
-		utils.mailer = mailer;
+		const { useMailer } = await import("../tools/mailer.js");
+		workerState({ useMailer });
 	}
 	workerState({
 		env: {
@@ -68,11 +48,12 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 		const redisClient: import('redis').RedisClientType = await useRedis(bus!, profile);
 		const { useQueue, useWorker } = initQueue(redisClient!.duplicate());
 		const useBus = initEventBus({ redisClient: redisClient!.duplicate(), profile });
-		utils.useRedis = closedOverRedis(redisClient!.duplicate());
+		// utils.useRedis = closedOverRedis(redisClient!.duplicate());
 		workerState({
 			useQueue,
 			useWorker,
 			useBus,
+			useRedis: closedOverRedis(redisClient!.duplicate())
 		});
 	} else {
 		const { initEventBus } = await import(brel);
@@ -81,7 +62,7 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 			useBus,
 		});
 	}
-	workerState({ utils });
+	// workerState({ utils });
 
 	app();
 };

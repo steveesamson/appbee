@@ -29,7 +29,7 @@ export const compileMap = (mapString = ""): Params<string> => {
 };
 
 
-export const dataLoader: DataLoader = <T = any>() => {
+export const useDataLoader: DataLoader = <T = any>() => {
 
 	return async ({ name, input, pipeline = [], debug = false }: DataLoaderOptions<T>): Promise<ResolveData<T>> => {
 		const log = logDebug(debug);

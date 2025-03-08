@@ -54,7 +54,6 @@ const usePlugin = <T extends keyof Plugins>(name: T): Plugins[T] => {
 	const { modules: { plugins } } = components;
 	return plugins[name];
 }
-
 const configureRestRoutes = async (policiesMap: PolicyMap) => {
 
 	const { loadPolicy } = loader(baseTrap.base);
@@ -63,19 +62,20 @@ const configureRestRoutes = async (policiesMap: PolicyMap) => {
 	const router = Router();
 	for (const route of Object.values(routes)) {
 		for (const [key, handler] of Object.entries(route)) {
-			if (key === "mountPoint") continue;
-
+			if (key === "mountPoint") {
+				continue;
+			}
 			const [method, rpath] = key.split(/\s+/).map((s: string) => s.trim());
 			const nextPolicyParams = policiesMap[method as HTTP_METHODS] || {};
-			const nextGlobalPolicy = nextPolicyParams.parent && nextPolicyParams.parent.length ? nextPolicyParams.parent : globalPolicy;
+			const nextGlobalPolicy = (nextPolicyParams.parent && nextPolicyParams.parent.length) ? nextPolicyParams.parent : globalPolicy;
 			const nextPolicy = nextPolicyParams[key];
-			const policyNames: string[] = dedupeArray<string>(nextPolicy && nextPolicy.length ? nextPolicy : nextGlobalPolicy);
-			const policies = [restRouter(), ...await loadPolicy(policyNames)];
-			router[method as HTTP_METHODS](rpath, policies as RequestHandler[], ...handler as RequestHandler[]);
+			const policyNames: string[] = dedupeArray<string>((nextPolicy && nextPolicy.length) ? nextPolicy : nextGlobalPolicy);
+			const policies = [restRouter(), ...await loadPolicy(policyNames), ...handler];
+			router[method as HTTP_METHODS](rpath, ...policies as RequestHandler[]);
 			const ioRoute = components.ioRoutes[method as HTTP_METHODS];
 
 			if (ioRoute) {
-				ioRoute[rpath] = registerRealtimePolicies([...policies as RequestHandler[], ...handler as RequestHandler[]]);
+				ioRoute[rpath] = registerRealtimePolicies([...policies as RequestHandler[]]);
 			}
 
 		}
@@ -128,7 +128,6 @@ const configureRestServer = async (base: string, extension: Params = {}) => {
 	// Load models
 	components.models = await loadModels({ store: configuration.store, useSource });
 	await useGlobals(isDev, base, components.models);
-	// console.log('models:', Object.keys(components.models));
 	//Load middlewares
 	components.modules.middlewares = await loadMiddlewares();
 

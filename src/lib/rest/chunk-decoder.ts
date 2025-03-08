@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "../common/types.js";
-import extend from "lodash/extend.js";
 import qs from "node:querystring";
 import handleError from "../utils/handle-error.js";
+import { StatusCodes } from "http-status-codes";
 
 type ChunkDecoderOptions = {
     isJson: boolean;
@@ -34,7 +34,7 @@ const useChunkDecoder = (req: Request, res: Response, next: NextFunction, { isJs
 
         } catch (e) {
             // console.error(e);
-            res.status(200).json(handleError(e));
+            res.status(StatusCodes.OK).json(handleError(e));
         }
 
     });

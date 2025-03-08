@@ -1,6 +1,7 @@
 import { match } from "path-to-regexp";
 import type { HTTP_METHODS, IORequest, Params, Request, Response } from "$lib/common/types.js";
 import qs from "node:querystring";
+import { StatusCodes } from "http-status-codes";
 
 const ioRouter = async ({ req, method, cb, socket, ioRoutes }: IORequest) => {
 
@@ -55,7 +56,7 @@ const ioRouter = async ({ req, method, cb, socket, ioRoutes }: IORequest) => {
 	});
 
 	if (!url || !url.trim()) {
-		return res.status(404).error("Not Found");
+		return res.status(StatusCodes.NOT_FOUND).error("Not Found");
 	}
 
 	// req.aware = () => {

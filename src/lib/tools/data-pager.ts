@@ -1,7 +1,7 @@
 import type { DataPager, DataPagerOptions, Params } from "$lib/common/types.js";
 import logDebug from "./log-debug.js";
 
-export const dataPager: DataPager = ({
+export const useDataPager: DataPager = ({
 	model,
 	params = {},
 	includes = 1,

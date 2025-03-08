@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { base, clearMocks, mockModules } from "@testapp/index.js";
 import { work, createWorker } from "./worker.js";
 import { workerState } from "../tools/app-state.js";
+import { utils } from "$lib/index.js";
 
 describe("worker.js", async () => {
 	beforeAll(async () => {
@@ -48,10 +49,10 @@ describe("worker.js", async () => {
 			it("expects worker to be started successfully ", async () => {
 				const workerApp = vi.fn();
 				await work(base, workerApp);
-				const { utils: { useFetch, useRedis } } = workerState();
-				expect(useFetch).toBeDefined();
+				const { useRedis } = workerState();
+				expect(utils.useFetch).toBeDefined();
 				expect(useRedis).toBeDefined();
-				const { configure } = useFetch();
+				const { configure } = utils.useFetch();
 				expect(configure).toBeDefined();
 				expect(workerApp).toHaveBeenCalled();
 			});

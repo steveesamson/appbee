@@ -2,6 +2,7 @@
  * Created by steve Samson <stevee.samson@gmail.com> on 2/5/14.
  */
 import type { Request, Response, NextFunction } from "$lib/common/types.js";
+import { StatusCodes } from "http-status-codes";
 
 
 export default async (req: Request, res: Response, next: NextFunction) => {
@@ -11,7 +12,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     if (!req.context.otp) {
         console.log("Access denied to %s", req.url);
 
-        return res.status(401).json({ error: 'Invalid operation.' });
+        return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid operation.' });
     }
 
     const { otp, payload, userId } = req.context;
@@ -26,7 +27,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
         next();
     } else {
-        return res.status(200).json({ error: 'The entered URL is no more valid' });
+        return res.status(StatusCodes.OK).json({ error: 'The entered URL is no more valid' });
     }
 
 

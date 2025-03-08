@@ -7,6 +7,7 @@ import Busboy, { type FileInfo } from "busboy";
 
 import type { Params, Request, Response, NextFunction, MultiPartFile } from "../common/types.js";
 import handleError, { errorMessage } from "../utils/handle-error.js";
+import { StatusCodes } from "http-status-codes";
 
 
 const useFileUploader = (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +15,6 @@ const useFileUploader = (req: Request, res: Response, next: NextFunction) => {
     const body: Params = {};
     const files: MultiPartFile[] = [];
     try {
-
 
         const busboy = Busboy({ headers: req.headers });
         busboy.on("file", (fieldname: string, file: File, fileInfo: FileInfo) => {
@@ -68,7 +68,7 @@ const useFileUploader = (req: Request, res: Response, next: NextFunction) => {
         req.pipe(busboy);
     } catch (e) {
         // console.error(e)
-        res.status(200).json(handleError(e));
+        res.status(StatusCodes.OK).json(handleError(e));
     }
 }
 

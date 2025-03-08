@@ -2,7 +2,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { base, clearMocks, mockModules } from "@testapp/index.js";
 import { serve } from "./rest-server.js";
 import { appState } from "../tools/app-state.js";
+import { utils } from "$lib/index.js";
 
+const { useFetch } = utils;
 describe("rest-server.js", async () => {
 	beforeAll(async () => {
 		mockModules();
@@ -16,7 +18,7 @@ describe("rest-server.js", async () => {
 		it("expects app to be defined ", async () => {
 			const app = await serve(base);
 			expect(app).toBeDefined();
-			const { utils: { useFetch, useRedis } } = appState();
+			const { useRedis } = appState();
 			expect(useFetch).toBeDefined();
 			expect(useRedis).toBeDefined();
 			const { configure } = useFetch();

@@ -5,7 +5,7 @@ const { get, post, put, destroy, patch } = Route("Accounts", "/accounts");
 
 get(`/`, (req: Request, res: Response) => {
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: [
       { accountNo: "00001", balance: 2000 },
       { accountNo: "00003", balance: 5000 }
@@ -15,13 +15,13 @@ get(`/`, (req: Request, res: Response) => {
 
 post(`/`, (req: Request, res: Response) => {
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: req.body
   });
 });
 
 put(`/:id`, (req: Request, res: Response) => {
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: {
       ...req.body
     }
@@ -29,13 +29,13 @@ put(`/:id`, (req: Request, res: Response) => {
 });
 
 destroy(`/:id?`, async (req: Request, res: Response) => {
-  res.status(200).json({ message: "Account removed" });
+  res.status(StatusCodes.OK).json({ message: "Account removed" });
 });
 
 
 patch(`/:id`, (req: Request, res: Response) => {
 
-  res.status(200).json({
+  res.status(StatusCodes.OK).json({
     data: {
       ...req.body,
       balance: 15000

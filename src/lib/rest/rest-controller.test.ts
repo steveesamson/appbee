@@ -9,6 +9,7 @@ import type { MultiPartFile, Params, Application } from "../common/types.js";
 import { useToken } from "../tools/security.js";
 import { appState } from "../tools/app-state.js";
 import { Route } from "./route.js";
+import { StatusCodes } from "http-status-codes";
 
 
 type Account = { accountNo: string; balance: number; }
@@ -36,7 +37,7 @@ const startIO = async () => {
 
 		socket = io("http://localhost:8000", {
 			transports: ioTransport || ["polling", "websocket"], extraHeaders: {
-				authorization: `bearer ${token}`
+				authorization: `Bearer ${token}`
 			}
 		});
 
@@ -75,6 +76,7 @@ const stopServer = () => {
 }
 
 describe("rest-controller.js", async () => {
+
 	beforeAll(async () => {
 		mockModules();
 		await startServer();
@@ -91,7 +93,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/accounts' to return 'find' response ", async () => {
 			const res = await get<Account[]>("/accounts");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data?.length).toBe(2);
 			expect(res.data[1]).toBeDefined();
 			expect(res.data[1].balance).toBe(5000);
@@ -105,7 +107,7 @@ describe("rest-controller.js", async () => {
 			};
 
 			const res = await post<Account>("/accounts", params);
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data.accountNo).toBe(params.accountNo);
 			expect(res.data.accountNo).toBe(params.accountNo);
 
@@ -117,23 +119,23 @@ describe("rest-controller.js", async () => {
 				balance: 15000
 			};
 			const res = await put<Account>("/accounts/2", params);
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res?.data?.balance).toBe(params.balance);
 		});
 
 		it("expects delete '/accounts/2' to return 'delete' response ", async () => {
 			const res = await destroy("/accounts/2");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.message).toBe("Account removed");
 		});
 
 		it("expects head '/accounts' to return 'info' response ", async () => {
 			const res = await head("/accounts");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 		});
 		it("expects options '/accounts' to return 'info' response ", async () => {
 			const res = await options("/accounts");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 		});
 	})
 
@@ -142,7 +144,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users' to return 'find' response ", async () => {
 			const res = await get<User[]>("/users", { member: true });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data.length).toBe(3);
 			expect(res.data[0].username).toBe('admin');
@@ -151,7 +153,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users' by search 'help' to return 'helpd' as username in response ", async () => {
 			const res = await get<User[]>("/users?search=help");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data.length).toBe(1);
 			expect(res.data[0].username).toBe('helpd');
@@ -159,7 +161,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users/1' to return  a record with id of 1", async () => {
 			const res = await get<User>("/users/1");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data).toBeDefined();
 			expect(res.data.id).toBe(1);
@@ -167,7 +169,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users?ROW_COUNT=1' to return  total record as count", async () => {
 			const res = await get<User>("/users?ROW_COUNT=1");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data).toBeDefined();
 			expect(res.data.count).toBe(3);
@@ -175,7 +177,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects put '/users/2' to return  updated record", async () => {
 			const res = await put<User>("/users/2", { username: "goldstar" });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data).toBeDefined();
 			expect(res.data.username).toBe('goldstar');
@@ -184,14 +186,14 @@ describe("rest-controller.js", async () => {
 		it("expects put '/users/' to return  error with no id/where clause", async () => {
 			const res = await put<User>("/users/", { username: "goldstar" });
 
-			// expect(res.status).toBe(200);
+			// expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeDefined();
 		});
 
 
 		it("expects post '/users' to return 'create' response ", async () => {
 			const res = await post<User>("/users", { username: 'omoo', email: "some@some.com", password: 'secret' });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			inserteID = res.data.id;
 			expect(res.data.username).toBe('omoo');
@@ -200,7 +202,7 @@ describe("rest-controller.js", async () => {
 		it(`expects delete '/users/${inserteID}' to delete record with id ${inserteID} `, async () => {
 			const path = `/users/${inserteID}`;
 			const res = await destroy<User>(path);
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data.id).toBe(inserteID);
 		});
@@ -228,7 +230,7 @@ describe("rest-controller.js", async () => {
 		it("expects post '/users' to return 'create' response with encoded body ", async () => {
 			const testRawBody = new URLSearchParams({ username: 'omoo', email: "some@some.com", password: 'secret', phone: '0803566221144' }).toString();
 			const res = await post<User>("/users", { testRawBody });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			await expect(res.data.username).toBe('omoo');
 			await destroy(`/users/${res.data.id}`);
@@ -296,7 +298,7 @@ describe("rest-controller.js", async () => {
 			data.append('email', '');
 			data.append('password', '');
 			const res = await uploadFile<UploadType>("/users/upload", data);
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data?.withError).toBe('');
 			expect(res.data?.fieldname).toBe('file');
 			expect(res.data?.filename).toBe('linux-logo.png');
@@ -316,7 +318,7 @@ describe("rest-controller.js", async () => {
 			data.append('email', '');
 			data.append('password', '');
 			const res = await uploadFile<UploadType>("/users/upload", data);
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data?.withError).toBe('yes');
 			expect(res.data?.fieldname).toBe('file');
 			expect(res.data?.filename).toBe('linux-logo.png');
@@ -349,12 +351,12 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/stories/send' to return a string response ", async () => {
 			const res = await Transport.sync("/stories/send", "get", { story: "Bawoo?" });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 		});
 
 		it("expects get '/accounts' to valid response ", async () => {
 			const res = await Transport.sync<Account[]>("/accounts", "get", {});
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data.length).toBe(2);
 
 			expect(res.data[1].balance).toBe(5000);
@@ -362,7 +364,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users' to valid response with 3 items ", async () => {
 			const res = await Transport.sync<User[]>("/users", "get");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data.length).toBe(3);
 
 			expect(res.data[0].username).toBe('admin');
@@ -370,7 +372,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users?ROW_COUNT=1' to return  total record as count", async () => {
 			const res = await Transport.sync<User>("/users?ROW_COUNT=1&smile=yes", 'get');
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data).toBeDefined();
 			expect(res.data.count).toBe(3);
@@ -379,7 +381,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects get '/users?search=help' to return  total record as count", async () => {
 			const res = await Transport.sync<User[]>("/users?search=help", 'get');
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data).toBeDefined();
 			expect(res.data.length).toBe(1);
@@ -388,7 +390,7 @@ describe("rest-controller.js", async () => {
 
 		it("expects post '/users' to return 'create' response ", async () => {
 			const res = await Transport.sync<User>("/users", 'post', { username: 'omoo', email: "some@some.com", password: 'secret', phone: '0803566221144' });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			inserteID = res.data.id;
 			expect(res.data.username).toBe('omoo');
@@ -396,21 +398,21 @@ describe("rest-controller.js", async () => {
 
 		it(`expects delete '/users/${inserteID}' to delete record with id ${inserteID} `, async () => {
 			const res = await Transport.sync<User>(`/users/${inserteID}`, "delete");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.error).toBeUndefined();
 			expect(res.data.id).toBe(inserteID);
 		});
 
 		it(`expects delete '/users' without 'query' to return error `, async () => {
 			const res = await Transport.sync<User>(`/users`, "delete");
-			expect(res.status).not.toBe(200);
+			expect(res.status).not.toBe(StatusCodes.OK);
 			expect(res.data).toBeUndefined();
 			expect(res.error).toBeDefined();
 			expect(res.error).toBe("You need a query object to delete any model");
 		});
 		it(`expects get '/nonexistent' to return a 'Not Found' error.`, async () => {
 			const res = await Transport.sync(`/nonexistent`, "get");
-			expect(res.status).toBe(404);
+			expect(res.status).toBe(StatusCodes.NOT_FOUND);
 			expect(res.error).toBe('Not Found');
 		});
 	});
@@ -418,14 +420,14 @@ describe("rest-controller.js", async () => {
 	describe("Error State", () => {
 		it(`expects get '/nonexistent' to return a 'Not Found' error.`, async () => {
 			const res = await get(`/nonexistent`);
-			expect(res.status).toBe(404);
+			expect(res.status).toBe(StatusCodes.NOT_FOUND);
 			expect(res.error).toBe('Not Found');
 		});
 
 		it(`expects get '/nonexistent' to return a 'HTTP Read Error'.`, async () => {
 			app.server?.close();
 			const res = await get(`/nonexistent`);
-			expect(res.status).toBe(404);
+			expect(res.status).toBe(StatusCodes.NOT_FOUND);
 			expect(res.error).toBe('Not Found');
 		});
 		it("expects post '/users' to return 'create' error ", async () => {
@@ -436,7 +438,7 @@ describe("rest-controller.js", async () => {
 					},
 				});
 			const res = await post<User>("/users", { testRawBody: " username=omoo&email=some@some.com&password=secret&phone=0803566221144" });
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 
 		});
 
@@ -498,14 +500,14 @@ describe("IO Sessions & Policies", async () => {
 
 		it("expects get '/accounts' to valid response ", async () => {
 			const res = await Transport.sync<Account[]>("/accounts", "get", {});
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data.length).toBe(2);
 
 			expect(res.data[1].balance).toBe(5000);
 		});
 		it("expects get '/users' to valid response with 3 items ", async () => {
 			const res = await Transport.sync<User[]>("/users", "get");
-			expect(res.status).toBe(200);
+			expect(res.status).toBe(StatusCodes.OK);
 			expect(res.data.length).toBe(3);
 
 			expect(res.data[0].username).toBe('admin');

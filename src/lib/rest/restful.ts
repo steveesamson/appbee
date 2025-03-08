@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions, Params, MongoUpdateType } from "../common/types.js";
 
 const handleGet = (getModel: GetModel) => async (req: Request<FindOptions>, res: Response) => {
@@ -6,9 +7,9 @@ const handleGet = (getModel: GetModel) => async (req: Request<FindOptions>, res:
 	const { error, ...rest } = await model.find({ query: { ...query, ...params }, ...rem });
 	if (error) {
 		console.error(error);
-		return res.status(500).json({ error });
+		return res.status(StatusCodes.OK).json({ error });
 	}
-	res.status(200).json({ ...rest });
+	res.status(StatusCodes.OK).json({ ...rest });
 };
 const handleCreate = (getModel: GetModel, preCreate?: PreCreate<CreateOptions>) => async (
 	req: Request<CreateOptions>,
@@ -25,16 +26,16 @@ const handleCreate = (getModel: GetModel, preCreate?: PreCreate<CreateOptions>) 
 		injection = preCreate(req);
 	}
 
-	const load = Array.isArray(_data) ? _data.map((next) => ({ ...next, ...injection })) : { ..._data, ...injection };
-	const { error, data } = await model.create({ relaxExclude, includes, data: load });
+	// const load = Array.isArray(_data) ? _data.map((next) => ({ ...next, ...injection })) : { ..._data, ...injection };
+	// const { error, data } = await model.create({ relaxExclude, includes, data: load });
 
-	// const { error, data } = await model.create({ relaxExclude, includes, data: { ..._data, ...injection } });
+	const { error, data } = await model.create({ relaxExclude, includes, data: { ..._data, ...injection } });
 
 	if (data) {
 		model.publishCreate(req.aware(), data);
-		res.status(201).json({ data: data });
+		res.status(StatusCodes.CREATED).json({ data: data });
 	} else {
-		res.status(500).json({ error });
+		res.status(StatusCodes.OK).json({ error });
 	}
 
 };
@@ -63,12 +64,12 @@ const handleUpdate = (getModel: GetModel) => async (
 	const query = { ...qry, ...params }
 	const { error, data } = await model.update({ query, ...rest });
 	if (error) {
-		return res.status(500).json({ error });
+		return res.status(StatusCodes.OK).json({ error });
 	}
 
 	if (data) {
 		model.publishUpdate(req.aware(), data);
-		res.status(200).json({ data });
+		res.status(StatusCodes.OK).json({ data });
 	}
 };
 const handleDelete = (getModel: GetModel) => async (req: Request<BaseDeleteOptions>, res: Response) => {
@@ -79,12 +80,12 @@ const handleDelete = (getModel: GetModel) => async (req: Request<BaseDeleteOptio
 	const { data } = await model.find({ query });
 	const { error } = await model.destroy({ query });
 	if (error) {
-		return res.status(500).json({ error });
+		return res.status(StatusCodes.OK).json({ error });
 	}
 
 	if (data) {
 		model.publishDestroy(req.aware(), data);
-		res.status(200).json({ data });
+		res.status(StatusCodes.OK).json({ data });
 	}
 };
 

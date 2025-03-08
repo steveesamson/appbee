@@ -3,14 +3,23 @@ import type { Request, Response } from "$lib/common/types.js";
 import multiTenancy from "./multi-tenancy.js";
 import { appState } from "../tools/app-state.js";
 import { mockResponse } from "@testapp/index.js";
+// import { useSource } from "$lib/utils/configurer.js";
+
 
 describe("multi-tenancy.js", async () => {
 
 	beforeAll(() => {
-		const useSource = vi.fn((store: string) => {
-			return store === "core" ? "core-source" : 'tenant-source';
+		vi.mock('$lib/utils/configurer.js', async (importOriginal) => {
+			const actual = await importOriginal() as any;
+			return {
+				...actual,
+				useSource: vi.fn((store: string) => {
+					return store === "core" ? "core-source" : 'tenant-source';
+				})
+			}
 		})
-		appState({ utils: { useSource } });
+
+		// appState({ utils: { useSource } });
 	})
 
 	afterAll(() => {

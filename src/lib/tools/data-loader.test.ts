@@ -1,6 +1,6 @@
 
 import { describe, expect, it, vi } from "vitest";
-import { dataLoader, compileMap } from "./data-loader.js";
+import { useDataLoader, compileMap } from "./data-loader.js";
 // import { mockResponse } from "@testapp/index.js";
 import { v, type AppModel, type DataLoaderOptions, type Params } from "$lib/common/types.js";
 
@@ -81,11 +81,11 @@ describe('data-loader.js', () => {
 	describe('dataLoader', () => {
 
 		it('should defined dataLoader', () => {
-			expect(dataLoader).toBeDefined();
-			expect(dataLoader).toBeTypeOf('function');
+			expect(useDataLoader).toBeDefined();
+			expect(useDataLoader).toBeTypeOf('function');
 		})
 		it("should load data for an object", async () => {
-			const dloader = dataLoader<Params>();
+			const dloader = useDataLoader<Params>();
 			const input = { id: 1, task: 2, user: 3 };
 
 			const options: DataLoaderOptions<Params> = {
@@ -112,7 +112,7 @@ describe('data-loader.js', () => {
 			expect(ret.userId).toBeDefined();
 		})
 		it("should load data for an array", async () => {
-			const dloader = dataLoader<Params[]>();
+			const dloader = useDataLoader<Params[]>();
 			const input = [{ id: 1, task: 2, user: 3 }];
 
 			const options: DataLoaderOptions<Params[]> = {
@@ -147,7 +147,7 @@ describe('data-loader.js', () => {
 		})
 
 		it("should return an empty array", async () => {
-			const dloader = dataLoader<Params[]>();
+			const dloader = useDataLoader<Params[]>();
 			const input = [] as Params[];
 
 			const options: DataLoaderOptions<Params[]> = {
@@ -162,7 +162,7 @@ describe('data-loader.js', () => {
 			expect(ret.length).toBe(0);
 		})
 		it("should throw an error", async () => {
-			const dloader = dataLoader<Params[]>();
+			const dloader = useDataLoader<Params[]>();
 			const input = [{ id: 1, task: 2, user: 3 }];
 
 			const options: DataLoaderOptions<Params[]> = {

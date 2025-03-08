@@ -2,7 +2,7 @@ import multiTenancy from "./multi-tenancy.js";
 import type { Request, Response, NextFunction, RequestHandler } from "../common/types.js";
 
 const restRouter = (): RequestHandler => (req: Request, res: Response, next: NextFunction) => {
-	const { method, body = {}, params, query = {} } = req;
+	const { method, body = {}, params = {}, query = {} } = req;
 	const mtd = method.toLowerCase();
 
 	if (mtd === 'get') {

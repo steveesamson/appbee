@@ -3,6 +3,7 @@ import path from "path";
 import type { Request, Response } from "../common/types.js";
 import { appState } from "./app-state.js";
 import { errorMessage } from "../utils/handle-error.js";
+import { StatusCodes } from "http-status-codes";
 
 export const useUnlink = () => (req: Request, res: Response) => {
 	const { env: { UPLOAD_DIR } } = appState();
@@ -20,9 +21,9 @@ export const useUnlink = () => (req: Request, res: Response) => {
 				}
 			});
 
-			res.status(200).json({ text: "Files successfully deleted" });
+			res.status(StatusCodes.OK).json({ text: "Files successfully deleted" });
 		}
 	} else {
-		res.status(200).json({ error: "There are no files" });
+		res.status(StatusCodes.BAD_REQUEST).json({ error: "There are no files" });
 	}
 };
