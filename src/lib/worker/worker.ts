@@ -2,7 +2,7 @@ import { existsSync as x } from "fs";
 import { join } from "path";
 import type { Params, WorkerApp } from "$lib/common/types.js";
 import { workerState } from "../tools/app-state.js";
-import { configureWorker, components } from "../utils/configurer.js";
+import { configureWorker, components, useJob } from "../utils/configurer.js";
 import objectIsEmpty from "../utils/object-is-empty.js";
 
 export const work = async (base: string, app: WorkerApp): Promise<void> => {
@@ -22,9 +22,13 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 	const { application, security, bus, smtp } = configuration;
 	const { useMultiTenant, uploadDir = "", templateDir = "", appName = "" } = application;
 
+	if (objectIsEmpty(bus)) {
+		throw Error("Sorry, am bailing; I cannot find working config for bus.");
+	}
+
 	if (!objectIsEmpty(smtp)) {
 		const { useMailer } = await import("../tools/mailer.js");
-		workerState({ useMailer });
+		workerState({ sendMail: useMailer(smtp) });
 	}
 	workerState({
 		env: {
@@ -38,31 +42,24 @@ export const createWorker = async (base: string, app: WorkerApp, extension?: Par
 		},
 		model,
 	});
-
 	const brel = "../tools/event-bus.js";
-	if (!objectIsEmpty(bus)) {
-		const profile = "worker";
-		const { initQueue } = await import('../tools/bee-que.js');
-		const { initEventBus } = await import(brel);
-		const { useRedis, closedOverRedis } = await import('../tools/redis.js');
-		const redisClient: import('redis').RedisClientType = await useRedis(bus!, profile);
-		const { useQueue, useWorker } = initQueue(redisClient!.duplicate());
-		const useBus = initEventBus({ redisClient: redisClient!.duplicate(), profile });
-		// utils.useRedis = closedOverRedis(redisClient!.duplicate());
-		workerState({
-			useQueue,
-			useWorker,
-			useBus,
-			useRedis: closedOverRedis(redisClient!.duplicate())
-		});
-	} else {
-		const { initEventBus } = await import(brel);
-		const useBus = initEventBus();
-		workerState({
-			useBus,
-		});
+	const profile = "worker";
+	const { initQueue } = await import('../tools/bull-queue.js');
+	const { initEventBus } = await import(brel);
+	const { useRedis, closedOverRedis } = await import('../tools/redis.js');
+	const redisClient: import('redis').RedisClientType = await useRedis(bus!, profile);
+	if (!redisClient) {
+		throw new Error("Unable to connect to bus.")
 	}
-	// workerState({ utils });
+	const useBus = initEventBus({ redisClient, profile });
+	const { useQueue, useWorker } = initQueue(bus!);
+	workerState({
+		useQueue,
+		useWorker,
+		useJob,
+		useBus,
+		useRedis: closedOverRedis(redisClient)
+	});
 
 	app();
 };

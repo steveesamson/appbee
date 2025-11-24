@@ -4,7 +4,7 @@ import type {
     ErrorMessage,
     OutputDataset,
 } from 'valibot';
-import { _addIssue, _getStandardProps } from 'valibot';
+import { _addIssue } from 'valibot';
 import { importSync } from '../import-sync.js';
 
 let _ObjectId: import('mongodb').ObjectId | undefined = undefined;
@@ -106,9 +106,6 @@ export function objectId(
         expects: 'unknown',
         async: false,
         message,
-        // get '~standard'() {
-        //     return _getStandardProps(this);
-        // },
         '~run'(dataset, config) {
             const isValid = isObjectId();
             // if (dataset.value) {

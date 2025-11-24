@@ -161,13 +161,7 @@ export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params"
 		db.limit(limit);
 	}
 
-	let direction = orderDirection?.toUpperCase();
-
-	if (!direction && context.orderDirection) {
-		direction = context.orderDirection?.toUpperCase();
-	} else {
-		direction = 'ASC';
-	}
+	const direction = (orderDirection || context.orderDirection || "ASC").toUpperCase();
 	if (orderBy) {
 		db.orderBy(orderBy, direction);
 	} else if (context.orderBy) {

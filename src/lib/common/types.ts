@@ -62,7 +62,7 @@ export type Result = {
 };
 
 
-// export 
+
 type PolicyValue = string | true | false | string[];
 
 type GlobalPolicyConfig = {
@@ -70,7 +70,7 @@ type GlobalPolicyConfig = {
 }
 
 type PolicyKey = '*' | `/${string}`;
-// export 
+
 type MethodPolicy = {
     [key in PolicyKey]?: PolicyValue;
 }
@@ -82,6 +82,7 @@ export type MongoUpdateType = "$set" | "$inc" | "$unset" | "$setOnInsert" | "$cu
 
 type UpdateKeys = {
     query: Params;
+    data?: Params;
     upsert?: BoolType;
     includes?: string;
 }
@@ -118,7 +119,6 @@ export type FindOptions<T = any> = {
     query: Partial<T>;
     params: any;
 }
-
 
 export type CreateOptions = {
     data: any;
@@ -223,7 +223,7 @@ export type RedisStoreConfig = {
     user?: string;
     password?: string;
     url?: string;
-    flushOnStart?: boolean;
+    // flushOnStart?: boolean;
 }
 
 export type StoreConfig = {
@@ -272,11 +272,11 @@ export type LdapConfig = {
 
 export type Encrypt = {
     verify: (plain: string, hash: string) => Promise<boolean>;
-    hash: (plain: string) => Promise<string>;
+    hash: (plain: string) => Promise<string | undefined>;
 }
 export type Token = {
-    verify: (token: string) => Promise<Params | string | number>;
-    sign: (load: Params) => Promise<string>;
+    verify: (token: string) => Promise<Params | string | number | undefined>;
+    sign: (load: Params) => Promise<string | undefined>;
 }
 
 export type CronConfig = {
@@ -319,13 +319,13 @@ export type Modules = {
     controllers: RouteMap;
     policies: PolicyMap;
     plugins: Plugins;
-    // middlewares: RestRequestHandler[];
+    jobs: Jobs;
     middlewares: ((req: Request, res: Response, next?: NextFunction) => any)[];
 }
 
 export type AddCronReturn = (() => void) | undefined;
 
-// export 
+
 type CronJobStatus = "stopped" | "running" | "disabled";
 export type CronJob = {
     key: string;
@@ -336,7 +336,7 @@ export type CronJob = {
 
 export type CronMaster = {
     length: number;
-    init: () => void;
+    init: (req: DBAware) => void;
     start: (cronKey: string) => BoolType;
     stop: (cronKey: string) => BoolType;
     evict: (cronKey: string) => BoolType;
@@ -346,9 +346,8 @@ export type CronMaster = {
     has: (cronKey: string) => BoolType
 }
 
-export type UseMailer = (smtpConfig: SMTPConfig) => SendMail;
+// export type UseMailer = (smtpConfig: SMTPConfig) => SendMail;
 
-export type SendMail = (options: MailOptions) => Promise<import('nodemailer/lib/smtp-transport/index.js').SMTPTransport.SentMessageInfo>;
 
 export type MailOptions = import('nodemailer/lib/mailer/index.js').Mail.Options & {
     text?: string;
@@ -386,21 +385,28 @@ export type BeeQConfig = {
     autoConnect: BoolType,
 }
 
-export type BeeQueueType = {
-    addJob: (jobSpec: Params, id?: any, restoring?: boolean) => Promise<any>;
-    processJob: (processor: (job: import('bee-queue').Job<Params>, done: import('bee-queue').DoneCallback<unknown>) => void, concurrency?: number) => void;
-    on: (event: string, handler: EventHandler) => void;
+export type JobEvent = 'completed' | 'failed';
+export type JobEventData = {
+    completed: { jobId: string; returnvalue?: Params; };
+    failed: { jobId: string; failedReason: string; };
 }
-export type DataPagerOptions = {
+export type JobEventHandler = (data: JobEventData[JobEvent]) => void;
+
+export type BeeQueueType = {
+    addJob: (jobSpec: Params, tag?: string) => Promise<import('bullmq').Job>;
+    processJob: (processor: (job: import('bullmq').Job) => Promise<any>) => void;
+    on: (event: JobEvent, handler: JobEventHandler) => void;
+}
+export type DataPagerOptions<T = any> = {
     model: AppModel;
     params?: Params;
     includes?: string | string[] | 1;
     LIMIT?: number;
     debug?: BoolType;
-    onPage: <T extends Params = Params>(data: T[], next?: () => void) => void;
+    onPage: (data: T[], next?: () => void) => void;
 };
 
-export type DataPager = (dataPagerOptions: DataPagerOptions) => { start: () => Promise<void>; };
+export type DataPager = <T>(dataPagerOptions: DataPagerOptions<T>) => { start: () => Promise<void>; };
 export type LoaderJob = {
     model: AppModel;
     from: string;
@@ -525,11 +531,12 @@ export type WorkerState = {
         SECRET: string;
     },
     model: Models;
-    useMailer: (smtpConfig: SMTPConfig) => SendMail;
+    sendMail: (options: MailOptions) => Promise<import('nodemailer/lib/smtp-transport/index.js').SMTPTransport.SentMessageInfo>;
     useBus: () => EventBusType;
-    useQueue?: (queueName: string) => BeeQueueType;
-    useWorker?: (queueName: string) => BeeQueueType;
-    useRedis?: () => import('redis').RedisClientType;
+    useQueue: (queueName: string) => BeeQueueType;
+    useWorker: (queueName: string) => BeeQueueType;
+    useRedis: () => import('redis').RedisClientType;
+    useJob: <T extends keyof Jobs>(name: T) => Jobs[T];
 }
 export type AppState = {
     env: {
@@ -550,7 +557,7 @@ export type AppState = {
         STATIC_DIR: string;
     },
     model: Models;
-    useMailer: (smtpConfig: SMTPConfig) => SendMail;
+    sendMail: (options: MailOptions) => Promise<import('nodemailer/lib/smtp-transport/index.js').SMTPTransport.SentMessageInfo>;
     useBus: () => EventBusType;
     useQueue?: (queueName: string) => BeeQueueType;
     useWorker?: (queueName: string) => BeeQueueType;

@@ -130,7 +130,7 @@ export const validOptionsExtractor = (context: AppModel) => (opts: Params = {}) 
 
 export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params">) => {
 	const collection = context.db.collection(context.collection);
-	const { includes = "", offset = 0, limit, orderBy, orderDirection, search, query = {} } = options;
+	const { includes = "", offset = 0, limit = 25, orderBy, orderDirection, search, query = {} } = options;
 
 	const projections =
 		typeof includes === "string" && includes.trim().length
@@ -155,13 +155,8 @@ export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params"
 		queries = { ...queries, $or: searches };
 	}
 
-	let direction = orderDirection?.toUpperCase();
+	const direction = (orderDirection || context.orderDirection || "ASC").toUpperCase();
 
-	if (!direction && context.orderDirection) {
-		direction = context.orderDirection?.toUpperCase();
-	} else {
-		direction = 'ASC';
-	}
 	const dirBit = direction === "ASC" ? 1 : -1;
 
 	if (orderBy) {
@@ -179,9 +174,9 @@ export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params"
 	} else {
 		facetArgs.push({ $sort: { _id: 1 } });
 	}
-	facetArgs.push({ $skip: offset });
+	facetArgs.push({ $skip: parseInt(`${offset}`, 10) });
 	if (limit) {
-		facetArgs.push({ $limit: limit });
+		facetArgs.push({ $limit: parseInt(`${limit}`, 10) });
 	}
 	const cursor = collection.aggregate([
 		{ $match: { ...queries } },

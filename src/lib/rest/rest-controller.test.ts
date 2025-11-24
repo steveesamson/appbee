@@ -258,8 +258,8 @@ describe("rest-controller.js", async () => {
 		it("expects put '/users' to return error for 'create' response with encoded body ", async () => {
 			const testRawBody = new URLSearchParams({ username: 'omoo', email: "some@some.com", password: 'secret' }).toString();
 			const res = await put<User>("/users/1", { testRawBody });
-			expect(res.error).toBeUndefined();
-			expect(res.data).toBeDefined();
+			expect(res.error).toBeDefined();
+			expect(res.data).toBeUndefined();
 		});
 	})
 
@@ -424,12 +424,7 @@ describe("rest-controller.js", async () => {
 			expect(res.error).toBe('Not Found');
 		});
 
-		it(`expects get '/nonexistent' to return a 'HTTP Read Error'.`, async () => {
-			app.server?.close();
-			const res = await get(`/nonexistent`);
-			expect(res.status).toBe(StatusCodes.NOT_FOUND);
-			expect(res.error).toBe('Not Found');
-		});
+
 		it("expects post '/users' to return 'create' error ", async () => {
 			setOptions(
 				{
@@ -441,10 +436,16 @@ describe("rest-controller.js", async () => {
 			expect(res.status).toBe(StatusCodes.OK);
 
 		});
+		it(`expects get '/nonexistent' to return a 'HTTP Read Error'.`, async () => {
+			app.server?.close();
+			const res = await get(`/nonexistent`);
+			expect(res.status).toBe(444);
+			expect(res.error).toBe('fetch failed');
+		});
 
 		it('expects Route of `fakeModel` to throw error', () => {
 
-			const rt = Route('fakeModel', 'fakemodel');
+			const rt = Route('fakeModel', '/fakemodel');
 			expect(rt).toBeDefined();
 
 

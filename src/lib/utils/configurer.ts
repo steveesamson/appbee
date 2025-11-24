@@ -54,6 +54,11 @@ const usePlugin = <T extends keyof Plugins>(name: T): Plugins[T] => {
 	const { modules: { plugins } } = components;
 	return plugins[name];
 }
+
+const useJob = <T extends keyof Jobs>(name: T): Jobs[T] => {
+	const { modules: { jobs } } = components;
+	return jobs[name];
+}
 const configureRestRoutes = async (policiesMap: PolicyMap) => {
 
 	const { loadPolicy } = loader(baseTrap.base);
@@ -143,7 +148,7 @@ const configureRestServer = async (base: string, extension: Params = {}) => {
 
 const configureWorker = async (base: string, extension: Params = {}) => {
 	clearComponents(base);
-	const { loadConfig, loadModels, loadPlugins } = loader(base);
+	const { loadConfig, loadModels, loadPlugins, loadJobs } = loader(base);
 	//Load configs
 	const configuration: Configuration = await loadConfig();
 	if (('bus' in extension) && isDev) {
@@ -156,6 +161,7 @@ const configureWorker = async (base: string, extension: Params = {}) => {
 	components.models = await loadModels({ store: configuration.store, useSource });
 	await useGlobals(isDev, base, components.models);
 	components.modules.plugins = await loadPlugins();
+	components.modules.jobs = await loadJobs();
 };
 
 export {
@@ -164,6 +170,7 @@ export {
 	configureRestServer,
 	configureWorker,
 	usePlugin,
+	useJob,
 	useSource,
 	useConfig,
 	components,

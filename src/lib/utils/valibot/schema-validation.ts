@@ -11,7 +11,6 @@ export const validateSchema = <T extends Params>(schema: Base) => {
         const { context = {} } = req;
         const { nuInput, unWrap } = useUnwrap(context);
         const { issues, output, success } = v.safeParse(schema, nuInput);
-
         if (success) {
             req.context = unWrap(output) as T;
             next!();

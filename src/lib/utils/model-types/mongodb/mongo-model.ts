@@ -78,7 +78,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			return { error: "No record was inserted." };
 		},
 		async update(options: MongoUpdateOptions): Promise<UpdateData> {
-			const { query, upsert, includes, ...rest } = options;
+			const { query, upsert, includes, data, ...rest } = options;
 
 			if (!query) {
 				return { error: "You need a query object to update any model" };
@@ -90,17 +90,23 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			const qry = extractOptions(query);
 			const conditions = getMongoParams(qry);
 
-			for (const [key, val] of Object.entries(rest)) {
-				rest[key as MongoUpdateType] = extractOptions(val);
+			let actions = {};
+			if (data) {
+				const _data = extractOptions(data);
+				actions = { $set: _data };
+			} else {
+				for (const [key, val] of Object.entries(rest)) {
+					rest[key as MongoUpdateType] = extractOptions(val);
+				}
+				actions = rest;
 			}
-
 			const collection = this.db.collection(this.collection);
 			const isSingle = hasKey(query);
 			const updateOperation = isSingle ? "updateOne" : "updateMany";
 
 			const { modifiedCount } = await collection[updateOperation](
 				conditions,
-				{ ...rest },
+				{ ...actions },
 				{ upsert },
 			);
 			return modifiedCount ? this.find({ query, beeSkipCount: true, includes }) : { error: "No, record was updated." };

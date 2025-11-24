@@ -61,6 +61,19 @@ describe('loader.js', () => {
             expect(listFolders).toBeTypeOf('function');
         })
     })
+    describe('loadJobs', () => {
+        it('expects loader to have loadJobs', async () => {
+            const { loadJobs } = configLoaders!;
+            expect(loadJobs).toBeDefined();
+            expect(loadJobs).toBeTypeOf('function');
+        });
+        it('should load added jobs', async () => {
+            const { loadJobs } = configLoaders!
+            const { loadSMS } = await loadJobs();
+            expect(loadSMS).toBeDefined()
+            expect(loadSMS).toBeTypeOf('function')
+        })
+    })
     describe('loadMiddlewares', () => {
         it('expects loader to have loadMiddlewares', async () => {
             const { loadMiddlewares } = configLoaders!;

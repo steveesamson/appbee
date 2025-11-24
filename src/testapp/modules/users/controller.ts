@@ -22,7 +22,6 @@ let users: Params[] = [
 
 get(`/:id?`, (req: Request<FindOptions>, res: Response) => {
 
-    // console.log('CTR:', { req });
     const { search = '', params = {}, query: { ROW_COUNT } } = req.context;
 
     if (search) {

@@ -28,10 +28,10 @@ describe("worker.js", async () => {
 				await createWorker(base, workerApp);
 				expect(workerApp).toHaveBeenCalled();
 			});
-			it("expects worker to be created successfully with bus disabled ", async () => {
+			it("expects worker to throw error with bus disabled ", async () => {
 				const workerApp = vi.fn();
-				await createWorker(base, workerApp, { bus: null });
-				expect(workerApp).toHaveBeenCalled();
+
+				await expect(async () => await createWorker(base, workerApp, { bus: null })).rejects.toThrowError(/Sorry/);
 			});
 		})
 	})

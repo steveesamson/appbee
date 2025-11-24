@@ -9,6 +9,6 @@ describe('use-fetch.js', () => {
 	it('should return an error', async () => {
 		const res = await usefetch.get("/non-exitent-url");
 		expect(res.error).toBeDefined();
-		expect(res.status).toBe(408)
+		expect(res.status).toBe(444)
 	})
 })

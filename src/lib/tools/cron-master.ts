@@ -1,6 +1,6 @@
 import cronRunner, { type ScheduledTask } from 'node-cron';
 import { format } from 'date-fns/format';
-import type { AddCronReturn, BoolType, CronConfig, CronJob, CronMaster, Params } from '../common/types.js';
+import type { AddCronReturn, BoolType, CronConfig, CronJob, CronMaster, DBAware, Params } from '../common/types.js';
 import { workerState } from './app-state.js';
 import { useDataPager } from './data-pager.js';
 
@@ -86,10 +86,9 @@ const createCronMaster = (): CronMaster => {
         dateToCronExpression(expressionDate: Date): string {
             return format(expressionDate, 'm H d M *');
         },
-        init(): void {
-            const { useQueue, model, utils: { useSource } } = workerState();
-            const jobsQueue = useQueue!('cronJobs');
-            const req = { source: useSource('core') };
+        init(req: DBAware): void {
+            const { useQueue, model } = workerState();
+            const jobsQueue = useQueue('cronJobs');
 
             const servicePager = useDataPager({
                 model: model.Service(req),

@@ -6,6 +6,7 @@ import { v, x, type AddCronReturn, type AppModel, type CronConfig, type Model } 
 import { Mango } from '@testapp/index.js';
 import { commonModel } from '../utils/model-types/common.js';
 import { mongoDBModel } from '../utils/model-types/mongodb/mongo-model.js';
+import { useSource } from '$lib/utils/configurer.js';
 
 describe('cron-master.js', () => {
     let model: AppModel;
@@ -32,10 +33,10 @@ describe('cron-master.js', () => {
                     },
                 };
             }),
-            utils: {
-                useSource: vi.fn(),
-                useConfig: vi.fn(),
-            },
+            // utils: {
+            //     useSource: vi.fn(),
+            //     useConfig: vi.fn(),
+            // },
             model: { Service: () => model } as unknown as Models
         })
         const schema = v.object({
@@ -87,7 +88,8 @@ describe('cron-master.js', () => {
         describe('init', () => {
             it('should init successfully', () => {
                 const { useQueue } = workerState();
-                useCronMaster.init();
+                const req = { source: useSource('core') }
+                useCronMaster.init(req);
                 expect(useQueue).toHaveBeenCalled();
                 expect(useCronMaster.length).toBe(0);
             })

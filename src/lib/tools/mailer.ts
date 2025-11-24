@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 import type Mail from "nodemailer/lib/mailer/index.js";
 import { appState } from "./app-state.js";
 import stud from "stud";
-import type { SendMail, MailOptions, SMTPConfig, UseMailer } from "../common/types.js";
+import type { SendMail, MailOptions, SMTPConfig } from "../common/types.js";
 import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 const mailConfig: SMTPTransport.MailOptions = {};
@@ -17,7 +17,7 @@ const mail = async (mailOptions: Mail.Options): Promise<SMTPTransport.SentMessag
 };
 const htmlToText = (html: string) => html.replace(/<[^>]+>/gi, "");
 
-const useMailer = (smtpConfig: SMTPConfig): SendMail => {
+const useMailer = (smtpConfig: SMTPConfig) => {
 
 	const { sender, ...transportConfig } = smtpConfig;
 	Object.assign(mailConfig, transportConfig);

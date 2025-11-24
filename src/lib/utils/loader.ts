@@ -70,7 +70,18 @@ const loader = (base: string) => {
 		}
 		return policiesMap;
 	};
-
+	const loadJobs = async (): Promise<Jobs> => {
+		const jbase = resolve(base, "jobs");
+		const jobs = {} as Jobs;
+		if (fileExists(jbase)) {
+			const list = fetchTypeFiles(jbase);
+			for (let i = 0; i < list.length; ++i) {
+				const job = await import(resolve(jbase, list[i]));
+				Object.assign(jobs, job);
+			}
+		}
+		return jobs;
+	};
 	const loadPlugins = async (): Promise<Plugins> => {
 		const pgbase = resolve(base, "plugins");
 		const plugins = {} as Plugins;
@@ -83,6 +94,7 @@ const loader = (base: string) => {
 		}
 		return plugins;
 	};
+
 
 	const loadControllers = async (): Promise<RouteMap> => {
 		const mdbase = resolve(base, "modules");
@@ -126,7 +138,8 @@ const loader = (base: string) => {
 		loadMiddlewares,
 		loadControllers,
 		loadPlugins,
-		loadModels
+		loadModels,
+		loadJobs
 	}
 };
 

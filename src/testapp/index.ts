@@ -156,31 +156,26 @@ export const mockModules = () => {
         }
     }));
 
-    vi.mock('bee-queue', () => {
-        const BeeQueue = vi.fn();
+    vi.mock('bullmq', () => {
+        const Queue = vi.fn();
+        const QueueEvents = vi.fn();
+        const Worker = vi.fn();
 
-        BeeQueue.prototype.createJob = function (job: Params) {
+        Queue.prototype.add = function (job: Params) {
             this.job = job;
             return ({
-                save: async () => {
-                    return job;
-                },
-                setId: (id: any) => { job.id = id; }
+                ...job
 
             });
         };
 
-        BeeQueue.prototype.process = function (concurrency: any, processor: any) {
-            if (typeof concurrency === 'number' && typeof processor === 'function') {
-                processor(this.job!, () => { });
-            } else if (typeof concurrency === 'function') {
-                concurrency(this.job!, () => { });
-            }
+        Worker.prototype.process = function (processor: (job: Params) => Promise<any>) {
+            processor(this.job);
         };
 
-        BeeQueue.prototype.on = function () { };
+        QueueEvents.prototype.on = vi.fn();
 
-        return { default: BeeQueue };
+        return { Queue, Worker, QueueEvents };
     })
     vi.mock('@socket.io/redis-emitter', () => {
         const Emitter = vi.fn();

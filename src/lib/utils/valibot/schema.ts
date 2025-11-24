@@ -1,4 +1,4 @@
-import { v, type Params } from "$lib/common/types.js";
+import { v, type NextFunction, type Params, type Request } from "$lib/common/types.js";
 
 export type Base<T extends Params = Params> = v.ObjectSchema<
     { [K in keyof T]: v.BaseSchema<T[K], T[K], v.BaseIssue<T[K]>> },
@@ -16,6 +16,7 @@ export const useSchema = <
 ) => {
     const withOmittedId = v.partial(baseSchema, ['id']);
     const createSchema = v.object({
+        __client_time: v.optional(v.string()),
         data: withOmittedId,
         params: v.partial(baseSchema),
     });
@@ -33,8 +34,31 @@ export const useSchema = <
         query: v.partial(baseSchema),
         params: v.any(),
     })
+    const sanitizeRead = (req: Request, res: Response, next: NextFunction) => {
+
+        const { query, params, ...rest } = req.context;
+        for (const [key, schema] of Object.entries(baseSchema.entries)) {
+            if (query[key] !== undefined) {
+                const { output, success } = v.safeParse(schema, query[key]);
+                if (success) {
+                    query[key] = output;
+                }
+            }
+            if (params[key] !== undefined) {
+                const { output, success } = v.safeParse(schema, params[key]);
+                if (success) {
+                    params[key] = output;
+                }
+            }
+        }
+        req.context = { query, params, ...rest };
+        console.log('DBUG: ctx - ', req.context)
+        next();
+    }
+
     const updateSchema = v.pipe(
         v.object({
+            __client_time: v.optional(v.string()),
             data: v.partial(baseSchema),
             ...conditionSchema.entries
         }),
@@ -45,7 +69,7 @@ export const useSchema = <
         v.check((input) => !!input.params || !!input.query, "Either params or query is required")
     );
 
-    return { createSchema, readSchema, updateSchema, deleteSchema };
+    return { readSchema, createSchema, updateSchema, deleteSchema, sanitizeRead };
 };
 
 

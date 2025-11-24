@@ -38,7 +38,7 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 
 	if (!objectIsEmpty(smtp)) {
 		const { useMailer } = await import('../tools/mailer.js');
-		appState({ useMailer });
+		appState({ sendMail: useMailer(smtp) });
 	}
 
 	appState({
@@ -64,17 +64,20 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 	const brel = `../tools/event-bus.js`;
 	if (!objectIsEmpty(bus)) {
 		const profile = "server";
-		const { initQueue } = await import('../tools/bee-que.js');
+		const { initQueue } = await import('../tools/bull-queue.js');
 		const { initEventBus } = await import(brel);
 		const { useRedis, closedOverRedis } = await import('../tools/redis.js');
 		redisClient = await useRedis(bus!, profile);
-		const { useQueue, useWorker } = initQueue(redisClient!.duplicate());
-		const useBus = initEventBus({ redisClient: redisClient!.duplicate(), profile });
+		if (!redisClient) {
+			throw new Error("Unable to connect to bus.")
+		}
+		const useBus = initEventBus({ redisClient, profile });
+		const { useQueue, useWorker } = initQueue(bus!);
 		appState({
 			useQueue,
 			useWorker,
 			useBus,
-			useRedis: closedOverRedis(redisClient!.duplicate())
+			useRedis: closedOverRedis(redisClient)
 		});
 	} else {
 		const { initEventBus } = await import(brel);
@@ -89,12 +92,13 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 	app.set("trust proxy", true);
 
 	const { env: { PUBLIC_DIR, APP_PORT, APP_HOST = "127.0.0.1", MOUNT_PATH = "" } } = appState();
-	const corsOptions = {
-		origin: ['*']
-	}
+	// const corsOptions = {
+	// 	origin: ['*']
+	// }
+	// 	cors(corsOptions),
 	app.use(
 		helmet(),
-		cors(corsOptions),
+		cors(),
 		express.static(PUBLIC_DIR!),
 		compression({ threshold: 0 }),
 		methodOverride(),
@@ -107,7 +111,7 @@ export const createRestServer = async (base: string, extension: Params = {}): Pr
 		app.use(restRouter(), ...middlewares as RequestHandler[]);
 	}
 	const ioServerOptions = {
-		cors: corsOptions,
+		// cors: corsOptions,
 		transports
 	};
 	const httpServer = createHTTPServer(app);

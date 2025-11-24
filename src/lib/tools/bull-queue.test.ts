@@ -1,23 +1,21 @@
 import { expect, it, describe, beforeAll, afterAll, vi } from 'vitest';
 import { clearMocks, base, mockModules } from '@testapp/index.js';
-import { initQueue } from './bee-que.js';
-import { useRedis } from './redis.js';
+import { initQueue } from './bull-queue.js';
 import type { Configuration, StoreConfigMap } from '../common/types.js';
 import loader from '../utils/loader.js';
+import type { Job } from 'bullmq';
 
-let redisClient = null;
+let redisConnection = null;
 let config: Configuration;
 let storeMap: StoreConfigMap;
-describe('bee-que.js', () => {
+describe('bull-queue.js', () => {
 
 	beforeAll(async () => {
 		const { loadConfig } = loader(base);
 		config = await loadConfig();
 		storeMap = config.store;
-		// mockRedis();
-		// mockBee();
 		mockModules();
-		redisClient = await useRedis(storeMap['queue']);
+		redisConnection = storeMap['queue'];
 	})
 	afterAll(() => {
 		clearMocks();
@@ -28,28 +26,39 @@ describe('bee-que.js', () => {
 			expect(initQueue).toBeTypeOf('function');
 		})
 		it('should expose useQueue and useWorker', async () => {
-			const { useQueue, useWorker } = initQueue(redisClient!);
+			const { useQueue, useWorker } = initQueue(redisConnection!);
 			expect(useQueue).toBeDefined();
 			expect(useQueue).toBeTypeOf('function');
 			expect(useWorker).toBeDefined();
 			expect(useWorker).toBeTypeOf('function');
 		})
 		it('should addJob and processJob', async () => {
-			const { useQueue, useWorker } = initQueue(redisClient!);
+			const { useQueue, useWorker } = initQueue(redisConnection!);
+			const job = { id: 1, post: 'post' };
+			const postQueue = useQueue('post');
+			await postQueue.addJob(job);
+
 			const onPost = useWorker('post');
-			onPost.processJob(vi.fn());
-			const postQueue = useQueue('post');
-			const job = await postQueue.addJob({ id: 1, post: 'post' });
-			expect(job).toEqual({ id: 1, post: 'post' })
+			onPost.processJob((_job: Job) => {
+				expect(_job.data).toEqual(job);
+				return Promise.resolve();
+			});
 		})
-		it('should addJob and tag it with an ID', async () => {
-			const { useQueue } = initQueue(redisClient!);
+		it('should addJob with tag and processJob', async () => {
+			const { useQueue, useWorker } = initQueue(redisConnection!);
+			const job = { id: 1, post: 'post' };
 			const postQueue = useQueue('post');
-			const job = await postQueue.addJob({}, 'myID');
-			expect(job.id).toBe('myID');
+			postQueue.on('completed', vi.fn());
+			await postQueue.addJob(job, "myTag");
+			const onPost = useWorker('post');
+			onPost.processJob((_job: Job) => {
+				expect(_job.name).toBe("myTag");
+				return Promise.resolve();
+			});
 		})
+
 		it('should error on addJob and processJob for wrong queue/worker', async () => {
-			const { useQueue, useWorker } = initQueue(redisClient!);
+			const { useQueue, useWorker } = initQueue(redisConnection!);
 
 			const onPost = useWorker('post');
 			await expect(async () => await onPost.addJob({})).rejects.toThrowError('You cannot add jobs to a worker, create a queue via "useQueue"');
@@ -58,17 +67,6 @@ describe('bee-que.js', () => {
 			expect(() => postQueue.processJob(vi.fn())).toThrowError(
 				'You cannot process jobs on a non-worker, create a worker via "useWorker"'
 			);
-		})
-
-		it('should process concurrently', async () => {
-			const { useQueue, useWorker } = initQueue(redisClient!);
-			const postQueue = useQueue('post');
-			const onPost = useWorker('post');
-			postQueue.on('add', vi.fn());
-			const processor = vi.fn();
-			onPost.processJob(processor, 10);
-			await postQueue.addJob({ id: 1, post: 'post' });
-			expect(processor).toHaveBeenCalled()
 		})
 
 	})

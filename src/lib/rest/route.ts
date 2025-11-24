@@ -26,17 +26,20 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 		routes[module] = route;
 	}
 
-	const { readSchema, createSchema, updateSchema, deleteSchema } = schema ? useSchema(schema) : { readSchema: null, createSchema: null, updateSchema: null, deleteSchema: null };
+	const { sanitizeRead, createSchema, updateSchema, deleteSchema } = schema ? useSchema(schema) : { readSchema: null, createSchema: null, updateSchema: null, deleteSchema: null };
 
 
 	const maps: RouteMethods = {
 		get(path: string, ...handler: RestRequestHandler[]) {
 			path = normalizePath(path, mountPoint);
 			const validators: RestRequestHandler[] = [];
-
+			if (sanitizeRead) {
+				// validators.push(validateSchema(readSchema));
+				validators.push(sanitizeRead as unknown as RestRequestHandler);
+			}
 			if (handler && handler.length) {
 				validators.push(...handler);
-			} else if (readSchema) {
+			} else {
 				validators.push(handleGet(getModel!));
 			}
 			route[`get ${path}`] = [...validators];

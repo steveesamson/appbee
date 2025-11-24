@@ -2,6 +2,7 @@ import extend from "lodash/extend.js";
 import type { HTTP_METHODS, Params } from "../common/types.js";
 import { URLSearchParams } from "url";
 import { errorMessage } from "../utils/handle-error.js";
+import { StatusCodes } from "http-status-codes";
 
 export type Result<T = any> = {
 	error?: string;
@@ -22,7 +23,7 @@ const defaultOptions: RequestInit = {
 	mode: 'cors'
 };
 
-let BASE_URL: string;
+let BASE_URL: string = '';
 
 // export type UseFetchReturn = Params<(path: string, params?: Params) => Promise<Result>>;
 
@@ -40,9 +41,11 @@ const transport = async <T>(path: string, method: (HTTP_METHODS | 'upload'), par
 			const { ['content-type']: _, ...rest } = opts.headers;
 			opts.headers = rest;
 			opts.body = formData as unknown as BodyInit;
-		} else if (!!params && 'testRawBody' in params) { // Testing...
+		}
+		else if (!!params && 'testRawBody' in params) { // Testing...
 			opts.body = params?.testRawBody;
-		} else {
+		}
+		else {
 			opts.body = JSON.stringify(params);
 		}
 
@@ -60,7 +63,8 @@ const transport = async <T>(path: string, method: (HTTP_METHODS | 'upload'), par
 		}
 
 	} catch (e) {
-		return { error: errorMessage(e), status: 408 } as Result<T>;
+		const error = errorMessage(e);
+		return { error, status: 444 } as Result<T>;
 	}
 }
 export const get = async <T>(path: string, params?: Params): Promise<Result<T>> => {

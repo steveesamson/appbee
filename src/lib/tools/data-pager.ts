@@ -1,14 +1,14 @@
-import type { DataPager, DataPagerOptions, Params } from "$lib/common/types.js";
+import type { DataPager, DataPagerOptions } from "$lib/common/types.js";
 import logDebug from "./log-debug.js";
 
-export const useDataPager: DataPager = ({
+export const useDataPager: DataPager = <T = any>({
 	model,
 	params = {},
 	includes = 1,
 	onPage,
 	LIMIT = 200,
 	debug = false,
-}: DataPagerOptions) => {
+}: DataPagerOptions<T>) => {
 	let offset = 0;
 	const log = logDebug(debug);
 	const start = async () => {
@@ -19,7 +19,7 @@ export const useDataPager: DataPager = ({
 		}
 		const nxt = offset + LIMIT > recordCount ? undefined : start;
 		offset += LIMIT;
-		onPage(data as Params[], nxt);
+		onPage(data as T[], nxt);
 	};
 	return {
 		start,
