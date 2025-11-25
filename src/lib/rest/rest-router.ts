@@ -1,8 +1,8 @@
 import multiTenancy from "./multi-tenancy.js";
-import type { Request, Response, NextFunction, RequestHandler } from "../common/types.js";
+import type { Request, Response, NextFunction } from "../common/types.js";
 import { removeUndefined } from "$lib/utils/remove-undefined.js";
 
-const restRouter = (): RequestHandler => (req: Request, res: Response, next: NextFunction) => {
+const restRouter = () => (req: Request, res: Response, next: NextFunction) => {
 	const { method, body = {}, params: _params = {}, query = {} } = req;
 	const mtd = method.toLowerCase();
 	const params = removeUndefined(_params);
@@ -28,7 +28,6 @@ const restRouter = (): RequestHandler => (req: Request, res: Response, next: Nex
 		} else {
 			req.context = { data: body, params, query };
 		}
-
 	}
 
 	req.aware = () => {

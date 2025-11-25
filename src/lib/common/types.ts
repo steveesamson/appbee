@@ -6,39 +6,6 @@ import * as useFetch from "../tools/use-fetch.js";
 import { Socket, Server } from "socket.io";
 import type { PolicyMap } from "../utils/configure-policies.js";
 import type { Base } from '../utils/valibot/schema.js';
-export * as v from "valibot";
-export * as x from "../utils/valibot/extensions.js"
-
-// export interface Request<
-//     T = any,
-//     P = ParamsDictionary,
-//     Q = any,
-//     R = any,
-//     S = Query,
-//     V extends Record<string, any> = Record<string, any>> extends ExpressRequest<
-//         P,
-//         Q,
-//         R,
-//         S,
-//         V
-//     > {
-//     context: T;
-//     files?: MultiPartFile[];
-//     source?: Source;
-//     io?: Socket;
-//     _query: { sid: string };
-//     currentUser?: Params;
-// };
-
-export interface Request<T = any> extends ExpressRequest {
-    context: T;
-    files?: MultiPartFile[];
-    source?: Source;
-    io?: Socket;
-    _query: { sid: string };
-    currentUser?: Params;
-    aware: () => ({ io?: Socket; source?: Source; context: T });
-};
 
 export type HTTP_METHODS = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'head' | 'options';
 export type ConfigKeys = 'application' | 'bus' | 'ldap' | 'policy' | 'security' | 'smtp' | 'store' | 'view';
@@ -51,9 +18,67 @@ export type RequestAware<T = any> = {
     context: T;
 }
 
-export type Params<K = any> = {
-    [key: string]: K;
-};
+type GetCtx<Q = any> = {
+    __client_time?: string;
+    query: Q;
+    params: Params;
+    includes?: any;
+    offset?: any;
+    limit?: any;
+    orderBy?: any;
+    orderDirection?: any;
+    search?: any;
+}
+type PostCtx<D = any> = {
+    __client_time?: string;
+    data: D;
+    params: Params;
+    includes?: any;
+}
+type PutCtx<D = any> = {
+    __client_time?: string;
+    data: D;
+    params: Params;
+    query: Partial<D>
+    includes?: any;
+}
+type DeleteCtx<Q = any> = {
+    __client_time?: string;
+    params: Params;
+    query: Partial<Q>
+    includes?: any;
+}
+
+export type Context = GetCtx | PostCtx | PutCtx | DeleteCtx;
+
+// export 
+type FileRenameTo = {
+    renameTo: (dir: string, fileName: string) => Promise<{
+        data?: {
+            src: string;
+            text: string;
+        }, error?: string;
+    }>
+}
+export type MultiPartFile = FileRenameTo & {
+    fieldname: string;
+    filename: string;
+    encoding: string;
+    path: string;
+    ext: string;
+    mimetype: string;
+}
+export interface Request extends ExpressRequest {
+    context: Context;
+    files?: MultiPartFile[];
+    source?: Source;
+    io?: Socket;
+    _query: { sid: string };
+    currentUser?: Params;
+    aware: () => ({ io?: Socket; source?: Source; context: Context });
+}
+
+export type Params<K = any> = Record<string, K>;
 export type IncludeMap = Params<1 | string>;
 export type Result = {
     data?: Params;
@@ -61,7 +86,33 @@ export type Result = {
     recordCount?: number;
 };
 
-
+export type GetContext<T = any> = {
+    __client_time?: string;
+    query: Partial<T>;
+    params: Params;
+    includes?: string | string[] | 1;
+    offset?: number;
+    limit?: number;
+    orderBy?: string;
+    search?: string;
+    orderDirection?: "ASC" | "DESC" | "asc" | "desc";
+}
+export type PostContext<T = any> = {
+    __client_time?: string;
+    params: Params;
+    data: T;
+};
+export type PutContext<T = any> = {
+    __client_time?: string;
+    data: Partial<T>;
+    params: Params;
+    query: Partial<T>;
+};
+export type DeleteContext<T = any> = {
+    __client_time?: string;
+    params: Params;
+    query: Partial<T>;
+};
 
 type PolicyValue = string | true | false | string[];
 
@@ -98,13 +149,13 @@ export type SqlUpdateOptions = {
 
 export type UpdateOptions = SqlUpdateOptions | MongoUpdateOptions;
 export type UpdateData<T = any> = {
-    data?: T | T[];
+    data?: T;
     error?: string;
 }
-export type DeleteData = UpdateData;
+export type DeleteData<T = Params> = UpdateData<T>;
 
-export type DeleteOptions = {
-    query: Params;
+export type DeleteOptions<T = any> = {
+    query: Partial<T>;
 };
 
 export type FindOptions<T = any> = {
@@ -113,25 +164,24 @@ export type FindOptions<T = any> = {
     limit?: number;
     orderBy?: string;
     orderDirection?: "ASC" | "DESC" | "asc" | "desc";
-    search: string;
+    search?: string;
     beeSkipCount?: BoolType;
     relaxExclude?: BoolType;
-    query: Partial<T>;
-    params: any;
+    query?: Partial<T>;
 }
 
-export type CreateOptions = {
-    data: any;
+export type CreateOptions<T = any> = {
+    data: T;
     includes?: string;
     relaxExclude?: BoolType;
 }
 export type CreateData<T = any> = {
-    data?: T | T[];
+    data?: T;
     error?: string;
 };
 
 export type FindData<T = any> = {
-    data?: T | T[];
+    data?: T;
     recordCount?: number;
     error?: string;
 };
@@ -151,10 +201,10 @@ export type AppModel = {
     aware: () => DBAware;
     pipeline: () => Params[];
     resolveResult: (data: ResolveData, includeMap: IncludeMap) => Promise<ResolveData>;
-    find: <T = any>(options: Partial<FindOptions>) => Promise<FindData<T>>;
+    find: <T = any>(options: FindOptions) => Promise<FindData<T>>;
     create: <T = any>(options: CreateOptions) => Promise<CreateData<T>>;
     update: <T = any>(options: UpdateOptions) => Promise<UpdateData<T>>;
-    destroy: (options: DeleteOptions) => Promise<DeleteData>;
+    destroy: <T = any>(options: DeleteOptions) => Promise<DeleteData<T>>;
     postCreate: (req: RequestAware, data: AfterData) => Promise<void>;
     postUpdate: (req: RequestAware, data: AfterData) => Promise<void>;
     postDestroy: (req: RequestAware, data: AfterData) => Promise<void>;
@@ -181,11 +231,9 @@ export type AppModel = {
 export type Model<T extends Base = Base> = Partial<AppModel> & {
     schema: T;
 };
-export type RestRequestHandler<T = any> = (req: Request<T>, res: Response, next?: NextFunction) => any;
+export type RestRequestHandler = (req: Request, res: Response, next?: NextFunction) => any;
 
-// export type MiddlewareRoutine<T = any> = (req: Request<T>, res: Response, next: NextFunction) => any;
-
-export type PreCreate<T = any> = (req: Request<T>) => Params;
+export type PreCreate = (req: Request) => Params;
 
 // export 
 type IORoute = {
@@ -197,7 +245,6 @@ export type IORoutes = {
 
 //method path is the key, ControllerRequest, the handler is the value
 export type RouteConfig = Record<string, RestRequestHandler[] | string>;
-// export type RouteConfig = Record<string, RestRequestHandler[]>;
 
 //controller name is the key, its Routes is the value
 export type RouteMap = Record<string, RouteConfig>;
@@ -476,23 +523,7 @@ export type Source = {
     storeType: DBType
 }
 
-// export 
-type FileRenameTo = {
-    renameTo: (dir: string, fileName: string) => Promise<{
-        data?: {
-            src: string;
-            text: string;
-        }, error?: string;
-    }>
-}
-export type MultiPartFile = FileRenameTo & {
-    fieldname: string;
-    filename: string;
-    encoding: string;
-    path: string;
-    ext: string;
-    mimetype: string;
-}
+
 
 export type Utils = {
     raa: (promise: Promise<Params>) => Promise<Result>;
@@ -512,13 +543,10 @@ export type Use = {
     captcha: () => RestRequestHandler;
     excelExport: () => RestRequestHandler;
     unlink: () => RestRequestHandler;
-    schema: <T extends Params>(schema: Base) => RestRequestHandler<T>;
+    schema: (schema: Base) => RestRequestHandler;
 }
 
 export type ToObjectId = (value: any) => any | any[];
-
-// export type Signature<T> = T extends (...args: infer A) => infer R ? ((...args: A) => R) : never;
-
 
 export type WorkerState = {
     env: {

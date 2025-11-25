@@ -1,8 +1,8 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { useDataLoader, compileMap } from "./data-loader.js";
-// import { mockResponse } from "@testapp/index.js";
-import { v, type AppModel, type DataLoaderOptions, type Params } from "$lib/common/types.js";
+import { type AppModel, type DataLoaderOptions, type Params } from "$lib/common/types.js";
+import { v } from '$lib/common/valibot.js';
 
 const publishCreate = vi.fn();
 const publishUpdate = vi.fn();

@@ -21,7 +21,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 		pipeline() {
 			return [];
 		},
-		async find(options: Omit<FindOptions, "params">): Promise<FindData> {
+		async find<T = Params>(options: FindOptions): Promise<FindData<T>> {
 			const {
 				includes: includeString = 1,
 				offset,
@@ -36,7 +36,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			const includeMap = normalizeIncludes(`${includeString}`, this);
 			const includes = includeMap[_modelName!];
 
-			const expectedOptions: Omit<FindOptions, "params"> = {
+			const expectedOptions: FindOptions = {
 				includes,
 				offset,
 				limit,
@@ -50,9 +50,9 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			const { cursor } = prepWhere(this, expectedOptions);
 
 			const finalize = getMongoFinalizer(this);
-			return raa(finalize({ query, relaxExclude, beeSkipCount, includeMap }, cursor));
+			return raa(finalize({ query, relaxExclude, beeSkipCount, includeMap }, cursor)) as FindData<T>;
 		},
-		async create(options: CreateOptions): Promise<CreateData> {
+		async create<T = Params>(options: CreateOptions): Promise<CreateData<T>> {
 			const extractOptions = validOptionsExtractor(this);
 			const { relaxExclude = false, includes, data } = options;
 
@@ -77,7 +77,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			}
 			return { error: "No record was inserted." };
 		},
-		async update(options: MongoUpdateOptions): Promise<UpdateData> {
+		async update<T = Params>(options: MongoUpdateOptions): Promise<UpdateData<T>> {
 			const { query, upsert, includes, data, ...rest } = options;
 
 			if (!query) {
@@ -111,7 +111,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 			);
 			return modifiedCount ? this.find({ query, beeSkipCount: true, includes }) : { error: "No, record was updated." };
 		},
-		async destroy(options: DeleteOptions): Promise<DeleteData> {
+		async destroy<T = Params>(options: DeleteOptions): Promise<DeleteData<T>> {
 			const { query } = options;
 
 			if (!query) {
@@ -127,7 +127,7 @@ const mongoDBModel = function (base: Partial<AppModel>): AppModel {
 
 			const deleteOperation = isSingle ? "deleteOne" : "deleteMany";
 			const { deletedCount } = await collection[deleteOperation](qry);
-			return deletedCount ? { data: query } : { error: "No, record was deleted" };
+			return (deletedCount ? { data: query } : { error: "No, record was deleted" }) as DeleteData<T>;
 		},
 	} as AppModel;
 

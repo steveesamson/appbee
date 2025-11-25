@@ -146,7 +146,7 @@ export const getSQLFinalizer = (context: AppModel) => async (options: DbFinalize
 	}
 };
 
-export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params">) => {
+export const prepWhere = (context: AppModel, options: FindOptions) => {
 	const { includes = "*", offset = 0, limit, orderBy, orderDirection, search, query = {} } = options;
 	let projections = includes;
 	if (isArray(includes)) {
@@ -169,7 +169,6 @@ export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params"
 	} else db.orderBy(`${modelName}.id`, direction);
 
 	return db.select(projections);
-	// return db;
 };
 
 

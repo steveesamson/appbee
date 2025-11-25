@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, describe, it, vi } from "vitest";
 import { toProjection, getMongoFinalizer, getMongoParams, getOperator, validOptionsExtractor, normalizeIncludes, prepWhere, reduceUnset, replaceMongoId } from "./mongo-common.js";
-import { v, type AppModel, type Model, type FindOptions, type Params } from "$lib/common/types.js";
+import { type AppModel, type Model, type FindOptions, type Params } from "$lib/common/types.js";
+import { v } from '$lib/common/valibot.js';
 import { mongoData as data, Mango } from "@testapp/index.js";
 import { useUnwrap } from "../../unwrapper.js";
 

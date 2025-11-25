@@ -26,8 +26,7 @@ const Route = (module: string, mountPoint: Mount, useModule?: keyof Models): Rou
 		routes[module] = route;
 	}
 
-	const { sanitizeRead, createSchema, updateSchema, deleteSchema } = schema ? useSchema(schema) : { readSchema: null, createSchema: null, updateSchema: null, deleteSchema: null };
-
+	const { sanitizeRead, createSchema, updateSchema, deleteSchema } = schema ? useSchema(schema) : {};
 
 	const maps: RouteMethods = {
 		get(path: string, ...handler: RestRequestHandler[]) {

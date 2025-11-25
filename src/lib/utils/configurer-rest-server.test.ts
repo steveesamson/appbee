@@ -12,6 +12,7 @@ const startServer = async () => {
 
 const stopServer = () => {
 	if (app) {
+
 		app.server?.close();
 	}
 }
@@ -129,10 +130,13 @@ describe('configurer-rest-server.js', () => {
 		})
 		describe('configureRealtimeRoutes', () => {
 			beforeAll(async () => {
-				await startServer();
+				try {
+					await startServer();
+
+				} catch (error) { console.error(error) }
 			})
 
-			afterAll(async () => {
+			afterAll(() => {
 				stopServer();
 			})
 			it('should be defined', () => {

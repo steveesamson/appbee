@@ -17,6 +17,7 @@
 		"test:e2e": "playwright test",
 		"knip": "knip"
 	},
+	"main": "dist/index.js",
 	"files": [
 		"dist",
 		"!dist/**/*.test.*",

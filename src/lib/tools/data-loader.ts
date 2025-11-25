@@ -1,4 +1,5 @@
-import { v, type DataLoader, type DataLoaderOptions, type LoaderJob, type Params, type ResolveData } from "$lib/common/types.js";
+import { type DataLoader, type DataLoaderOptions, type LoaderJob, type Params, type ResolveData } from "$lib/common/types.js";
+import { v } from '$lib/common/valibot.js';
 import toDedupeArray from "$lib/utils/string-to-dedupe-array.js";
 import dedupeArray from "$lib/utils/dedupe-array.js";
 import logDebug from "./log-debug.js";

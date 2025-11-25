@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { validateSchema } from "./schema-validation.js";
-import { v, type Request, type Response, type NextFunction } from "$lib/common/types.js";
+import { type Request, type Response } from "$lib/common/types.js";
+import { v } from '$lib/common/valibot.js';
 
 
 const schema = v.object({
@@ -29,7 +30,7 @@ describe("schema-validation.js", () => {
                         email: 'stevee.samson@gmail.com'
                     }
                 }
-            } as Request;
+            } as unknown as Request;
 
             const res = {} as Response;
 
@@ -48,13 +49,13 @@ describe("schema-validation.js", () => {
                     name: 'Steve',
                     email: 'stevee.samson@gmail.com'
                 }
-            } as Request;
+            } as unknown as Request;
             const res = {
                 json: vi.fn(),
                 status: vi.fn(() => {
                     return res;
                 })
-            } as Response;
+            } as unknown as Response;
 
             const next = vi.fn();
             const validator = validateSchema(schema);

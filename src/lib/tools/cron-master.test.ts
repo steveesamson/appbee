@@ -2,11 +2,12 @@ import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { useCronMaster } from './cron-master.js';
 import { workerState } from './app-state.js';
 import { addDays } from 'date-fns/addDays';
-import { v, x, type AddCronReturn, type AppModel, type CronConfig, type Model } from '../common/types.js';
+import { type AddCronReturn, type AppModel, type CronConfig, type Model } from '../common/types.js';
 import { Mango } from '@testapp/index.js';
 import { commonModel } from '../utils/model-types/common.js';
 import { mongoDBModel } from '../utils/model-types/mongodb/mongo-model.js';
 import { useSource } from '$lib/utils/configurer.js';
+import { v, x } from '$lib/common/valibot.js';
 
 describe('cron-master.js', () => {
     let model: AppModel;

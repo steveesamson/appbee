@@ -1,7 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import type { Response, Request, PreCreate, GetModel, FindOptions, CreateOptions, Params, MongoUpdateType } from "../common/types.js";
 
-const handleGet = (getModel: GetModel) => async (req: Request<FindOptions>, res: Response) => {
+const handleGet = (getModel: GetModel) => async (req: Request, res: Response) => {
 	const model = getModel(req);
 	const { context: { query = {}, params = {}, ...rem } } = req;
 	const { error, ...rest } = await model.find({ query: { ...query, ...params }, ...rem });
@@ -11,11 +11,12 @@ const handleGet = (getModel: GetModel) => async (req: Request<FindOptions>, res:
 	}
 	res.status(StatusCodes.OK).json({ ...rest });
 };
-const handleCreate = (getModel: GetModel, preCreate?: PreCreate<CreateOptions>) => async (
-	req: Request<CreateOptions>,
+const handleCreate = (getModel: GetModel, preCreate?: PreCreate) => async (
+	req: Request,
 	res: Response,
 ) => {
-	const { data: _data, relaxExclude, includes } = req.context;
+	const { data: inData } = req.context;
+	const { relaxExclude, includes, ..._data } = inData || {};
 	const model = getModel(req);
 	let injection = {};
 
@@ -39,23 +40,23 @@ const handleCreate = (getModel: GetModel, preCreate?: PreCreate<CreateOptions>) 
 	}
 
 };
-type BaseDeleteOptions = {
-	params?: {
-		id?: unknown;
-	},
-	query?: Params;
-}
-type BaseSqlUpdateOptions = BaseDeleteOptions & {
-	data: Params;
-}
+// type BaseDeleteOptions = {
+// 	params?: {
+// 		id?: unknown;
+// 	},
+// 	query?: Params;
+// }
+// type BaseSqlUpdateOptions = BaseDeleteOptions & {
+// 	data: Params;
+// }
 
-type BaseMongoDBUpdateOptions = BaseDeleteOptions & {
-	[key in MongoUpdateType]?: Params;
-}
-type UpdateOptions = BaseSqlUpdateOptions | BaseMongoDBUpdateOptions;
+// type BaseMongoDBUpdateOptions = BaseDeleteOptions & {
+// 	[key in MongoUpdateType]?: Params;
+// }
+// type UpdateOptions = BaseSqlUpdateOptions | BaseMongoDBUpdateOptions;
 
 const handleUpdate = (getModel: GetModel) => async (
-	req: Request<UpdateOptions>,
+	req: Request,
 	res: Response,
 ) => {
 	const { context } = req;
@@ -72,7 +73,7 @@ const handleUpdate = (getModel: GetModel) => async (
 		res.status(StatusCodes.OK).json({ data });
 	}
 };
-const handleDelete = (getModel: GetModel) => async (req: Request<BaseDeleteOptions>, res: Response) => {
+const handleDelete = (getModel: GetModel) => async (req: Request, res: Response) => {
 	const { context } = req;
 	const { query: qry = {}, params = {} } = context;
 	const model = getModel(req);

@@ -1,4 +1,5 @@
-import { v, type Model } from "$lib/common/types.js";
+import { type Model } from "$lib/common/types.js";
+import { v } from '$lib/common/valibot.js';
 import { useSchema, type Infer } from "$lib/utils/valibot/schema.js";
 
 

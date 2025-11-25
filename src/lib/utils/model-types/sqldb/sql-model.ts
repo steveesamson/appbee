@@ -22,7 +22,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 		async resolveResult(data: ResolveData, _: IncludeMap): Promise<ResolveData> {
 			return data;
 		},
-		async find(options: Omit<FindOptions, "params">): Promise<FindData> {
+		async find<T = Params>(options: FindOptions<T>): Promise<FindData<T>> {
 			const {
 				includes: includeString = 1,
 				offset,
@@ -37,7 +37,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			const includeMap = normalizeIncludes(`${includeString}`, this as AppModel);
 			const includes = includeMap[_modelName!];
 
-			const expectedOptions: Omit<FindOptions, "params"> = {
+			const expectedOptions: FindOptions = {
 				includes,
 				offset,
 				limit,
@@ -49,9 +49,9 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			};
 			const finalize = getSQLFinalizer(this as AppModel);
 			const db = prepWhere(this as AppModel, expectedOptions);
-			return raa(finalize({ query, includeMap, relaxExclude, beeSkipCount }, db));
+			return raa(finalize({ query, includeMap, relaxExclude, beeSkipCount }, db)) as FindData<T>;
 		},
-		async create(options: CreateOptions): Promise<CreateData> {
+		async create<T = Params>(options: CreateOptions): Promise<CreateData<T>> {
 			const { relaxExclude, includes, data } = options;
 			const getValidOptions = validOptionsExtractor(this as AppModel);
 			const isMultiple = data && isArray(data);
@@ -70,7 +70,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			}
 			return { error: "No record was inserted." };
 		},
-		async update(options: SqlUpdateOptions): Promise<UpdateData> {
+		async update<T = Params>(options: SqlUpdateOptions): Promise<UpdateData<T>> {
 			const { query, data, includes } = options;
 			const getCollection = collectionInstance(this as AppModel);
 			const getValidOptions = validOptionsExtractor(this as AppModel);
@@ -86,7 +86,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 
 			return this.find!({ query, beeSkipCount: true, includes });
 		},
-		async destroy(options: DeleteOptions): Promise<DeleteData> {
+		async destroy<T = Params>(options: DeleteOptions): Promise<DeleteData<T>> {
 			const { query } = options;
 
 			if (!query) {
@@ -95,7 +95,7 @@ export const sqlModel = function (base: Partial<AppModel>): AppModel {
 			const getCollection = collectionInstance(this as AppModel);
 			const { db } = getCollection({ query });
 			const idKey = this.insertKey!;
-			return raa(db.del([idKey], { includeTriggerModifications: true }));
+			return raa(db.del([idKey], { includeTriggerModifications: true })) as DeleteData<T>;
 		},
 	} as AppModel;
 	return derived;

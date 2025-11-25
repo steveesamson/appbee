@@ -1,4 +1,5 @@
-import { v, type NextFunction, type Params, type Request } from "$lib/common/types.js";
+import { type GetCtx, type NextFunction, type Params, type Request } from "$lib/common/types.js";
+import { v } from '$lib/common/valibot.js';
 
 export type Base<T extends Params = Params> = v.ObjectSchema<
     { [K in keyof T]: v.BaseSchema<T[K], T[K], v.BaseIssue<T[K]>> },
@@ -18,10 +19,10 @@ export const useSchema = <
     const createSchema = v.object({
         __client_time: v.optional(v.string()),
         data: withOmittedId,
-        params: v.partial(baseSchema),
+        params: v.optional(v.any()),
     });
     const conditionSchema = v.object({
-        params: v.partial(baseSchema),
+        params: v.optional(v.any()),
         query: v.partial(baseSchema),
     })
     const readSchema = v.object({
@@ -36,7 +37,7 @@ export const useSchema = <
     })
     const sanitizeRead = (req: Request, res: Response, next: NextFunction) => {
 
-        const { query, params, ...rest } = req.context;
+        const { query, params, ...rest } = req.context as GetCtx;
         for (const [key, schema] of Object.entries(baseSchema.entries)) {
             if (query[key] !== undefined) {
                 const { output, success } = v.safeParse(schema, query[key]);

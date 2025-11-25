@@ -128,7 +128,7 @@ export const validOptionsExtractor = (context: AppModel) => (opts: Params = {}) 
 // 	return optsCopy;
 // };
 
-export const prepWhere = (context: AppModel, options: Omit<FindOptions, "params">) => {
+export const prepWhere = (context: AppModel, options: FindOptions) => {
 	const collection = context.db.collection(context.collection);
 	const { includes = "", offset = 0, limit = 25, orderBy, orderDirection, search, query = {} } = options;
 

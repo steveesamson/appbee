@@ -1,5 +1,5 @@
 import { Route } from "$lib/rest/route.js";
-import type { Request, Response, MultiPartFile, Params, FindOptions } from "$lib/common/types.js";
+import type { Request, Response, MultiPartFile, Params } from "$lib/common/types.js";
 import { appState } from "$lib/index.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -20,7 +20,7 @@ let users: Params[] = [
     }
 ];
 
-get(`/:id?`, (req: Request<FindOptions>, res: Response) => {
+get(`/:id?`, (req: Request, res: Response) => {
 
     const { search = '', params = {}, query: { ROW_COUNT } } = req.context;
 
