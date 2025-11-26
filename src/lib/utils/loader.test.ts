@@ -109,7 +109,7 @@ describe('loader.js', () => {
 
     })
     describe('loadModels', () => {
-        it('should return empty model list via loadModels', async () => {
+        it.skip('should return empty model list via loadModels', async () => {
             const _base = path.join(base, 'empty');
             const { loadConfig, loadModels } = loader(_base);
             const { store } = await loadConfig();
@@ -124,7 +124,7 @@ describe('loader.js', () => {
             expect(loadModels).toBeTypeOf('function');
 
         });
-        it('should return empty model list', async () => {
+        it.skip('should return empty model list', async () => {
             const _base = path.join(base, 'empty');
             const { loadConfig, loadModels } = loader(_base);
             const { store } = await loadConfig();

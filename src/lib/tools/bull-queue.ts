@@ -2,7 +2,7 @@ import type { Params, BeeQueueType, RedisStoreConfig, JobEvent, JobEventHandler 
 import { Job, Queue, Worker, QueueEvents } from "bullmq";
 
 
-export type RedisConnection = {
+type RedisConnection = {
 	connection: RedisStoreConfig;
 }
 

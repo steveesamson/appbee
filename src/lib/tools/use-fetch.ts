@@ -2,7 +2,6 @@ import extend from "lodash/extend.js";
 import type { HTTP_METHODS, Params } from "../common/types.js";
 import { URLSearchParams } from "url";
 import { errorMessage } from "../utils/handle-error.js";
-import { StatusCodes } from "http-status-codes";
 
 export type Result<T = any> = {
 	error?: string;
